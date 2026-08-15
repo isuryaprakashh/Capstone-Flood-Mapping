@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: flood-mapping-api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+      - API_DEBUG=false
+      - USE_STUB=false
+      - O3_FUSION_WEIGHTS=/app/checkpoints/fusion_net_best.pth
+    volumes:
+      - ./checkpoints:/app/checkpoints
+      - ./CP1-DATASET:/app/CP1-DATASET
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]

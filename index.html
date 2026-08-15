@@ -1,0 +1,2378 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Capstone Master Plan — KLCAP-2026-00010">
+    <title>Capstone Master Plan — KLCAP-2026-00010</title>
+
+    <!-- Google Fonts: Inter & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS v4 -->
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Tailwind v4 Class-based Dark Mode -->
+    <style type="text/tailwindcss">
+        @custom-variant dark (&:where(.dark, .dark *));
+    </style>
+
+    <style>
+        body { font-family: 'Inter', system-ui, sans-serif; }
+        code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* Minimal smooth transition */
+        .theme-trans { transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease; }
+
+        /* Step circle number */
+        .step-num {
+            width: 28px; height: 28px;
+            border-radius: 9999px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px; font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            flex-shrink: 0;
+        }
+
+        /* Tab active indicator */
+        .tab-btn.active {
+            border-bottom: 2px solid currentColor;
+        }
+
+        /* Hover card border transition */
+        .hover-card { transition: border-color 0.2s ease, transform 0.15s ease; }
+        .hover-card:hover { transform: translateY(-1px); }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #d4d4d8; border-radius: 3px; }
+        .dark ::-webkit-scrollbar-thumb { background: #27272a; }
+    </style>
+</head>
+
+<body class="bg-zinc-50 text-zinc-900 dark:bg-black dark:text-zinc-100 antialiased min-h-screen theme-trans selection:bg-zinc-200 dark:selection:bg-zinc-800 overflow-x-hidden">
+
+    <!-- TOP FLOATING PILL NAVBAR -->
+    <div class="sticky top-4 z-50 flex justify-center px-4 pointer-events-none mb-8">
+        <nav class="pointer-events-auto backdrop-blur-xl bg-white/90 dark:bg-zinc-900/90 border border-blue-500/40 dark:border-blue-500/50 rounded-full px-2 sm:px-4 h-10 flex items-center justify-between gap-1 sm:gap-4 max-w-[67rem] w-full shadow-xs theme-trans">
+            <div class="flex items-center gap-2 shrink-0">
+                <div class="w-5 h-5 rounded-full bg-zinc-900 dark:bg-white text-white dark:text-black flex items-center justify-center font-mono text-[10px] font-bold">
+                    KL
+                </div>
+                <span class="text-xs font-bold mono text-zinc-900 dark:text-white tracking-tight hidden sm:inline">KLCAP-2026-00010</span>
+            </div>
+
+            <!-- NAV VIEW TABS: PLAN & DASHBOARD -->
+            <div class="flex items-center gap-1 p-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-xs font-medium theme-trans">
+                <button onclick="switchView('plan')" id="nav-btn-plan" class="px-2 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-semibold transition-all cursor-pointer bg-zinc-900 text-white dark:bg-white dark:text-black shadow-xs flex items-center gap-1 sm:gap-1.5">
+                    <i data-lucide="book-open" class="w-3.5 h-3.5"></i>
+                    <span>Plan</span>
+                </button>
+                <button onclick="switchView('dashboard')" id="nav-btn-dashboard" class="px-2 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-semibold transition-all cursor-pointer text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white flex items-center gap-1 sm:gap-1.5">
+                    <i data-lucide="layout-dashboard" class="w-3.5 h-3.5"></i>
+                    <span>Dashboard</span>
+                </button>
+            </div>
+
+            <!-- Right Controls: User Pill, Admin Dashboard, Logout & Theme Toggle -->
+
+            <div class="flex items-center gap-2 shrink-0">
+                <!-- Logged In User Pill Badge & Logout -->
+                <div id="nav-user-pill" class="flex items-center gap-1.5"></div>
+
+                <!-- Theme Toggle Button -->
+                <button id="theme-toggle" class="p-1 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white cursor-pointer shrink-0" aria-label="Toggle Theme">
+                    <i data-lucide="sun" class="w-3.5 h-3.5 dark:hidden"></i>
+                    <i data-lucide="moon" class="w-3.5 h-3.5 hidden dark:block"></i>
+                </button>
+            </div>
+        </nav>
+    </div>
+
+
+    <!-- NOTION-STYLE FLOATING SIDE NAVIGATION -->
+    <div id="side-nav-container" class="fixed right-5 top-1/2 -translate-y-1/2 z-40 hidden lg:flex flex-col items-end group">
+        
+        <!-- Expanded Popover Outline Menu (Pops out to the left on hover with gap) -->
+        <div class="absolute right-10 top-1/2 -translate-y-1/2 w-60 bg-white/95 dark:bg-zinc-900/95 text-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-800 rounded-xl p-2 shadow-2xl backdrop-blur-md opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-200 space-y-0.5 text-xs font-sans theme-trans">
+            <div class="px-2.5 py-1.5 text-[10px] uppercase font-bold tracking-wider text-zinc-400 border-b border-zinc-100 dark:border-zinc-800/80 mb-1 flex items-center justify-between font-mono">
+                <span>Page Outline</span>
+                <i data-lucide="compass" class="w-3.5 h-3.5 text-blue-500"></i>
+            </div>
+            
+            <a href="#sec-overview" data-side-target="sec-overview" class="side-nav-item flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white">
+                <span class="w-1.5 h-1.5 rounded-full bg-zinc-400 dark:bg-zinc-600 side-dot shrink-0"></span>
+                <span class="truncate font-medium">Overview</span>
+            </a>
+            <a href="#sec1" data-side-target="sec1" class="side-nav-item flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white">
+                <span class="w-1.5 h-1.5 rounded-full bg-zinc-400 dark:bg-zinc-600 side-dot shrink-0"></span>
+                <span class="truncate font-medium">1. Title &amp; Objectives</span>
+            </a>
+            <a href="#sec2" data-side-target="sec2" class="side-nav-item flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white">
+                <span class="w-1.5 h-1.5 rounded-full bg-zinc-400 dark:bg-zinc-600 side-dot shrink-0"></span>
+                <span class="truncate font-medium">2. Reference Links</span>
+            </a>
+            <a href="#sec3" data-side-target="sec3" class="side-nav-item flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white">
+                <span class="w-1.5 h-1.5 rounded-full bg-zinc-400 dark:bg-zinc-600 side-dot shrink-0"></span>
+                <span class="truncate font-medium">3. Dataset &amp; Sources</span>
+            </a>
+            <a href="#sec4" data-side-target="sec4" class="side-nav-item flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white">
+                <span class="w-1.5 h-1.5 rounded-full bg-zinc-400 dark:bg-zinc-600 side-dot shrink-0"></span>
+                <span class="truncate font-medium">4. Team Members</span>
+            </a>
+            <a href="#sec5" data-side-target="sec5" class="side-nav-item flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white">
+                <span class="w-1.5 h-1.5 rounded-full bg-zinc-400 dark:bg-zinc-600 side-dot shrink-0"></span>
+                <span class="truncate font-medium">5. Folder Structure</span>
+            </a>
+            <a href="#sec6" data-side-target="sec6" class="side-nav-item flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white">
+                <span class="w-1.5 h-1.5 rounded-full bg-zinc-400 dark:bg-zinc-600 side-dot shrink-0"></span>
+                <span class="truncate font-medium">6. Tech Stack</span>
+            </a>
+            <a href="#sec7" data-side-target="sec7" class="side-nav-item flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white">
+                <span class="w-1.5 h-1.5 rounded-full bg-zinc-400 dark:bg-zinc-600 side-dot shrink-0"></span>
+                <span class="truncate font-medium">7. Research Papers</span>
+            </a>
+            <a href="#sec8" data-side-target="sec8" class="side-nav-item flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white">
+                <span class="w-1.5 h-1.5 rounded-full bg-zinc-400 dark:bg-zinc-600 side-dot shrink-0"></span>
+                <span class="truncate font-medium">8. Review Timeline</span>
+            </a>
+            <a href="#sec9" data-side-target="sec9" class="side-nav-item flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white">
+                <span class="w-1.5 h-1.5 rounded-full bg-zinc-400 dark:bg-zinc-600 side-dot shrink-0"></span>
+                <span class="truncate font-medium">9. Rubrics</span>
+            </a>
+        </div>
+
+        <!-- Collapsed Mini Dash Strip (Right Edge) -->
+        <div class="flex flex-col items-end gap-2 p-2 rounded-full bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border border-zinc-200 dark:border-zinc-800 shadow-md cursor-pointer theme-trans">
+            <a href="#sec-overview" data-side-dash="sec-overview" class="side-dash w-3.5 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700 hover:w-5 transition-all duration-200" title="Overview"></a>
+            <a href="#sec1" data-side-dash="sec1" class="side-dash w-3.5 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700 hover:w-5 transition-all duration-200" title="1. Title & Objectives"></a>
+            <a href="#sec2" data-side-dash="sec2" class="side-dash w-3.5 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700 hover:w-5 transition-all duration-200" title="2. Reference Links"></a>
+            <a href="#sec3" data-side-dash="sec3" class="side-dash w-3.5 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700 hover:w-5 transition-all duration-200" title="3. Dataset"></a>
+            <a href="#sec4" data-side-dash="sec4" class="side-dash w-3.5 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700 hover:w-5 transition-all duration-200" title="4. Team Members"></a>
+            <a href="#sec5" data-side-dash="sec5" class="side-dash w-3.5 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700 hover:w-5 transition-all duration-200" title="5. Folder Structure"></a>
+            <a href="#sec6" data-side-dash="sec6" class="side-dash w-3.5 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700 hover:w-5 transition-all duration-200" title="6. Tech Stack"></a>
+            <a href="#sec7" data-side-dash="sec7" class="side-dash w-3.5 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700 hover:w-5 transition-all duration-200" title="7. Research Papers"></a>
+            <a href="#sec8" data-side-dash="sec8" class="side-dash w-3.5 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700 hover:w-5 transition-all duration-200" title="8. Review Timeline"></a>
+            <a href="#sec9" data-side-dash="sec9" class="side-dash w-3.5 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700 hover:w-5 transition-all duration-200" title="9. Rubrics"></a>
+        </div>
+    </div>
+
+
+    <!-- VIEW 1: MASTER PLAN VIEW -->
+    <div id="view-plan" class="space-y-12">
+
+    <!-- OVERVIEW HEADER -->
+    <header id="sec-overview" class="max-w-[67rem] mx-auto px-4 pb-8 border-b border-zinc-200 dark:border-zinc-800 space-y-4">
+        <div>
+            <span class="text-xs font-mono font-semibold uppercase text-zinc-400">Overview &amp; Implementation Guide</span>
+            <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-900 dark:text-white mt-1">
+                Flooded Road and Building Mapping from Satellite Imagery using Deep Learning.
+            </h1>
+        </div>
+
+        <p class="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed max-w-4xl">
+            SpaceNet 8 Dataset &middot; Multi-Temporal Pre/Post Satellite Image Segmentation &middot; AI Damage Classification &middot; Emergency Responder Mapping Platform
+        </p>
+
+        <!-- License / Attribution Bar (Colored Border) -->
+        <div class="p-3 rounded-lg bg-white dark:bg-zinc-900/80 border border-blue-500/40 dark:border-blue-500/50 text-xs text-zinc-600 dark:text-zinc-400 flex items-center justify-between flex-wrap gap-4">
+            <div class="flex items-center gap-2">
+                <i data-lucide="info" class="w-4 h-4 text-blue-500 shrink-0"></i>
+                <span>Capstone Project ID: <code class="mono font-bold text-zinc-900 dark:text-white">KLCAP-2026-00010</code></span>
+            </div>
+            <a href="https://ay2026-27cp.klef.in/#uc=KLCAP-2026-00010" target="_blank" class="px-2.5 py-1 rounded bg-zinc-900 text-white dark:bg-white dark:text-black font-semibold text-[11px] shrink-0 hover:opacity-90 transition-opacity">
+                University Portal &rarr;
+            </a>
+        </div>
+    </header>
+
+
+    <!-- MAIN STEP-BY-STEP DOC CONTAINER -->
+    <main class="max-w-[67rem] mx-auto px-4 py-8 space-y-12">
+
+        <!-- STEP 1: TITLE & OBJECTIVES (COLORED BORDERS FOR O1-O5) -->
+        <section id="sec1" class="space-y-4">
+            <div class="flex items-center gap-3">
+                <div class="step-num bg-zinc-900 text-white dark:bg-white dark:text-black">1</div>
+                <h2 class="text-base font-bold text-zinc-900 dark:text-white">Title &amp; Institutional Objectives (O1 – O5)</h2>
+            </div>
+
+            <div class="pl-10 space-y-3">
+                <p class="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                    Build a deep learning pipeline to extract building footprints and road networks from pre/post satellite imagery, spot flood damage, and render actionable maps for rescue teams.
+                </p>
+
+                <div class="grid grid-cols-1 sm:grid-cols-5 gap-2 text-xs">
+                    <!-- O1 Data Pipeline -->
+                    <div class="p-3 rounded-lg bg-white dark:bg-zinc-900/60 border border-blue-500/40 dark:border-blue-500/50 hover:border-blue-500 transition-colors">
+                        <span class="text-[10px] font-bold mono text-blue-600 dark:text-blue-400 block mb-1">O1</span>
+                        <span class="font-semibold text-zinc-900 dark:text-zinc-100 block">Data Pipeline</span>
+                        <span class="text-[11px] text-zinc-500">GeoTIFF tiling &amp; CRS alignment</span>
+                    </div>
+
+                    <!-- O2 Baseline Model -->
+                    <div class="p-3 rounded-lg bg-white dark:bg-zinc-900/60 border border-amber-500/40 dark:border-amber-500/50 hover:border-amber-500 transition-colors">
+                        <span class="text-[10px] font-bold mono text-amber-600 dark:text-amber-400 block mb-1">O2</span>
+                        <span class="font-semibold text-zinc-900 dark:text-zinc-100 block">Baseline Model</span>
+                        <span class="text-[11px] text-zinc-500">PyTorch U-Net feature extractor</span>
+                    </div>
+
+                    <!-- O3 Fusion Network -->
+                    <div class="p-3 rounded-lg bg-white dark:bg-zinc-900/60 border border-purple-500/40 dark:border-purple-500/50 hover:border-purple-500 transition-colors">
+                        <span class="text-[10px] font-bold mono text-purple-600 dark:text-purple-400 block mb-1">O3</span>
+                        <span class="font-semibold text-zinc-900 dark:text-zinc-100 block">Fusion Network</span>
+                        <span class="text-[11px] text-zinc-500">Siamese Cross-Attention novel AI</span>
+                    </div>
+
+                    <!-- O4 Web System -->
+                    <div class="p-3 rounded-lg bg-white dark:bg-zinc-900/60 border border-emerald-500/40 dark:border-emerald-500/50 hover:border-emerald-500 transition-colors">
+                        <span class="text-[10px] font-bold mono text-emerald-600 dark:text-emerald-400 block mb-1">O4</span>
+                        <span class="font-semibold text-zinc-900 dark:text-zinc-100 block">Web System</span>
+                        <span class="text-[11px] text-zinc-500">FastAPI backend &amp; Leaflet map</span>
+                    </div>
+
+                    <!-- O5 MLOps & Tests -->
+                    <div class="p-3 rounded-lg bg-white dark:bg-zinc-900/60 border border-rose-500/40 dark:border-rose-500/50 hover:border-rose-500 transition-colors">
+                        <span class="text-[10px] font-bold mono text-rose-600 dark:text-rose-400 block mb-1">O5</span>
+                        <span class="font-semibold text-zinc-900 dark:text-zinc-100 block">MLOps &amp; Tests</span>
+                        <span class="text-[11px] text-zinc-500">pytest coverage &amp; Docker container</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- STEP 2: REFERENCE LINKS & GIT REPOSITORY SETUP (COLORED BORDERS) -->
+        <section id="sec2" class="space-y-4">
+            <div class="flex items-center gap-3">
+                <div class="step-num bg-zinc-900 text-white dark:bg-white dark:text-black">2</div>
+                <h2 class="text-base font-bold text-zinc-900 dark:text-white">Official GitHub Repository &amp; Setup Instructions</h2>
+            </div>
+
+            <div class="pl-10 space-y-4 text-xs">
+                <!-- FEATURED TEAM GITHUB & GIT WORKFLOW CARD -->
+                <div class="rounded-xl border border-blue-500/50 dark:border-blue-500/60 bg-gradient-to-br from-blue-500/5 via-white to-indigo-500/5 dark:from-blue-950/30 dark:via-zinc-900 dark:to-indigo-950/30 p-4 space-y-3.5 shadow-xs">
+                    <div class="flex items-center justify-between flex-wrap gap-2 pb-2 border-b border-blue-500/20 dark:border-blue-500/30">
+                        <div class="flex items-center gap-2">
+                            <div class="w-7 h-7 rounded-lg bg-zinc-900 dark:bg-white text-white dark:text-black flex items-center justify-center shrink-0 shadow-xs">
+                                <i data-lucide="github" class="w-4 h-4"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-sm text-zinc-900 dark:text-white tracking-tight">Official Team GitHub Repository</h3>
+                                <p class="text-[11px] text-zinc-500 dark:text-zinc-400">All team members must clone and pull code from this repo</p>
+                            </div>
+                        </div>
+                        <a href="https://github.com/isuryaprakashh/Capstone-Flood-Mapping" target="_blank" class="px-3 py-1.5 rounded-lg bg-zinc-900 text-white dark:bg-white dark:text-black font-semibold text-xs flex items-center gap-1.5 hover:opacity-90 transition-opacity">
+                            <span>Open Repository</span>
+                            <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                        </a>
+                    </div>
+
+                    <!-- Step-by-Step Instructions Grid (8:4 ratio for wider clone box) -->
+                    <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
+                        <!-- Step 1: First Time Clone (Wider: col-span-7 / col-span-8) -->
+                        <div class="md:col-span-7 lg:col-span-8 rounded-lg bg-white dark:bg-zinc-900 p-3 border border-zinc-200 dark:border-zinc-800 space-y-2.5 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold font-mono bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/30">STEP 1: FIRST-TIME SETUP</span>
+                                    <span class="text-[10px] text-zinc-400 font-mono">2 Commands</span>
+                                </div>
+                                <p class="text-[11px] text-zinc-600 dark:text-zinc-300 font-medium mb-2">Clone the repository for the first time on your machine:</p>
+
+                                <div class="space-y-2.5">
+                                    <!-- Command 1: git clone -->
+                                    <div class="space-y-1">
+                                        <div class="flex items-center justify-between text-[10px] text-zinc-500 font-mono">
+                                            <span class="font-semibold text-zinc-700 dark:text-zinc-300">1. Clone Repository</span>
+                                            <button onclick="copyCode('git-clone-cmd')" class="hover:text-zinc-900 dark:hover:text-white cursor-pointer flex items-center gap-1 text-zinc-500">
+                                                <i data-lucide="copy" class="w-3 h-3"></i> Copy
+                                            </button>
+                                        </div>
+                                        <pre id="git-clone-cmd" class="p-2 rounded bg-zinc-950 text-zinc-100 font-mono text-[11px] leading-relaxed overflow-x-auto border border-zinc-800">git clone https://github.com/isuryaprakashh/Capstone-Flood-Mapping.git</pre>
+                                    </div>
+
+                                    <!-- Command 2: cd -->
+                                    <div class="space-y-1">
+                                        <div class="flex items-center justify-between text-[10px] text-zinc-500 font-mono">
+                                            <span class="font-semibold text-zinc-700 dark:text-zinc-300">2. Enter Directory</span>
+                                            <button onclick="copyCode('git-cd-cmd')" class="hover:text-zinc-900 dark:hover:text-white cursor-pointer flex items-center gap-1 text-zinc-500">
+                                                <i data-lucide="copy" class="w-3 h-3"></i> Copy
+                                            </button>
+                                        </div>
+                                        <pre id="git-cd-cmd" class="p-2 rounded bg-zinc-950 text-zinc-100 font-mono text-[11px] leading-relaxed overflow-x-auto border border-zinc-800">cd Capstone-Flood-Mapping</pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Daily git pull (Reduced width: col-span-5 / col-span-4) -->
+                        <div class="md:col-span-5 lg:col-span-4 rounded-lg bg-white dark:bg-zinc-900 p-3 border border-zinc-200 dark:border-zinc-800 space-y-2.5 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold font-mono bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">STEP 2: EVERY TIME YOU WORK</span>
+                                    <button onclick="copyCode('git-pull-cmd')" class="text-[10px] font-mono text-zinc-500 hover:text-zinc-900 dark:hover:text-white cursor-pointer flex items-center gap-1">
+                                        <i data-lucide="copy" class="w-3 h-3"></i> Copy
+                                    </button>
+                                </div>
+                                <p class="text-[11px] text-zinc-600 dark:text-zinc-300 font-medium mb-2">Always pull latest changes before starting work:</p>
+                                <div class="mt-4">
+                                    <pre id="git-pull-cmd" class="p-2 rounded bg-zinc-950 text-zinc-100 font-mono text-[11px] leading-relaxed overflow-x-auto border border-zinc-800">git pull origin main</pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- EXTERNAL REFERENCE LINKS GRID -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                    <a href="https://spacenet.ai/sn8-challenge/" target="_blank" class="p-3 rounded-lg bg-white dark:bg-zinc-900/60 border border-sky-500/40 dark:border-sky-500/50 hover:border-sky-500 flex items-center justify-between hover-card text-zinc-900 dark:text-zinc-100">
+                        <div class="flex items-center gap-2 font-medium">
+                            <i data-lucide="globe" class="w-4 h-4 text-sky-500"></i>
+                            <span>SpaceNet 8 Challenge Homepage</span>
+                        </div>
+                        <i data-lucide="external-link" class="w-3.5 h-3.5 text-sky-500"></i>
+                    </a>
+
+                    <a href="https://medium.com/@SpaceNet_Project/the-spacenet-8-flood-detection-challenge-dataset-and-algorithmic-baseline-release-e0c9f5a44154" target="_blank" class="p-3 rounded-lg bg-white dark:bg-zinc-900/60 border border-amber-500/40 dark:border-amber-500/50 hover:border-amber-500 flex items-center justify-between hover-card text-zinc-900 dark:text-zinc-100">
+                        <div class="flex items-center gap-2 font-medium">
+                            <i data-lucide="file-text" class="w-4 h-4 text-amber-500"></i>
+                            <span>SpaceNet 8 Medium Release Post</span>
+                        </div>
+                        <i data-lucide="external-link" class="w-3.5 h-3.5 text-amber-500"></i>
+                    </a>
+
+                    <a href="https://github.com/SpaceNetChallenge/SpaceNet9" target="_blank" class="p-3 rounded-lg bg-white dark:bg-zinc-900/60 border border-indigo-500/40 dark:border-indigo-500/50 hover:border-indigo-500 flex items-center justify-between hover-card text-zinc-900 dark:text-zinc-100">
+                        <div class="flex items-center gap-2 font-medium">
+                            <i data-lucide="github" class="w-4 h-4 text-indigo-500"></i>
+                            <span>SpaceNet Challenge Repository</span>
+                        </div>
+                        <i data-lucide="external-link" class="w-3.5 h-3.5 text-indigo-500"></i>
+                    </a>
+
+                    <a href="https://openaccess.thecvf.com/content/CVPR2022W/EarthVision/papers/Hansch_SpaceNet_8_-_The_Detection_of_Flooded_Roads_and_Buildings_CVPRW_2022_paper.pdf" target="_blank" class="p-3 rounded-lg bg-white dark:bg-zinc-900/60 border border-rose-500/40 dark:border-rose-500/50 hover:border-rose-500 flex items-center justify-between hover-card text-zinc-900 dark:text-zinc-100">
+                        <div class="flex items-center gap-2 font-medium">
+                            <i data-lucide="scroll-text" class="w-4 h-4 text-rose-500"></i>
+                            <span>CVPR 2022 Workshop Paper (PDF)</span>
+                        </div>
+                        <i data-lucide="external-link" class="w-3.5 h-3.5 text-rose-500"></i>
+                    </a>
+
+                    <a href="https://docs.torchgeo.org/en/stable/_modules/torchgeo/datasets/spacenet/spacenet8.html" target="_blank" class="p-3 rounded-lg bg-white dark:bg-zinc-900/60 border border-purple-500/40 dark:border-purple-500/50 hover:border-purple-500 flex items-center justify-between hover-card text-zinc-900 dark:text-zinc-100">
+                        <div class="flex items-center gap-2 font-medium">
+                            <i data-lucide="code-2" class="w-4 h-4 text-purple-500"></i>
+                            <span>TorchGeo SpaceNet 8 Dataset Docs</span>
+                        </div>
+                        <i data-lucide="external-link" class="w-3.5 h-3.5 text-purple-500"></i>
+                    </a>
+
+                    <a href="https://mlhub.earth/" target="_blank" class="p-3 rounded-lg bg-white dark:bg-zinc-900/60 border border-emerald-500/40 dark:border-emerald-500/50 hover:border-emerald-500 flex items-center justify-between hover-card text-zinc-900 dark:text-zinc-100">
+                        <div class="flex items-center gap-2 font-medium">
+                            <i data-lucide="database" class="w-4 h-4 text-emerald-500"></i>
+                            <span>Radiant Earth MLHub Catalog</span>
+                        </div>
+                        <i data-lucide="external-link" class="w-3.5 h-3.5 text-emerald-500"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- STEP 3: DATASET & DIRECT DOWNLOADS (COLORED BORDERS) -->
+        <section id="sec3" class="space-y-4">
+            <div class="flex items-center gap-3">
+                <div class="step-num bg-zinc-900 text-white dark:bg-white dark:text-black">3</div>
+                <h2 class="text-base font-bold text-zinc-900 dark:text-white">Dataset — Source, Info &amp; Direct Downloads</h2>
+            </div>
+
+            <div class="pl-10 space-y-3">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+                    <a href="https://spacenet-dataset.s3.amazonaws.com/spacenet/SN8_floods/tarballs/Germany_Training_Public.tar.gz" target="_blank" class="p-3 rounded-lg bg-white dark:bg-zinc-900/60 border border-blue-500/40 dark:border-blue-500/50 hover:border-blue-500 hover-card flex items-center justify-between">
+                        <div class="flex items-center gap-2 font-medium">
+                            <span class="font-mono text-[10px] text-blue-500 uppercase font-bold">DE</span>
+                            <span>Germany Training (.tar.gz)</span>
+                        </div>
+                        <i data-lucide="download" class="w-3.5 h-3.5 text-blue-500"></i>
+                    </a>
+                    <a href="https://spacenet-dataset.s3.amazonaws.com/spacenet/SN8_floods/tarballs/Louisiana-East_Training_Public.tar.gz" target="_blank" class="p-3 rounded-lg bg-white dark:bg-zinc-900/60 border border-indigo-500/40 dark:border-indigo-500/50 hover:border-indigo-500 hover-card flex items-center justify-between">
+                        <div class="flex items-center gap-2 font-medium">
+                            <span class="font-mono text-[10px] text-indigo-500 uppercase font-bold">US</span>
+                            <span>Louisiana East Training (.tar.gz)</span>
+                        </div>
+                        <i data-lucide="download" class="w-3.5 h-3.5 text-indigo-500"></i>
+                    </a>
+                    <a href="https://spacenet-dataset.s3.amazonaws.com/spacenet/SN8_floods/tarballs/Louisiana-West_Test_Public.tar.gz" target="_blank" class="p-3 rounded-lg bg-white dark:bg-zinc-900/60 border border-purple-500/40 dark:border-purple-500/50 hover:border-purple-500 hover-card flex items-center justify-between">
+                        <div class="flex items-center gap-2 font-medium">
+                            <span class="font-mono text-[10px] text-purple-500 uppercase font-bold">US</span>
+                            <span>Louisiana West Test (.tar.gz)</span>
+                        </div>
+                        <i data-lucide="download" class="w-3.5 h-3.5 text-purple-500"></i>
+                    </a>
+                </div>
+
+                <!-- Table -->
+                <div class="overflow-x-auto rounded-lg border border-blue-500/30 dark:border-blue-500/40 bg-white dark:bg-zinc-900/60 w-full max-w-full">
+                    <table class="w-full text-left text-xs min-w-[650px]">
+                        <thead class="bg-zinc-50 dark:bg-zinc-900 text-zinc-500 font-semibold border-b border-zinc-200 dark:border-zinc-800">
+                            <tr>
+                                <th class="p-2.5">Dataset Split</th>
+                                <th class="p-2.5">Pre (.tif)</th>
+                                <th class="p-2.5">Post (.tif)</th>
+                                <th class="p-2.5">Total (.tif)</th>
+                                <th class="p-2.5">Labels (.geojson)</th>
+                                <th class="p-2.5">Road Segments</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-zinc-200 dark:divide-zinc-800 font-mono text-zinc-700 dark:text-zinc-300">
+                            <tr>
+                                <td class="p-2.5 font-sans font-medium text-zinc-900 dark:text-white">Germany Training</td>
+                                <td class="p-2.5">202</td>
+                                <td class="p-2.5">282</td>
+                                <td class="p-2.5">484</td>
+                                <td class="p-2.5">202</td>
+                                <td class="p-2.5">9,761</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2.5 font-sans font-medium text-zinc-900 dark:text-white">Louisiana East Training</td>
+                                <td class="p-2.5">599</td>
+                                <td class="p-2.5">599</td>
+                                <td class="p-2.5">1,198</td>
+                                <td class="p-2.5">599</td>
+                                <td class="p-2.5">23,663</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2.5 font-sans font-medium text-zinc-900 dark:text-white">Louisiana West Test</td>
+                                <td class="p-2.5">406</td>
+                                <td class="p-2.5">488</td>
+                                <td class="p-2.5">894</td>
+                                <td class="p-2.5 text-zinc-400 font-sans italic">Test set</td>
+                                <td class="p-2.5 text-zinc-400 font-sans italic">Blind eval</td>
+                            </tr>
+                            <tr class="bg-zinc-50 dark:bg-zinc-900/90 font-bold text-zinc-900 dark:text-white font-sans">
+                                <td class="p-2.5">Total Dataset Summary</td>
+                                <td class="p-2.5 font-mono text-blue-600 dark:text-blue-400">1,207</td>
+                                <td class="p-2.5 font-mono text-blue-600 dark:text-blue-400">1,369</td>
+                                <td class="p-2.5 font-mono text-blue-600 dark:text-blue-400">2,576</td>
+                                <td class="p-2.5 font-mono text-blue-600 dark:text-blue-400">801</td>
+                                <td class="p-2.5 font-mono text-blue-600 dark:text-blue-400">33,424</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- STEP 4: TEAM MEMBERS & WORKLOAD (COLORED BORDERS) -->
+        <section id="sec4" class="space-y-4">
+            <div class="flex items-center gap-3">
+                <div class="step-num bg-zinc-900 text-white dark:bg-white dark:text-black">4</div>
+                <h2 class="text-base font-bold text-zinc-900 dark:text-white">Team Members &amp; Workload Share</h2>
+            </div>
+
+            <div class="pl-10 space-y-3" id="sec4-team-dynamic-container">
+                <!-- Dynamically populated by renderTeamOverviewSection() -->
+            </div>
+        </section>
+
+        <!-- STEP 5: FOLDER & CODEBASE STRUCTURE (ACCENT BORDER) -->
+        <section id="sec5" class="space-y-4">
+            <div class="flex items-center gap-3">
+                <div class="step-num bg-zinc-900 text-white dark:bg-white dark:text-black">5</div>
+                <h2 class="text-base font-bold text-zinc-900 dark:text-white">Folder &amp; Project Directory Structure</h2>
+            </div>
+
+            <div class="pl-10 space-y-3 text-xs">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Card 1: CP1-DATASET/ -->
+                    <div class="rounded-lg border border-purple-500/40 dark:border-purple-500/50 hover:border-purple-500 transition-colors overflow-hidden bg-white dark:bg-zinc-900 flex flex-col">
+                        <div class="flex items-center justify-between px-3 py-2 bg-zinc-50 dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800">
+                            <span class="font-mono text-[11px] font-bold text-purple-600 dark:text-purple-400">CP1-DATASET/</span>
+                            <button onclick="copyCode('tree-ds')" class="px-2.5 py-1 text-[10px] font-mono rounded bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/30 hover:bg-purple-500 hover:text-white transition-colors cursor-pointer flex items-center gap-1">
+                                <i data-lucide="copy" class="w-3 h-3"></i> Copy
+                            </button>
+                        </div>
+                        <div class="p-3 flex-1 overflow-x-auto">
+                            <pre id="tree-ds" class="font-mono text-[11px] text-zinc-800 dark:text-zinc-200 leading-relaxed">CP1-DATASET/
+├── Germany_Training_Public/
+│   ├── PRE-event/       # 202 GeoTIFF imagery tiles
+│   ├── POST-event/      # 282 GeoTIFF imagery tiles
+│   ├── annotations/     # 202 GeoJSON building & road masks
+│   ├── mapping.csv
+│   └── reference.csv
+├── Louisiana-East_Training_Public/
+│   ├── PRE-event/       # 599 GeoTIFF imagery tiles
+│   ├── POST-event/      # 599 GeoTIFF imagery tiles
+│   └── annotations/     # 599 GeoJSON building & road masks
+└── Louisiana-West_Test_Public/
+    ├── PRE-event/       # 406 test tiles
+    └── POST-event/      # 488 test tiles</pre>
+                        </div>
+                    </div>
+
+                    <!-- Card 2: CAPSTONE-PROJECT/ -->
+                    <div class="rounded-lg border border-purple-500/40 dark:border-purple-500/50 hover:border-purple-500 transition-colors overflow-hidden bg-white dark:bg-zinc-900 flex flex-col">
+                        <div class="flex items-center justify-between px-3 py-2 bg-zinc-50 dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800">
+                            <span class="font-mono text-[11px] font-bold text-purple-600 dark:text-purple-400">CAPSTONE-PROJECT/</span>
+                            <button onclick="copyCode('tree-code')" class="px-2.5 py-1 text-[10px] font-mono rounded bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/30 hover:bg-purple-500 hover:text-white transition-colors cursor-pointer flex items-center gap-1">
+                                <i data-lucide="copy" class="w-3 h-3"></i> Copy
+                            </button>
+                        </div>
+                        <div class="p-3 flex-1 overflow-x-auto">
+                            <pre id="tree-code" class="font-mono text-[11px] text-zinc-800 dark:text-zinc-200 leading-relaxed">CAPSTONE-PROJECT/
+├── api/             # FastAPI backend microservice (/predict, /route)
+├── data/            # GeoTIFF tiler, CRS converter, mask generator
+├── models/          # PyTorch U-Net baseline & Siamese FusionNet
+├── losses/          # Dice + Focal + BCE combined loss function
+├── graph/           # NetworkX road-graph connectivity engine
+├── inference/       # Prediction pipeline
+├── ui/              # React / Leaflet interactive map dashboard
+├── tests/           # pytest suite with coverage reports (85%+)
+├── checkpoints/     # Saved model weights (.pth)
+├── .env             # Environment configuration file
+└── Dockerfile       # NVIDIA Docker container setup</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- STEP 6: TECH STACK & .ENV (ACCENT BORDER) -->
+        <section id="sec6" class="space-y-4">
+            <div class="flex items-center gap-3">
+                <div class="step-num bg-zinc-900 text-white dark:bg-white dark:text-black">6</div>
+                <h2 class="text-base font-bold text-zinc-900 dark:text-white">Tech Stack &amp; Environment Setup (.env)</h2>
+            </div>
+
+            <div class="pl-10 space-y-3 text-xs">
+                <!-- Tech Stack Cards with 1-Line Usage Explanations -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                    <!-- PyTorch -->
+                    <div class="p-3 rounded-lg bg-white dark:bg-zinc-900/60 border border-amber-500/40 dark:border-amber-500/50 hover:border-amber-500 transition-colors space-y-1">
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-zinc-900 dark:text-white font-mono text-[11px]">PyTorch 2.x</span>
+                            <span class="px-1.5 py-0.5 rounded text-[10px] font-bold mono bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30">Deep Learning</span>
+                        </div>
+                        <p class="text-zinc-500 text-[11px] leading-relaxed">Core framework for training U-Net baseline and Siamese Cross-Attention fusion segmentation models.</p>
+                    </div>
+
+                    <!-- TorchGeo -->
+                    <div class="p-3 rounded-lg bg-white dark:bg-zinc-900/60 border border-purple-500/40 dark:border-purple-500/50 hover:border-purple-500 transition-colors space-y-1">
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-zinc-900 dark:text-white font-mono text-[11px]">TorchGeo</span>
+                            <span class="px-1.5 py-0.5 rounded text-[10px] font-bold mono bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/30">Spatial Datasets</span>
+                        </div>
+                        <p class="text-zinc-500 text-[11px] leading-relaxed">PyTorch extension for spatial sampling, GeoTIFF loading, and geospatial data augmentation.</p>
+                    </div>
+
+                    <!-- Rasterio -->
+                    <div class="p-3 rounded-lg bg-white dark:bg-zinc-900/60 border border-blue-500/40 dark:border-blue-500/50 hover:border-blue-500 transition-colors space-y-1">
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-zinc-900 dark:text-white font-mono text-[11px]">Rasterio 1.3+</span>
+                            <span class="px-1.5 py-0.5 rounded text-[10px] font-bold mono bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/30">GeoTIFF I/O</span>
+                        </div>
+                        <p class="text-zinc-500 text-[11px] leading-relaxed">Geospatial raster I/O for reading multi-band satellite imagery, CRS reprojecting, and metadata parsing.</p>
+                    </div>
+
+                    <!-- GDAL -->
+                    <div class="p-3 rounded-lg bg-white dark:bg-zinc-900/60 border border-sky-500/40 dark:border-sky-500/50 hover:border-sky-500 transition-colors space-y-1">
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-zinc-900 dark:text-white font-mono text-[11px]">GDAL 3.x</span>
+                            <span class="px-1.5 py-0.5 rounded text-[10px] font-bold mono bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/30">GIS Abstraction</span>
+                        </div>
+                        <p class="text-zinc-500 text-[11px] leading-relaxed">Underlying geospatial library for high-performance raster/vector conversions and coordinate systems.</p>
+                    </div>
+
+                    <!-- FastAPI -->
+                    <div class="p-3 rounded-lg bg-white dark:bg-zinc-900/60 border border-teal-500/40 dark:border-teal-500/50 hover:border-teal-500 transition-colors space-y-1">
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-zinc-900 dark:text-white font-mono text-[11px]">FastAPI</span>
+                            <span class="px-1.5 py-0.5 rounded text-[10px] font-bold mono bg-teal-500/10 text-teal-600 dark:text-teal-400 border border-teal-500/30">Backend API</span>
+                        </div>
+                        <p class="text-zinc-500 text-[11px] leading-relaxed">Asynchronous Python backend microservice serving real-time inference and routing endpoints.</p>
+                    </div>
+
+                    <!-- React / Leaflet -->
+                    <div class="p-3 rounded-lg bg-white dark:bg-zinc-900/60 border border-indigo-500/40 dark:border-indigo-500/50 hover:border-indigo-500 transition-colors space-y-1">
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-zinc-900 dark:text-white font-mono text-[11px]">React / Leaflet</span>
+                            <span class="px-1.5 py-0.5 rounded text-[10px] font-bold mono bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/30">Map Frontend</span>
+                        </div>
+                        <p class="text-zinc-500 text-[11px] leading-relaxed">Interactive web frontend map dashboard for visualizing pre/post tiles and flood damage overlays.</p>
+                    </div>
+
+                    <!-- MongoDB -->
+                    <div class="p-3 rounded-lg bg-white dark:bg-zinc-900/60 border border-emerald-500/40 dark:border-emerald-500/50 hover:border-emerald-500 transition-colors space-y-1">
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-zinc-900 dark:text-white font-mono text-[11px]">MongoDB</span>
+                            <span class="px-1.5 py-0.5 rounded text-[10px] font-bold mono bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">Database</span>
+                        </div>
+                        <p class="text-zinc-500 text-[11px] leading-relaxed">NoSQL database for storing model prediction metadata, session logs, and disaster zone polygons.</p>
+                    </div>
+
+                    <!-- NetworkX -->
+                    <div class="p-3 rounded-lg bg-white dark:bg-zinc-900/60 border border-cyan-500/40 dark:border-cyan-500/50 hover:border-cyan-500 transition-colors space-y-1">
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-zinc-900 dark:text-white font-mono text-[11px]">NetworkX 3.x</span>
+                            <span class="px-1.5 py-0.5 rounded text-[10px] font-bold mono bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/30">Graph Engine</span>
+                        </div>
+                        <p class="text-zinc-500 text-[11px] leading-relaxed">Graph theory engine for building road network topology and routing rescue vehicles around flooded roads.</p>
+                    </div>
+
+                    <!-- Docker -->
+                    <div class="p-3 rounded-lg bg-white dark:bg-zinc-900/60 border border-blue-500/40 dark:border-blue-500/50 hover:border-blue-500 transition-colors space-y-1">
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-zinc-900 dark:text-white font-mono text-[11px]">Docker</span>
+                            <span class="px-1.5 py-0.5 rounded text-[10px] font-bold mono bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/30">Containerization</span>
+                        </div>
+                        <p class="text-zinc-500 text-[11px] leading-relaxed">NVIDIA GPU-enabled container setup for reproducible training environments and cloud deployment.</p>
+                    </div>
+
+                    <!-- pytest -->
+                    <div class="p-3 rounded-lg bg-white dark:bg-zinc-900/60 border border-rose-500/40 dark:border-rose-500/50 hover:border-rose-500 transition-colors space-y-1">
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-zinc-900 dark:text-white font-mono text-[11px]">pytest</span>
+                            <span class="px-1.5 py-0.5 rounded text-[10px] font-bold mono bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/30">Testing & MLOps</span>
+                        </div>
+                        <p class="text-zinc-500 text-[11px] leading-relaxed">Automated unit and integration test suite covering API routes, loss functions, and data transformations.</p>
+                    </div>
+                </div>
+
+                <!-- .env Code Block -->
+                <div class="rounded-lg border border-teal-500/40 dark:border-teal-500/50 hover:border-teal-500 transition-colors overflow-hidden bg-white dark:bg-zinc-900">
+                    <div class="flex items-center justify-between px-3 py-2 bg-zinc-50 dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800">
+                        <span class="font-mono text-[11px] font-bold text-teal-600 dark:text-teal-400">.env</span>
+                        <button onclick="copyCode('env-block')" class="px-2.5 py-1 text-[10px] font-mono rounded bg-teal-500/10 text-teal-600 dark:text-teal-400 border border-teal-500/30 hover:bg-teal-500 hover:text-white transition-colors cursor-pointer flex items-center gap-1">
+                            <i data-lucide="copy" class="w-3 h-3"></i> Copy .env
+                        </button>
+                    </div>
+                    <div class="p-3">
+                        <pre id="env-block" class="font-mono text-[11px] text-zinc-800 dark:text-zinc-200 overflow-x-auto leading-relaxed"># ===== Database =====
+MONGODB_URI=mongodb+srv://&lt;username&gt;:&lt;password&gt;@&lt;cluster&gt;.mongodb.net/&lt;dbname&gt;?retryWrites=true&amp;w=majority
+MONGODB_DB_NAME=capstone_flood_mapping
+
+# ===== FastAPI Server =====
+API_HOST=0.0.0.0
+API_PORT=8000
+API_DEBUG=true
+
+# ===== Model Checkpoints =====
+MODEL_CHECKPOINT_DIR=./checkpoints
+O2_BASELINE_WEIGHTS=./checkpoints/unet_baseline_best.pth
+O3_FUSION_WEIGHTS=./checkpoints/fusion_net_best.pth
+
+# ===== Compute =====
+CUDA_VISIBLE_DEVICES=0
+WANDB_PROJECT=capstone-flood-mapping
+
+# ===== Dataset =====
+SPACENET8_DATA_DIR=./CP1-DATASET
+TILE_SIZE=512
+BATCH_SIZE=8</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- STEP 7: RELATED RESEARCH PAPER (COLORED BORDERS) -->
+        <section id="sec7" class="space-y-4">
+            <div class="flex items-center gap-3">
+                <div class="step-num bg-zinc-900 text-white dark:bg-white dark:text-black">7</div>
+                <h2 class="text-base font-bold text-zinc-900 dark:text-white">Related Research Paper &amp; Articles</h2>
+            </div>
+
+            <div class="pl-10 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                <a href="https://openaccess.thecvf.com/content/CVPR2022W/EarthVision/papers/Hansch_SpaceNet_8_-_The_Detection_of_Flooded_Roads_and_Buildings_CVPRW_2022_paper.pdf" target="_blank" class="p-3.5 rounded-lg bg-white dark:bg-zinc-900/60 border border-rose-500/40 dark:border-rose-500/50 hover:border-rose-500 hover-card flex items-center justify-between">
+                    <div>
+                        <span class="font-bold text-zinc-900 dark:text-white block">SpaceNet 8 CVPR 2022 Paper</span>
+                        <span class="text-[11px] text-zinc-500 block">Ronny Hänsch et al. (CVPRW OpenAccess PDF)</span>
+                    </div>
+                    <i data-lucide="external-link" class="w-3.5 h-3.5 text-rose-500"></i>
+                </a>
+
+                <a href="https://medium.com/@SpaceNet_Project/the-spacenet-8-flood-detection-challenge-dataset-and-algorithmic-baseline-release-e0c9f5a44154" target="_blank" class="p-3.5 rounded-lg bg-white dark:bg-zinc-900/60 border border-amber-500/40 dark:border-amber-500/50 hover:border-amber-500 hover-card flex items-center justify-between">
+                    <div>
+                        <span class="font-bold text-zinc-900 dark:text-white block">Official Baseline Release Post</span>
+                        <span class="text-[11px] text-zinc-500 block">SpaceNet Project Medium Announcement</span>
+                    </div>
+                    <i data-lucide="external-link" class="w-3.5 h-3.5 text-amber-500"></i>
+                </a>
+            </div>
+        </section>
+
+
+        <!-- STEP 8: REVIEW TIMELINE (COLORED LEFT BORDERS) -->
+        <section id="sec8" class="space-y-4">
+            <div class="flex items-center gap-3">
+                <div class="step-num bg-zinc-900 text-white dark:bg-white dark:text-black">8</div>
+                <h2 class="text-base font-bold text-zinc-900 dark:text-white">Review Timeline &amp; Milestone Presentation Calendar</h2>
+            </div>
+
+            <div class="pl-10 grid grid-cols-1 sm:grid-cols-4 gap-2 text-xs">
+                <div class="p-3.5 rounded-lg bg-white dark:bg-zinc-900/60 border-l-4 border-l-blue-500 border border-blue-500/30 dark:border-blue-500/40 space-y-1">
+                    <span class="text-[10px] font-bold uppercase text-blue-600 dark:text-blue-400 mono block">Aug 17 – 22, 2026</span>
+                    <span class="font-bold text-zinc-900 dark:text-white block">Review 1</span>
+                    <span class="text-[11px] text-zinc-500 block">Charter, Lit Review &amp; Gap Statement</span>
+                </div>
+
+                <div class="p-3.5 rounded-lg bg-white dark:bg-zinc-900/60 border-l-4 border-l-amber-500 border border-amber-500/30 dark:border-amber-500/40 space-y-1">
+                    <span class="text-[10px] font-bold uppercase text-amber-600 dark:text-amber-400 mono block">Sep 21 – 26, 2026</span>
+                    <span class="font-bold text-zinc-900 dark:text-white block">Review 2</span>
+                    <span class="text-[11px] text-zinc-500 block">O1 Data Pipeline &amp; O2 U-Net Baseline</span>
+                </div>
+
+                <div class="p-3.5 rounded-lg bg-white dark:bg-zinc-900/60 border-l-4 border-l-purple-500 border border-purple-500/30 dark:border-purple-500/40 space-y-1">
+                    <span class="text-[10px] font-bold uppercase text-purple-600 dark:text-purple-400 mono block">Oct 26 – 30, 2026</span>
+                    <span class="font-bold text-zinc-900 dark:text-white block">Review 3</span>
+                    <span class="text-[11px] text-zinc-500 block">O3 Fusion Model (&ge; O2 + 0.03 IoU) &amp; Diary</span>
+                </div>
+
+                <div class="p-3.5 rounded-lg bg-white dark:bg-zinc-900/60 border-l-4 border-l-emerald-500 border border-emerald-500/30 dark:border-emerald-500/40 space-y-1">
+                    <span class="text-[10px] font-bold uppercase text-emerald-600 dark:text-emerald-400 mono block">Nov 30 – Dec 03</span>
+                    <span class="font-bold text-zinc-900 dark:text-white block">Final Defense</span>
+                    <span class="text-[11px] text-zinc-500 block">Live Web System Demo &amp; Docker Setup</span>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- STEP 9: RUBRICS (100 MARKS) -->
+        <section id="sec9" class="space-y-4">
+            <div class="flex items-center gap-3">
+                <div class="step-num bg-zinc-900 text-white dark:bg-white dark:text-black">9</div>
+                <h2 class="text-base font-bold text-zinc-900 dark:text-white">Rubrics &amp; Marking Scheme (100 Marks Total)</h2>
+            </div>
+
+            <div class="pl-10 space-y-3">
+                <div class="overflow-x-auto rounded-lg border border-blue-500/30 dark:border-blue-500/40 bg-white dark:bg-zinc-900/60">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-zinc-50 dark:bg-zinc-900 text-zinc-500 font-semibold border-b border-zinc-200 dark:border-zinc-800">
+                            <tr>
+                                <th class="p-2.5">Rubric Criteria</th>
+                                <th class="p-2.5">Raw Weight</th>
+                                <th class="p-2.5">Strategy to Maximize Score</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-zinc-200 dark:divide-zinc-800 text-zinc-700 dark:text-zinc-300">
+                            <tr>
+                                <td class="p-2.5 font-medium text-zinc-900 dark:text-white">Problem Significance &amp; Scope</td>
+                                <td class="p-2.5 font-mono font-bold text-blue-600 dark:text-blue-400">20 Marks</td>
+                                <td class="p-2.5 text-zinc-500">SpaceNet 8 dataset, emergency responder persona, GeoTIFF masks</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2.5 font-medium text-zinc-900 dark:text-white">Literature Review &amp; Gap Analysis</td>
+                                <td class="p-2.5 font-mono font-bold text-amber-600 dark:text-amber-400">20 Marks</td>
+                                <td class="p-2.5 text-zinc-500">Multi-temporal Siamese Cross-Attention novelty vs single image U-Net</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2.5 font-medium text-zinc-900 dark:text-white">Objectives &amp; SDG Traceability</td>
+                                <td class="p-2.5 font-mono font-bold text-purple-600 dark:text-purple-400">20 Marks</td>
+                                <td class="p-2.5 text-zinc-500">Traceability Matrix mapping O1–O5 to code files, metrics, and milestones</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2.5 font-medium text-zinc-900 dark:text-white">Methodology &amp; Risk Mitigation</td>
+                                <td class="p-2.5 font-mono font-bold text-emerald-600 dark:text-emerald-400">20 Marks</td>
+                                <td class="p-2.5 text-zinc-500">AWS S3 tarball access, GPU server compute, spatial holdout split</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2.5 font-medium text-zinc-900 dark:text-white">Live System Demo &amp; Defense</td>
+                                <td class="p-2.5 font-mono font-bold text-rose-600 dark:text-rose-400">20 Marks</td>
+                                <td class="p-2.5 text-zinc-500">All 4 team members present live code &amp; dashboard components</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    </div>
+    <!-- END OF VIEW 1: MASTER PLAN -->
+
+
+    <!-- VIEW 2: PERSONALIZED WORK DASHBOARD VIEW -->
+    <div id="view-dashboard" class="hidden max-w-[67rem] mx-auto px-4 py-8 space-y-8">
+        <!-- Personalized User Header Banner -->
+        <div id="dashboard-user-header"></div>
+
+        <!-- My Personal Assigned Work (Tasks Checklist) -->
+        <div class="space-y-3">
+            <div class="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 pb-2 flex-wrap gap-2">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="check-square" class="w-4 h-4 text-blue-500"></i>
+                    <h2 class="text-base font-bold text-zinc-900 dark:text-white">My Personalized Assigned Work &amp; Checklist</h2>
+                </div>
+                <div class="text-[11px] font-mono text-zinc-500 dark:text-zinc-400 flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800/80 px-2.5 py-1 rounded border border-zinc-200 dark:border-zinc-700">
+                    <i data-lucide="info" class="w-3.5 h-3.5 text-blue-500 shrink-0"></i>
+                    <span>Contact Team Lead (<code class="font-bold text-amber-500 font-mono">2300030929</code>) to change assigned role</span>
+                </div>
+            </div>
+            <div id="personal-tasks-content"></div>
+        </div>
+
+        <!-- Team Task Pipeline & Progress Tracker -->
+        <div class="space-y-3">
+            <div class="flex items-center gap-2 border-b border-zinc-200 dark:border-zinc-800 pb-2">
+                <i data-lucide="git-branch" class="w-4 h-4 text-purple-500"></i>
+                <h2 class="text-base font-bold text-zinc-900 dark:text-white">Full Team Pipeline &amp; Dependency Progress</h2>
+            </div>
+            <div id="dashboard-team-pipeline-content"></div>
+        </div>
+
+        <!-- Admin Control Panel (Visible strictly to Admin: 2300030929) -->
+        <div id="dashboard-admin-panel" class="hidden space-y-3">
+            <div class="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 pb-2 flex-wrap gap-3">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="shield-check" class="w-4 h-4 text-amber-500 shrink-0"></i>
+                    <h2 class="text-base font-bold text-zinc-900 dark:text-white leading-tight">Admin Control Panel — User Activity &amp; Password Reset</h2>
+                </div>
+                <button onclick="resetAuthDatabase()" class="px-2.5 py-1 text-[10px] font-mono rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30 hover:bg-amber-500 hover:text-white transition-colors cursor-pointer flex items-center gap-1">
+                    <i data-lucide="rotate-ccw" class="w-3 h-3"></i> Reset Passwords &amp; Logins
+                </button>
+            </div>
+            <div id="dashboard-admin-table-content"></div>
+        </div>
+    </div>
+
+
+    <!-- FOOTER -->
+    <footer class="border-t border-zinc-200 dark:border-zinc-800 py-8 text-center text-xs text-zinc-500">
+        KLCAP-2026-00010 &middot; Capstone Master Plan
+    </footer>
+
+
+    <!-- LOGIN MODAL OVERLAY -->
+    <div id="login-modal" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 transition-opacity duration-200">
+        <div class="relative w-full max-w-md bg-white dark:bg-zinc-900/80 border border-blue-500/40 dark:border-blue-500/50 rounded-lg p-5 shadow-sm space-y-5 theme-trans">
+            <div class="text-center space-y-2">
+                <div class="flex items-center justify-center gap-2 mb-2">
+                    <div class="w-5 h-5 rounded-full bg-zinc-900 dark:bg-white text-white dark:text-black flex items-center justify-center font-mono text-[10px] font-bold">KL</div>
+                    <span class="text-xs font-bold mono text-zinc-900 dark:text-white tracking-tight">KLCAP-2026-00010</span>
+                </div>
+                <h3 class="text-base font-bold text-zinc-900 dark:text-white">Capstone Portal Sign In</h3>
+                <p class="text-xs text-zinc-500 dark:text-zinc-400">Flooded Road &amp; Building Mapping Platform</p>
+            </div>
+
+            <form onsubmit="handleLogin(event)" class="space-y-3 text-xs">
+                <div id="login-error-msg" class="hidden p-3 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-600 dark:text-rose-400 font-medium"></div>
+
+                <!-- Student ID Input -->
+                <div class="space-y-1">
+                    <label class="font-semibold text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
+                        <i data-lucide="user" class="w-3.5 h-3.5 text-blue-500"></i>
+                        <span>Student ID</span>
+                    </label>
+                    <input type="text" id="login-id-input" placeholder="e.g. 2300030929" required class="w-full px-3 py-2 rounded-lg bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:border-blue-500 font-mono text-xs transition-colors">
+                </div>
+
+                <!-- Password Input -->
+                <div class="space-y-1">
+                    <div class="flex justify-between items-center">
+                        <label class="font-semibold text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
+                            <i data-lucide="key-round" class="w-3.5 h-3.5 text-blue-500"></i>
+                            <span>Password</span>
+                        </label>
+                        <span class="text-[10px] text-black-500 font-bold">Default: ID on initial login</span>
+                    </div>
+                    <input type="password" id="login-pass-input" placeholder="Enter password" required class="w-full px-3 py-2 rounded-lg bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:border-blue-500 font-mono text-xs transition-colors">
+                </div>
+
+                <button type="submit" class="w-full py-2.5 rounded-lg bg-zinc-900 dark:bg-white text-white dark:text-black font-semibold text-xs hover:opacity-90 transition-opacity cursor-pointer flex items-center justify-center gap-1.5">
+                    <i data-lucide="log-in" class="w-4 h-4"></i> Sign In to Portal
+                </button>
+            </form>
+
+            
+        </div>
+    </div>
+
+
+    <!-- CHANGE PASSWORD MODAL OVERLAY -->
+    <div id="pwd-change-modal" class="hidden fixed inset-0 z-[110] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 transition-opacity duration-200">
+        <div class="relative w-full max-w-md bg-white dark:bg-zinc-900/80 border border-amber-500/40 dark:border-amber-500/50 rounded-lg p-5 shadow-sm space-y-5 theme-trans">
+            <button onclick="closeModal('pwd-change-modal')" class="absolute top-3.5 right-3.5 p-1 rounded-lg text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer" aria-label="Close Modal">
+                <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+
+            <div class="text-center space-y-1">
+                <div class="w-10 h-10 mx-auto rounded-full bg-amber-500/10 text-amber-500 flex items-center justify-center font-bold text-lg font-mono mb-2">
+                    <i data-lucide="key-round" class="w-5 h-5"></i>
+                </div>
+                <h3 class="text-base font-bold text-zinc-900 dark:text-white">Initial Password Change Required</h3>
+                <p class="text-xs text-zinc-500 dark:text-zinc-400">First-time login detected for Student ID <span id="change-pwd-userid-label" class="font-mono font-bold text-amber-500"></span>. Please set a new secure password to continue.</p>
+            </div>
+
+            <form onsubmit="handleChangePassword(event)" class="space-y-3 text-xs">
+                <div id="pwd-change-error-msg" class="hidden p-3 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-600 dark:text-rose-400 font-medium"></div>
+
+                <div class="space-y-1">
+                    <label class="font-semibold text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
+                        <i data-lucide="key" class="w-3.5 h-3.5 text-amber-500"></i>
+                        <span>New Password</span>
+                    </label>
+                    <input type="password" id="new-pass-input" placeholder="Create new password" required class="w-full px-3 py-2 rounded-lg bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:border-amber-500 font-mono text-xs transition-colors">
+                </div>
+
+                <div class="space-y-1">
+                    <label class="font-semibold text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
+                        <i data-lucide="check-square" class="w-3.5 h-3.5 text-amber-500"></i>
+                        <span>Confirm New Password</span>
+                    </label>
+                    <input type="password" id="confirm-pass-input" placeholder="Re-enter new password" required class="w-full px-3 py-2 rounded-lg bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:border-amber-500 font-mono text-xs transition-colors">
+                </div>
+
+                <button type="submit" class="w-full py-2.5 rounded-lg bg-zinc-900 dark:bg-white text-white dark:text-black font-semibold text-xs hover:opacity-90 transition-opacity cursor-pointer flex items-center justify-center gap-1.5">
+                    <i data-lucide="check-circle" class="w-4 h-4"></i> Update Password &amp; Continue
+                </button>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- ROLE SELECTION MODAL OVERLAY (FOR INITIAL MEMBER LOGIN) -->
+    <div id="role-select-modal" class="hidden fixed inset-0 z-[115] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 transition-opacity duration-200">
+        <div class="relative w-full max-w-md bg-white dark:bg-zinc-900/90 border border-purple-500/40 dark:border-purple-500/50 rounded-lg p-5 shadow-sm space-y-4 theme-trans">
+            <button onclick="closeModal('role-select-modal')" class="absolute top-3.5 right-3.5 p-1 rounded-lg text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer" aria-label="Close Modal">
+                <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+
+            <div class="text-center space-y-1">
+                <div class="w-10 h-10 mx-auto rounded-full bg-purple-500/10 text-purple-500 flex items-center justify-center font-bold text-lg font-mono mb-1">
+                    <i data-lucide="user-check" class="w-5 h-5"></i>
+                </div>
+                <h3 class="text-base font-bold text-zinc-900 dark:text-white">Select Your Team Member Role</h3>
+                <p class="text-xs text-zinc-500 dark:text-zinc-400">First-time login detected for Student ID <span id="role-select-userid-label" class="font-mono font-bold text-purple-500"></span>. Please select your assigned project role to continue.</p>
+            </div>
+
+            <form onsubmit="handleConfirmRole(event)" class="space-y-3 text-xs">
+                <div id="role-select-error-msg" class="hidden p-3 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-600 dark:text-rose-400 font-medium"></div>
+
+                <div class="space-y-2">
+                    <label class="font-semibold text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
+                        <i data-lucide="award" class="w-3.5 h-3.5 text-purple-500"></i>
+                        <span>Choose Your Role &amp; Responsibilities</span>
+                    </label>
+
+                    <div id="role-select-options-container" class="space-y-2">
+                        <!-- Populated dynamically by JavaScript -->
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full py-2.5 rounded-lg bg-zinc-900 dark:bg-white text-white dark:text-black font-semibold text-xs hover:opacity-90 transition-opacity cursor-pointer flex items-center justify-center gap-1.5 mt-2">
+                    <i data-lucide="check-circle" class="w-4 h-4"></i> Confirm Role &amp; Access Dashboard
+                </button>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- JAVASCRIPT: THEME TOGGLE, COPY & AUTHENTICATION HANDLER -->
+    <script>
+        lucide.createIcons();
+
+        // Theme Toggle
+        const themeBtn = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        if (savedTheme === 'dark') html.classList.add('dark');
+        else html.classList.remove('dark');
+
+        themeBtn.addEventListener('click', () => {
+            const isDark = html.classList.toggle('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        });
+
+        // Copy Helper
+        function copyCode(id) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            navigator.clipboard.writeText(el.textContent).then(() => {
+                const btn = event.currentTarget;
+                const oldText = btn.innerHTML;
+                btn.textContent = 'Copied!';
+                setTimeout(() => btn.innerHTML = oldText, 1500);
+            });
+        }
+
+        // ==========================================
+        // AUTHENTICATION & USER MANAGEMENT MODULE
+        // ==========================================
+
+        // ---- Server-backed user cache ----
+        // cachedUsersDB holds the latest snapshot from the server.
+        // It is refreshed on initAuth, login, password change, role select, and admin actions.
+        let cachedUsersDB = {};
+
+        async function fetchUsersFromServer() {
+            try {
+                const res = await fetch('/api/auth/users');
+                if (!res.ok) throw new Error('Failed to fetch users');
+                const data = await res.json();
+                if (data.ok && data.users) {
+                    cachedUsersDB = data.users;
+                    return data.users;
+                }
+                throw new Error(data.error || 'Unknown error');
+            } catch (err) {
+                console.error('[fetchUsersFromServer]', err);
+                // Return cached data if available, otherwise empty
+                return cachedUsersDB;
+            }
+        }
+
+        // Synchronous accessor — returns the last-fetched cache.
+        // All flows that need fresh data call fetchUsersFromServer() first.
+        function getUsersDB() {
+            return cachedUsersDB;
+        }
+
+        // No-op: writes go through API endpoints now
+        function saveUsersDB(_db) { /* server-managed */ }
+
+        function getLoggedInUserId() {
+            return sessionStorage.getItem('capstone_current_user');
+        }
+
+        function setLoggedInUserId(id) {
+            if (id) sessionStorage.setItem('capstone_current_user', id);
+            else sessionStorage.removeItem('capstone_current_user');
+        }
+
+        function formatTimestamp() {
+            const now = new Date();
+            return now.toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata', month: 'short', day: 'numeric', year: 'numeric' }) + ', ' +
+                   now.toLocaleTimeString('en-US', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true }) + ' IST';
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) modal.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }
+
+        function openLoginModal() {
+            const modal = document.getElementById('login-modal');
+            if (modal) modal.classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
+        }
+
+        let pendingUserIdForPwdChange = null;
+        let pendingUserIdForRoleSelect = null;
+        let currentViewMode = 'plan';
+
+        function switchView(mode) {
+            currentViewMode = mode;
+            const btnPlan = document.getElementById('nav-btn-plan');
+            const btnDash = document.getElementById('nav-btn-dashboard');
+            const viewPlan = document.getElementById('view-plan');
+            const viewDash = document.getElementById('view-dashboard');
+            const sideNav = document.getElementById('side-nav-container');
+
+            if (mode === 'dashboard') {
+                if (btnPlan && btnDash) {
+                    btnPlan.className = 'px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white flex items-center gap-1.5';
+                    btnDash.className = 'px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer bg-zinc-900 text-white dark:bg-white dark:text-black shadow-xs flex items-center gap-1.5';
+                }
+                if (viewPlan) viewPlan.classList.add('hidden');
+                if (viewDash) viewDash.classList.remove('hidden');
+                if (sideNav) sideNav.classList.add('hidden');
+
+                const users = getUsersDB();
+                const loggedInId = getLoggedInUserId();
+                if (loggedInId && users[loggedInId]) {
+                    renderPersonalDashboard(users[loggedInId]);
+                }
+            } else {
+                if (btnPlan && btnDash) {
+                    btnPlan.className = 'px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer bg-zinc-900 text-white dark:bg-white dark:text-black shadow-xs flex items-center gap-1.5';
+                    btnDash.className = 'px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white flex items-center gap-1.5';
+                }
+                if (viewPlan) viewPlan.classList.remove('hidden');
+                if (viewDash) viewDash.classList.add('hidden');
+                if (sideNav) sideNav.classList.remove('hidden');
+            }
+            lucide.createIcons();
+        }
+
+        function renderRoleSelectModalOptions(pendingUserId) {
+            const container = document.getElementById('role-select-options-container');
+            if (!container) return;
+
+            const users = getUsersDB();
+            const takenRoles = {};
+            for (const uid in users) {
+                const u = users[uid];
+                // A role is only taken if a DIFFERENT user has actually logged in AND selected/confirmed their role (!u.mustSelectRole)
+                if (uid !== pendingUserId && u.assignedRoleId && !u.mustSelectRole && u.lastLogin) {
+                    takenRoles[u.assignedRoleId] = u.id;
+                }
+            }
+
+            const ROLE_CHOICES = [
+                {
+                    id: 'm2',
+                    title: 'Member 2 — AI Model Architect',
+                    desc: 'U-Net Baseline, Siamese Cross-Attention Fusion Model, Loss Functions, eval.py',
+                    accent: 'blue'
+                },
+                {
+                    id: 'm3',
+                    title: 'Member 3 — Geospatial Data Engineer',
+                    desc: 'GeoTIFF ingestion, CRS coordinate transforms, 512×512 tiling, spatial holdout split',
+                    accent: 'purple'
+                },
+                {
+                    id: 'm4',
+                    title: 'Member 4 — Full-Stack & MLOps Lead',
+                    desc: 'FastAPI backend (/predict, /route), React/Leaflet Dashboard, NetworkX graph, pytest',
+                    accent: 'emerald'
+                }
+            ];
+
+            let html = '';
+            let firstAvailableChecked = false;
+
+            ROLE_CHOICES.forEach(choice => {
+                const isTaken = takenRoles[choice.id];
+                const takenByStudentId = isTaken ? takenRoles[choice.id] : null;
+
+                let disabledAttr = '';
+                let statusBadge = '';
+                let labelCls = 'flex items-start gap-2.5 p-3 rounded-lg border transition-colors ';
+
+                if (isTaken) {
+                    disabledAttr = 'disabled';
+                    labelCls += 'border-zinc-200 dark:border-zinc-800/60 bg-zinc-100 dark:bg-zinc-800/30 opacity-50 cursor-not-allowed';
+                    statusBadge = `<span class="px-1.5 py-0.2 rounded text-[10px] font-mono font-bold bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/30 ml-2">(Already Taken by Student ${takenByStudentId})</span>`;
+                } else {
+                    labelCls += `border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/60 cursor-pointer ${
+                        choice.accent === 'blue' ? 'hover:border-blue-500/50' :
+                        choice.accent === 'purple' ? 'hover:border-purple-500/50' : 'hover:border-emerald-500/50'
+                    }`;
+                }
+
+                let isChecked = '';
+                if (!isTaken && !firstAvailableChecked) {
+                    isChecked = 'checked';
+                    firstAvailableChecked = true;
+                }
+
+                html += `
+                    <label class="${labelCls}">
+                        <input type="radio" name="member-role-choice" value="${choice.id}" ${isChecked} ${disabledAttr} class="mt-0.5 accent-${choice.accent}-500">
+                        <div class="flex-1">
+                            <div class="flex items-center">
+                                <span class="font-bold text-zinc-900 dark:text-white text-xs">${choice.title}</span>
+                                ${statusBadge}
+                            </div>
+                            <span class="text-[11px] text-zinc-500 block mt-0.5">${choice.desc}</span>
+                        </div>
+                    </label>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function openRoleSelectModal() {
+            const loggedInId = getLoggedInUserId();
+            if (!loggedInId) return;
+            pendingUserIdForRoleSelect = loggedInId;
+            const label = document.getElementById('role-select-userid-label');
+            if (label) label.textContent = loggedInId;
+            renderRoleSelectModalOptions(loggedInId);
+            const modal = document.getElementById('role-select-modal');
+            if (modal) modal.classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
+        }
+
+        async function handleConfirmRole(e) {
+            e.preventDefault();
+            const selectedRole = document.querySelector('input[name="member-role-choice"]:checked')?.value;
+            const errorMsgEl = document.getElementById('role-select-error-msg');
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            if (errorMsgEl) errorMsgEl.classList.add('hidden');
+
+            if (!selectedRole || !pendingUserIdForRoleSelect) {
+                if (errorMsgEl) {
+                    errorMsgEl.textContent = 'Please select an available role to proceed.';
+                    errorMsgEl.classList.remove('hidden');
+                }
+                return;
+            }
+
+            if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Confirming...'; }
+
+            try {
+                const res = await fetch('/api/auth/select-role', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: pendingUserIdForRoleSelect, roleId: selectedRole })
+                });
+                const data = await res.json();
+
+                if (!data.ok) {
+                    if (errorMsgEl) {
+                        errorMsgEl.textContent = data.error || 'Failed to select role. Please try again.';
+                        errorMsgEl.classList.remove('hidden');
+                    }
+                    return;
+                }
+
+                const modal = document.getElementById('role-select-modal');
+                if (modal) modal.classList.add('hidden');
+                document.body.classList.remove('overflow-hidden');
+                pendingUserIdForRoleSelect = null;
+
+                await initAuth();
+                switchView('dashboard');
+            } catch (err) {
+                console.error('[handleConfirmRole]', err);
+                if (errorMsgEl) {
+                    errorMsgEl.textContent = 'Network error. Please try again.';
+                    errorMsgEl.classList.remove('hidden');
+                }
+            } finally {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i data-lucide="check-circle" class="w-4 h-4"></i> Confirm Role &amp; Access Dashboard';
+                    lucide.createIcons();
+                }
+            }
+        }
+
+        async function initAuth() {
+            // Always fetch fresh user data from server
+            await fetchUsersFromServer();
+            const users = getUsersDB();
+            const loggedInId = getLoggedInUserId();
+
+            const loginModal = document.getElementById('login-modal');
+            const pwdChangeModal = document.getElementById('pwd-change-modal');
+            const roleSelectModal = document.getElementById('role-select-modal');
+
+            if (!loggedInId || !users[loggedInId]) {
+                // Show login modal, block content
+                loginModal.classList.remove('hidden');
+                pwdChangeModal.classList.add('hidden');
+                if (roleSelectModal) roleSelectModal.classList.add('hidden');
+                document.body.classList.add('overflow-hidden');
+                renderNavUserPill(null);
+                return;
+            }
+
+            const currentUser = users[loggedInId];
+
+            // 1. Check if user must change password (server provides isDefaultPass flag)
+            if (currentUser.mustChange || currentUser.isDefaultPass) {
+                pendingUserIdForPwdChange = loggedInId;
+                loginModal.classList.add('hidden');
+                pwdChangeModal.classList.remove('hidden');
+                if (roleSelectModal) roleSelectModal.classList.add('hidden');
+                document.getElementById('change-pwd-userid-label').textContent = loggedInId;
+                document.body.classList.add('overflow-hidden');
+                renderNavUserPill(null);
+                return;
+            }
+
+            // 2. Check if member user must select a role
+            if (currentUser.role !== 'admin' && (!currentUser.assignedRoleId || currentUser.mustSelectRole)) {
+                pendingUserIdForRoleSelect = loggedInId;
+                loginModal.classList.add('hidden');
+                pwdChangeModal.classList.add('hidden');
+                if (roleSelectModal) {
+                    roleSelectModal.classList.remove('hidden');
+                    document.getElementById('role-select-userid-label').textContent = loggedInId;
+                    renderRoleSelectModalOptions(loggedInId);
+                }
+                document.body.classList.add('overflow-hidden');
+                renderNavUserPill(currentUser);
+                return;
+            }
+
+            // Authenticated, password changed & role assigned
+            loginModal.classList.add('hidden');
+            pwdChangeModal.classList.add('hidden');
+            if (roleSelectModal) roleSelectModal.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+
+            renderNavUserPill(currentUser);
+
+            if (currentViewMode === 'dashboard') {
+                renderPersonalDashboard(currentUser);
+            }
+            lucide.createIcons();
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const idInput = document.getElementById('login-id-input').value.trim();
+            const passInput = document.getElementById('login-pass-input').value;
+            const errorMsgEl = document.getElementById('login-error-msg');
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+
+            errorMsgEl.classList.add('hidden');
+
+            if (!idInput || !passInput) {
+                errorMsgEl.textContent = 'Please enter both Student ID and Password.';
+                errorMsgEl.classList.remove('hidden');
+                return;
+            }
+
+            // Disable button during request
+            if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Signing in...'; }
+
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: idInput, pass: passInput })
+                });
+                const data = await res.json();
+
+                if (!data.ok) {
+                    errorMsgEl.textContent = data.error || 'Invalid Student ID or Password. Please try again.';
+                    errorMsgEl.classList.remove('hidden');
+                    return;
+                }
+
+                // Login successful — store session
+                setLoggedInUserId(data.user.id);
+                document.getElementById('login-pass-input').value = '';
+
+                // Check if password change is required
+                if (data.user.mustChange || data.user.isDefaultPass) {
+                    pendingUserIdForPwdChange = data.user.id;
+                    document.getElementById('login-modal').classList.add('hidden');
+                    document.getElementById('pwd-change-modal').classList.remove('hidden');
+                    document.getElementById('change-pwd-userid-label').textContent = data.user.id;
+                } else {
+                    await initAuth();
+                }
+            } catch (err) {
+                console.error('[handleLogin]', err);
+                errorMsgEl.textContent = 'Network error. Please check your connection and try again.';
+                errorMsgEl.classList.remove('hidden');
+            } finally {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i data-lucide="log-in" class="w-4 h-4"></i> Sign In to Portal';
+                    lucide.createIcons();
+                }
+            }
+        }
+
+        async function handleChangePassword(e) {
+            e.preventDefault();
+            const newPass = document.getElementById('new-pass-input').value;
+            const confirmPass = document.getElementById('confirm-pass-input').value;
+            const errorMsgEl = document.getElementById('pwd-change-error-msg');
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+
+            errorMsgEl.classList.add('hidden');
+
+            if (!pendingUserIdForPwdChange) {
+                await initAuth();
+                return;
+            }
+
+            if (newPass.length < 4) {
+                errorMsgEl.textContent = 'Password must be at least 4 characters long.';
+                errorMsgEl.classList.remove('hidden');
+                return;
+            }
+
+            if (newPass === pendingUserIdForPwdChange) {
+                errorMsgEl.textContent = 'New password cannot be the same as your initial Student ID!';
+                errorMsgEl.classList.remove('hidden');
+                return;
+            }
+
+            if (newPass !== confirmPass) {
+                errorMsgEl.textContent = 'New password and confirmation do not match.';
+                errorMsgEl.classList.remove('hidden');
+                return;
+            }
+
+            if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Updating...'; }
+
+            try {
+                const res = await fetch('/api/auth/change-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: pendingUserIdForPwdChange, newPassword: newPass })
+                });
+                const data = await res.json();
+
+                if (!data.ok) {
+                    errorMsgEl.textContent = data.error || 'Failed to change password. Please try again.';
+                    errorMsgEl.classList.remove('hidden');
+                    return;
+                }
+
+                document.getElementById('new-pass-input').value = '';
+                document.getElementById('confirm-pass-input').value = '';
+                pendingUserIdForPwdChange = null;
+
+                await initAuth();
+            } catch (err) {
+                console.error('[handleChangePassword]', err);
+                errorMsgEl.textContent = 'Network error. Please try again.';
+                errorMsgEl.classList.remove('hidden');
+            } finally {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i data-lucide="check-circle" class="w-4 h-4"></i> Update Password &amp; Continue';
+                    lucide.createIcons();
+                }
+            }
+        }
+
+        function handleLogout() {
+            setLoggedInUserId(null);
+            pendingUserIdForPwdChange = null;
+            initAuth();
+        }
+
+        async function resetSingleUserPassword(userId) {
+            const users = getUsersDB();
+            if (!users[userId]) return;
+
+            if (confirm(`Are you sure you want to reset password and role for User ID ${userId} back to default (${userId})?`)) {
+                try {
+                    const adminId = getLoggedInUserId();
+                    const res = await fetch('/api/auth/reset', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'reset-user', adminId, targetUserId: userId })
+                    });
+                    const data = await res.json();
+
+                    if (!data.ok) {
+                        alert(data.error || 'Failed to reset user.');
+                        return;
+                    }
+
+                    // Refresh user data and re-render
+                    await fetchUsersFromServer();
+                    const currentLoggedIn = getUsersDB()[getLoggedInUserId()];
+                    if (currentLoggedIn) renderPersonalDashboard(currentLoggedIn);
+                    lucide.createIcons();
+                } catch (err) {
+                    console.error('[resetSingleUserPassword]', err);
+                    alert('Network error. Please try again.');
+                }
+            }
+        }
+
+        async function resetAuthDatabase() {
+            if (confirm('Are you sure you want to reset all user passwords and login history to initial defaults?')) {
+                try {
+                    const adminId = getLoggedInUserId();
+                    const res = await fetch('/api/auth/reset', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'reset-all', adminId })
+                    });
+                    const data = await res.json();
+
+                    if (!data.ok) {
+                        alert(data.error || 'Failed to reset database.');
+                        return;
+                    }
+
+                    setLoggedInUserId(null);
+                    pendingUserIdForPwdChange = null;
+                    await initAuth();
+                } catch (err) {
+                    console.error('[resetAuthDatabase]', err);
+                    alert('Network error. Please try again.');
+                }
+            }
+        }
+
+        function renderNavUserPill(user) {
+            const container = document.getElementById('nav-user-pill');
+            if (!container) return;
+
+            if (!user) {
+                container.innerHTML = `
+                    <button onclick="openLoginModal()" class="px-3 py-1 rounded-full text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white transition-all cursor-pointer shadow-xs flex items-center gap-1.5">
+                        <i data-lucide="log-in" class="w-3.5 h-3.5"></i>
+                        <span class="hidden sm:inline">Login</span>
+                    </button>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            const isAdmin = user.role === 'admin';
+            const roleBadgeClass = isAdmin ? 'bg-amber-500 text-white' : 'bg-blue-500 text-white';
+
+            container.innerHTML = `
+                <div class="hidden sm:flex px-2.5 py-1 rounded-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white font-mono text-[11px] items-center gap-1.5 shadow-2xs">
+                    <i data-lucide="user" class="w-3 h-3 text-blue-500"></i>
+                    <span class="font-bold">${user.id}</span>
+                    <span class="px-1 py-0.2 text-[9px] font-bold rounded ${roleBadgeClass}">${user.role.toUpperCase()}</span>
+                </div>
+                <button onclick="handleLogout()" class="px-2.5 py-1 rounded-full text-[10px] font-mono bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/30 hover:bg-rose-500 hover:text-white transition-colors cursor-pointer flex items-center gap-1">
+                    <i data-lucide="log-out" class="w-3 h-3"></i> <span class="hidden sm:inline">Logout</span>
+                </button>
+            `;
+            lucide.createIcons();
+        }
+
+        // ==========================================
+        // TEAM TASK TRACKER — DEPENDENCY PIPELINE
+        // ==========================================
+
+
+
+        const MEMBER_COLORS = {
+            'm3': {
+                label: 'PHASE 1',
+                cardBorder: 'border-purple-500/40 dark:border-purple-500/50',
+                badgeCls: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/30',
+                idCls: 'text-purple-600 dark:text-purple-400',
+                barBg: 'bg-purple-500',
+                checkBorderDone: 'border-purple-500 bg-purple-500',
+                checkBorderHover: 'hover:border-purple-500'
+            },
+            'm2': {
+                label: 'PHASE 2',
+                cardBorder: 'border-blue-500/40 dark:border-blue-500/50',
+                badgeCls: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30',
+                idCls: 'text-blue-600 dark:text-blue-400',
+                barBg: 'bg-blue-500',
+                checkBorderDone: 'border-blue-500 bg-blue-500',
+                checkBorderHover: 'hover:border-blue-500'
+            },
+            'm4': {
+                label: 'PHASE 3',
+                cardBorder: 'border-emerald-500/40 dark:border-emerald-500/50',
+                badgeCls: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30',
+                idCls: 'text-emerald-600 dark:text-emerald-400',
+                barBg: 'bg-emerald-500',
+                checkBorderDone: 'border-emerald-500 bg-emerald-500',
+                checkBorderHover: 'hover:border-emerald-500'
+            },
+            'm1': {
+                label: 'PHASE 4',
+                cardBorder: 'border-amber-500/40 dark:border-amber-500/50',
+                badgeCls: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30',
+                idCls: 'text-amber-600 dark:text-amber-400',
+                barBg: 'bg-amber-500',
+                checkBorderDone: 'border-amber-500 bg-amber-500',
+                checkBorderHover: 'hover:border-amber-500'
+            }
+        };
+
+        const TASK_MEMBERS = [
+            {
+                id: 'm3', name: 'Member 3 — Geospatial Data Engineer', studentId: '2300031878',
+                tasks: [
+                    { id: 'm3-t1', text: 'Task 0: Download SpaceNet 8 dataset (Germany + Louisiana East) & setup env', deps: [] },
+                    { id: 'm3-t2', text: 'Organize raw GeoTIFFs & push 20-sample subset to shared storage', deps: ['m3-t1'] },
+                    { id: 'm3-t3', text: 'Reproject images to unified CRS (EPSG:4326/UTM) via rasterio/gdalwarp', deps: ['m3-t2'] },
+                    { id: 'm3-t4', text: 'Tile images to 512×512 patches with overlap handling (scripts/tile_images.py)', deps: ['m3-t3'] },
+                    { id: 'm3-t5', text: 'Generate binary segmentation masks from GeoJSON annotations', deps: ['m3-t4'] },
+                    { id: 'm3-t6', text: 'Create spatial train/val/test holdout splits (geographic tile split)', deps: ['m3-t5'] },
+                    { id: 'm3-t7', text: 'Build PyTorch Dataset/DataLoader with albumentations pipeline', deps: ['m3-t6'] },
+                    { id: 'm3-t8', text: 'Validate loader — sample batch shapes, mask alignment & QA notebook', deps: ['m3-t7'] },
+                    { id: 'm3-t9', text: 'Domain-shift robustness eval — cross-region split (Germany vs Louisiana)', deps: ['m3-t8'] },
+                    { id: 'm3-t10', text: 'Finalize data documentation & preprocessing report chapter', deps: ['m3-t9'] }
+                ]
+            },
+            {
+                id: 'm2', name: 'Member 2 — AI Model Architect', studentId: '2300031465',
+                tasks: [
+                    { id: 'm2-t1', text: 'Design U-Net encoder-decoder + Siamese Cross-Attention architecture skeleton', deps: ['m3-t1'] },
+                    { id: 'm2-t2', text: 'Implement custom loss functions combo (BCE + Dice + Focal)', deps: ['m2-t1'] },
+                    { id: 'm2-t3', text: 'Implement real forward pass for both models once DataLoader validated', deps: ['m3-t8', 'm2-t2'] },
+                    { id: 'm2-t4', text: 'Freeze architecture v1 & hand off to M1 for training', deps: ['m2-t3'] },
+                    { id: 'm2-t5', text: 'Write eval.py — comparative evaluation (fusion model vs U-Net baseline)', deps: ['m1-t6'] },
+                    { id: 'm2-t6', text: 'Road connectivity/routing logic — mask to skeleton & weighted graph (networkx)', deps: ['m2-t5'] },
+                    { id: 'm2-t7', text: 'Co-own pipeline integration testing & Docker setup with M1', deps: ['m2-t6', 'm1-t7'] }
+                ]
+            },
+            {
+                id: 'm1', name: 'Member 1 — Team Lead & Training Lead', studentId: '2300030929',
+                tasks: [
+                    { id: 'm1-t1', text: 'Set up GPU training environment (CUDA, PyTorch, requirements.txt)', deps: ['m3-t1'] },
+                    { id: 'm1-t2', text: 'Set up experiment tracking (W&B/CSV logger) & write train.py skeleton', deps: ['m1-t1'] },
+                    { id: 'm1-t3', text: 'Train U-Net baseline model on prepared dataset once DataLoader ready', deps: ['m1-t2', 'm2-t4', 'm3-t8'] },
+                    { id: 'm1-t4', text: 'Train Siamese Cross-Attention Fusion model & run hyperparameter sweep', deps: ['m1-t3'] },
+                    { id: 'm1-t5', text: 'Log all metrics (IoU, F1, precision/recall) & select best checkpoint', deps: ['m1-t4'] },
+                    { id: 'm1-t6', text: 'Export best model checkpoint (.pt) for M4 deployment', deps: ['m1-t5'] },
+                    { id: 'm1-t7', text: 'Docker containerization of full pipeline (Dockerfile, docker-compose) with M2', deps: ['m4-t7'] },
+                    { id: 'm1-t8', text: 'Run full end-to-end benchmark testing & compile final metrics', deps: ['m1-t7'] },
+                    { id: 'm1-t9', text: 'Prepare review defense presentation, slides & final report', deps: ['m1-t8'] }
+                ]
+            },
+            {
+                id: 'm4', name: 'Member 4 — Full-Stack & MLOps Lead', studentId: '2300030341',
+                tasks: [
+                    { id: 'm4-t1', text: 'Set up FastAPI project structure & React frontend scaffold (Vite)', deps: ['m3-t1'] },
+                    { id: 'm4-t2', text: 'Build stub /predict endpoint returning dummy binary mask for early UI testing', deps: ['m4-t1'] },
+                    { id: 'm4-t3', text: 'Integrate Leaflet map in frontend with stub flood overlay rendering', deps: ['m4-t2'] },
+                    { id: 'm4-t4', text: 'Write pytest scaffolding early (tests/test_predict_stub.py)', deps: ['m4-t2'] },
+                    { id: 'm4-t5', text: 'Swap stub for real model in /predict endpoint (with USE_STUB fallback)', deps: ['m1-t6', 'm4-t4'] },
+                    { id: 'm4-t6', text: 'Implement /route endpoint with real shortest-viable-path graph routing', deps: ['m2-t6', 'm4-t5'] },
+                    { id: 'm4-t7', text: 'Connect frontend ↔ backend fully end-to-end (upload → map overlay + route)', deps: ['m4-t6'] },
+                    { id: 'm4-t8', text: 'Write full pytest suite (target ≥80% coverage) & API docs', deps: ['m4-t7'] },
+                    { id: 'm4-t9', text: 'Final integration polish & demo rehearsal (graceful error handling)', deps: ['m4-t8'] }
+                ]
+            }
+        ];
+
+        // Build a flat lookup for all tasks
+        const ALL_TASKS_MAP = {};
+        TASK_MEMBERS.forEach(m => m.tasks.forEach(t => ALL_TASKS_MAP[t.id] = t));
+
+        // ---- Server-backed task progress cache ----
+        let cachedTaskProgress = {};
+
+        async function fetchTaskProgressFromServer() {
+            try {
+                const res = await fetch('/api/tasks/progress');
+                if (!res.ok) throw new Error('Failed to fetch task progress');
+                const data = await res.json();
+                if (data.ok) {
+                    cachedTaskProgress = data.progress || {};
+                    return cachedTaskProgress;
+                }
+                throw new Error(data.error || 'Unknown error');
+            } catch (err) {
+                console.error('[fetchTaskProgressFromServer]', err);
+                return cachedTaskProgress;
+            }
+        }
+
+        function getTaskProgress() {
+            return cachedTaskProgress;
+        }
+
+        function getRoleAssignedStudentId(roleId) {
+            const users = getUsersDB();
+            for (const id in users) {
+                const u = users[id];
+                if (u.assignedRoleId === roleId && !u.mustSelectRole) {
+                    return u.id;
+                }
+            }
+            // Member 1 is Admin default (2300030929)
+            if (roleId === 'm1') return '2300030929';
+            return null;
+        }
+
+        async function saveTaskProgress(progress) {
+            cachedTaskProgress = progress;
+            try {
+                await fetch('/api/tasks/progress', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ progress })
+                });
+            } catch (err) {
+                console.error('[saveTaskProgress]', err);
+            }
+        }
+
+        function getTaskOwner(taskId) {
+            const task = ALL_TASKS_MAP[taskId];
+            if (!task) return null;
+            for (const m of TASK_MEMBERS) {
+                if (m.tasks.some(t => t.id === taskId)) {
+                    const currentAssignedId = getRoleAssignedStudentId(m.id);
+                    return { ...m, studentId: currentAssignedId };
+                }
+            }
+            return null;
+        }
+
+        async function resetAllTasks() {
+            if (confirm('Are you sure you want to clear all task progress checklist items?')) {
+                try {
+                    await fetch('/api/tasks/progress', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'reset' })
+                    });
+                    cachedTaskProgress = {};
+                    renderTaskTracker();
+                } catch (err) {
+                    console.error('[resetAllTasks]', err);
+                    alert('Network error. Please try again.');
+                }
+            }
+        }
+
+        function isTaskUnlocked(taskId, progress) {
+            const task = ALL_TASKS_MAP[taskId];
+            if (!task) return false;
+            if (task.deps.length === 0) return true;
+            return task.deps.every(depId => progress[depId] === true);
+        }
+
+        function getBlockingDep(taskId, progress) {
+            const task = ALL_TASKS_MAP[taskId];
+            if (!task) return null;
+            for (const depId of task.deps) {
+                if (!progress[depId]) return ALL_TASKS_MAP[depId];
+            }
+            return null;
+        }
+
+        // When unchecking a task, cascade-uncheck all tasks that depend on it
+        function cascadeUncheck(taskId, progress) {
+            TASK_MEMBERS.forEach(m => {
+                m.tasks.forEach(t => {
+                    if (t.deps.includes(taskId) && progress[t.id]) {
+                        progress[t.id] = false;
+                        cascadeUncheck(t.id, progress); // recursive
+                    }
+                });
+            });
+        }
+
+        function canUserToggleTask(user, taskId) {
+            if (!user) return false;
+            if (user.role === 'admin') return true; // Team Lead / Admin can manage all tasks
+            const owner = getTaskOwner(taskId);
+            if (!owner) return false;
+            return user.assignedRoleId === owner.id || user.id === owner.studentId;
+        }
+
+        async function adminReassignUserRole(targetUserId) {
+            const loggedInId = getLoggedInUserId();
+            const users = getUsersDB();
+            const currentUser = users[loggedInId];
+            if (!currentUser || currentUser.role !== 'admin') {
+                alert('Only Team Lead (Admin: 2300030929) can reset user roles.');
+                return;
+            }
+            if (confirm(`Are you sure you want to reset the assigned role for Student ID ${targetUserId}? They will be prompted to choose an available role on next login.`)) {
+                try {
+                    const res = await fetch('/api/auth/reset', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'reassign-role', adminId: loggedInId, targetUserId })
+                    });
+                    const data = await res.json();
+
+                    if (!data.ok) {
+                        alert(data.error || 'Failed to reassign role.');
+                        return;
+                    }
+
+                    await fetchUsersFromServer();
+                    const refreshedUser = getUsersDB()[loggedInId];
+                    if (refreshedUser) renderPersonalDashboard(refreshedUser);
+                    lucide.createIcons();
+                } catch (err) {
+                    console.error('[adminReassignUserRole]', err);
+                    alert('Network error. Please try again.');
+                }
+            }
+        }
+
+        function renderPersonalDashboard(user) {
+            const headerContainer = document.getElementById('dashboard-user-header');
+            const personalTasksContainer = document.getElementById('personal-tasks-content');
+            const teamPipelineContainer = document.getElementById('dashboard-team-pipeline-content');
+            const adminPanel = document.getElementById('dashboard-admin-panel');
+            const adminTableContent = document.getElementById('dashboard-admin-table-content');
+
+            if (!user) return;
+
+            const roleId = user.assignedRoleId || 'm1';
+            const color = MEMBER_COLORS[roleId] || MEMBER_COLORS['m1'];
+            const progress = getTaskProgress();
+
+            // 1. User Header Banner
+            if (headerContainer) {
+                headerContainer.innerHTML = `
+                    <div class="p-4 rounded-lg bg-white dark:bg-zinc-900/80 border ${color.cardBorder} flex items-center justify-between flex-wrap gap-4 theme-trans">
+                        <div class="space-y-1">
+                            <div class="flex items-center gap-2">
+                                <span class="text-base sm:text-lg font-bold text-zinc-900 dark:text-white">Welcome, ${user.name}</span>
+                                <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold ${color.badgeCls} border">${color.label}</span>
+                            </div>
+                            <p class="text-xs text-zinc-500">Student ID: <code class="font-mono font-bold ${color.idCls}">${user.id}</code> &middot; Personalized Work Dashboard</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            ${user.role !== 'admin' ? `
+                            <div class="px-3 py-1.5 rounded-lg text-xs font-mono bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 flex items-center gap-1.5 shadow-2xs">
+                                <i data-lucide="info" class="w-3.5 h-3.5 text-blue-500 shrink-0"></i>
+                                <span>To change role, contact Team Lead (<code class="font-bold text-amber-600 dark:text-amber-400 font-mono">2300030929</code>)</span>
+                            </div>
+                            ` : `
+                            <span class="px-3 py-1.5 rounded-lg text-xs font-mono bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold flex items-center gap-1.5">
+                                <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Admin Control Mode
+                            </span>
+                            `}
+                        </div>
+                    </div>
+                `;
+            }
+
+            // 2. Personal Assigned Tasks
+            if (personalTasksContainer) {
+                const myMemberData = TASK_MEMBERS.find(m => m.id === roleId) || TASK_MEMBERS[0];
+                const done = myMemberData.tasks.filter(t => progress[t.id]).length;
+                const total = myMemberData.tasks.length;
+                const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+
+                let myTasksHtml = '';
+                myMemberData.tasks.forEach((task, idx) => {
+                    const isChecked = progress[task.id] === true;
+                    const unlocked = isTaskUnlocked(task.id, progress);
+                    const blocker = !unlocked ? getBlockingDep(task.id, progress) : null;
+                    const isMine = canUserToggleTask(user, task.id);
+
+                    let checkboxClass = '';
+                    if (isChecked) {
+                        checkboxClass = `w-4 h-4 rounded border-2 ${color.checkBorderDone} flex items-center justify-center cursor-pointer shrink-0`;
+                    } else if (unlocked && isMine) {
+                        checkboxClass = `w-4 h-4 rounded border-2 border-zinc-300 dark:border-zinc-600 cursor-pointer shrink-0 ${color.checkBorderHover} transition-colors`;
+                    } else if (unlocked && !isMine) {
+                        checkboxClass = `w-4 h-4 rounded border-2 border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800/40 shrink-0 cursor-not-allowed opacity-60`;
+                    } else {
+                        checkboxClass = `w-4 h-4 rounded border-2 border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800/50 shrink-0 cursor-not-allowed opacity-40`;
+                    }
+
+                    const textClass = isChecked
+                        ? 'line-through text-zinc-400 dark:text-zinc-500'
+                        : unlocked
+                            ? 'text-zinc-900 dark:text-white font-medium'
+                            : 'text-zinc-400 dark:text-zinc-600';
+
+                    const checkIcon = isChecked ? `<i data-lucide="check" class="w-2.5 h-2.5 text-white"></i>` : '';
+                    const clickAction = `onclick="toggleTask('${task.id}')"`;
+
+                    let depLabel = '';
+                    if (!unlocked && blocker) {
+                        const owner = getTaskOwner(blocker.id);
+                        const ownerStudentId = getRoleAssignedStudentId(owner.id);
+                        const ownerLabel = owner ? `${owner.name.split('—')[0].trim()} (${ownerStudentId})` : 'Previous Member';
+                        const ownerColor = owner ? MEMBER_COLORS[owner.id] : null;
+                        const ownerBadgeCls = ownerColor ? ownerColor.badgeCls : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30';
+
+                        depLabel = `
+                            <div class="mt-1 flex items-center gap-1.5 flex-wrap text-[10px]">
+                                <span class="px-1.5 py-0.2 rounded font-mono font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30 flex items-center gap-1">
+                                    <i data-lucide="lock" class="w-3 h-3"></i> LOCKED
+                                </span>
+                                <span class="text-zinc-500 dark:text-zinc-400">Waiting on <span class="px-1.5 py-0.2 rounded font-mono font-bold ${ownerBadgeCls} border">${ownerLabel}</span> to complete:</span>
+                                <span class="font-mono text-zinc-700 dark:text-zinc-300 font-semibold">"${blocker.text}"</span>
+                            </div>
+                        `;
+                    }
+
+                    myTasksHtml += `
+                        <div class="flex items-start gap-2.5 py-2.5 ${idx > 0 ? 'border-t border-zinc-100 dark:border-zinc-800/50' : ''}">
+                            <div ${clickAction} class="${checkboxClass}" style="margin-top:1px">${checkIcon}</div>
+                            <div class="flex-1 min-w-0">
+                                <span class="text-xs ${textClass}">${task.text}</span>
+                                ${depLabel}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                personalTasksContainer.innerHTML = `
+                    <div class="rounded-lg bg-white dark:bg-zinc-900/60 border ${color.cardBorder} overflow-hidden space-y-3 p-4">
+                        <div class="flex items-center justify-between flex-wrap gap-2">
+                            <div>
+                                <span class="font-bold text-xs sm:text-sm text-zinc-900 dark:text-white">${myMemberData.name}</span>
+                                <span class="font-mono text-xs ${color.idCls} font-bold ml-1.5">(${user.id})</span>
+                            </div>
+                            <span class="font-mono text-xs font-bold text-zinc-900 dark:text-white">${done} / ${total} Tasks Finished (${pct}%)</span>
+                        </div>
+                        <div class="h-2 bg-zinc-100 dark:bg-zinc-800 rounded overflow-hidden">
+                            <div style="width: ${pct}%" class="h-full ${color.barBg} transition-all duration-300"></div>
+                        </div>
+
+                        <!-- TASK 0 SHARED ONBOARDING BANNER -->
+                        <div class="p-3 rounded-lg bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-amber-500/10 border border-blue-500/30 space-y-1 text-xs">
+                            <div class="flex items-center justify-between flex-wrap gap-2">
+                                <span class="font-bold text-zinc-900 dark:text-white flex items-center gap-1.5">
+                                    <i data-lucide="sparkles" class="w-4 h-4 text-blue-500"></i>
+                                    TASK 0 — Shared Team Onboarding &amp; Dataset Setup
+                                </span>
+                                <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-blue-600 text-white">REQUIRED FOR ALL 4 MEMBERS</span>
+                            </div>
+                            <p class="text-zinc-600 dark:text-zinc-300 text-[11px] leading-relaxed">
+                                <code class="font-mono bg-zinc-200 dark:bg-zinc-800 px-1 py-0.5 rounded">git pull origin main</code> &middot; Download SpaceNet 8 dataset (Germany + Louisiana East tarballs) locally &middot; Verify Python, PyTorch/CUDA, FastAPI &amp; React stack before writing code.
+                            </p>
+                        </div>
+
+                        <div class="pt-1">
+                            ${myTasksHtml}
+                        </div>
+                    </div>
+                `;
+            }
+
+            // 3. Render Full Team Pipeline (Auto-synced with task progress)
+            renderTaskTracker();
+
+            // 4. Render Admin Panel inside Dashboard (Strictly for Admin)
+            if (user.role === 'admin' && adminPanel && adminTableContent) {
+                adminPanel.classList.remove('hidden');
+                const users = getUsersDB();
+                let rowsHtml = '';
+                for (const id in users) {
+                    const u = users[id];
+                    const isDefPass = (u.isDefaultPass || u.mustChange);
+                    const pwdStatusBadge = isDefPass
+                        ? `<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30">Default (Unchanged)</span>`
+                        : `<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">Custom Set</span>`;
+
+                    const lastLoginDisplay = u.lastLogin
+                        ? `<span class="text-zinc-900 dark:text-white font-semibold">${u.lastLogin}</span>`
+                        : `<span class="text-zinc-400 italic font-sans">Never Logged In</span>`;
+
+                    const roleBadge = u.role === 'admin'
+                        ? `<span class="px-1.5 py-0.5 rounded text-[10px] font-bold mono bg-amber-500 text-white">ADMIN</span>`
+                        : `<span class="px-1.5 py-0.5 rounded text-[10px] font-bold mono bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">USER</span>`;
+
+                    const isSelf = u.id === user.id ? ' <span class="text-[10px] text-blue-500 font-bold font-sans">(You)</span>' : '';
+
+                    const roleBtnHtml = u.role !== 'admin' ? `
+                        <button onclick="adminReassignUserRole('${u.id}')" class="px-2 py-1 text-[10px] font-mono rounded bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/30 hover:bg-purple-500 hover:text-white transition-colors cursor-pointer flex items-center gap-1">
+                            <i data-lucide="rotate-ccw" class="w-3 h-3"></i> Reset Role
+                        </button>
+                    ` : '';
+
+                    rowsHtml += `
+                        <tr>
+                            <td class="p-2.5 font-bold font-mono text-zinc-900 dark:text-white">${u.id}${isSelf}</td>
+                            <td class="p-2.5 font-sans font-medium text-zinc-900 dark:text-white">${u.name}</td>
+                            <td class="p-2.5">${roleBadge}</td>
+                            <td class="p-2.5">${pwdStatusBadge}</td>
+                            <td class="p-2.5 font-mono text-[11px]">${lastLoginDisplay}</td>
+                            <td class="p-2.5">
+                                <div class="flex items-center gap-1.5">
+                                    <button onclick="resetSingleUserPassword('${u.id}')" class="px-2.5 py-1 text-[10px] font-mono rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30 hover:bg-amber-500 hover:text-white transition-colors cursor-pointer flex items-center gap-1">
+                                        <i data-lucide="key-round" class="w-3 h-3"></i> Reset Pass
+                                    </button>
+                                    ${roleBtnHtml}
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                }
+
+                adminTableContent.innerHTML = `
+                    <div class="overflow-x-auto rounded-lg border border-blue-500/30 dark:border-blue-500/40 bg-white dark:bg-zinc-900/60 w-full max-w-full">
+                        <table class="w-full text-left text-xs min-w-[700px]">
+                            <thead class="bg-zinc-50 dark:bg-zinc-900 text-zinc-500 font-semibold border-b border-zinc-200 dark:border-zinc-800">
+                                <tr>
+                                    <th class="p-2.5">Student ID</th>
+                                    <th class="p-2.5">Name / Assigned Role</th>
+                                    <th class="p-2.5">Role</th>
+                                    <th class="p-2.5">Password Status</th>
+                                    <th class="p-2.5">Last Login</th>
+                                    <th class="p-2.5">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-zinc-200 dark:divide-zinc-800 text-zinc-700 dark:text-zinc-300">
+                                ${rowsHtml}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            } else if (adminPanel) {
+                adminPanel.classList.add('hidden');
+            }
+
+            lucide.createIcons();
+        }
+
+        async function toggleTask(taskId) {
+            const loggedInId = getLoggedInUserId();
+            const users = getUsersDB();
+            const currentUser = loggedInId ? users[loggedInId] : null;
+
+            if (!canUserToggleTask(currentUser, taskId)) {
+                const owner = getTaskOwner(taskId);
+                const ownerStudentId = getRoleAssignedStudentId(owner.id);
+                const ownerName = owner ? `${owner.name} (${ownerStudentId})` : 'the assigned team member';
+                alert(`\uD83D\uDD12 Permission Denied: You can only check off tasks assigned to your own role.\n\nThis task is assigned to: ${ownerName}`);
+                return;
+            }
+
+            const progress = getTaskProgress();
+
+            if (progress[taskId]) {
+                // Unchecking — cascade uncheck dependents
+                progress[taskId] = false;
+                cascadeUncheck(taskId, progress);
+            } else {
+                // Checking — only if unlocked
+                if (isTaskUnlocked(taskId, progress)) {
+                    progress[taskId] = true;
+                }
+            }
+
+            await saveTaskProgress(progress);
+            if (currentUser) {
+                renderPersonalDashboard(currentUser);
+            } else {
+                renderTaskTracker();
+            }
+        }
+
+        function renderTaskTracker() {
+            const containers = [
+                document.getElementById('task-tracker-container'),
+                document.getElementById('dashboard-team-pipeline-content')
+            ].filter(Boolean);
+
+            if (containers.length === 0) return;
+
+            const progress = getTaskProgress();
+            const loggedInId = getLoggedInUserId();
+            const users = getUsersDB();
+            const currentUser = loggedInId ? users[loggedInId] : null;
+
+            // Calculate totals
+            let totalTasks = 0, totalDone = 0;
+            TASK_MEMBERS.forEach(m => {
+                m.tasks.forEach(t => {
+                    totalTasks++;
+                    if (progress[t.id]) totalDone++;
+                });
+            });
+
+            let html = '';
+
+            // Overall progress bar header
+            const overallPct = totalTasks > 0 ? Math.round((totalDone / totalTasks) * 100) : 0;
+            html += `
+                <!-- TASK 0 SHARED ONBOARDING BANNER -->
+                <div class="p-3.5 rounded-lg bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-amber-500/10 border border-blue-500/30 space-y-1.5 text-xs">
+                    <div class="flex items-center justify-between flex-wrap gap-2">
+                        <span class="font-bold text-zinc-900 dark:text-white flex items-center gap-1.5 text-xs sm:text-sm">
+                            <i data-lucide="sparkles" class="w-4 h-4 text-blue-500"></i>
+                            TASK 0 — Shared Team Onboarding &amp; Dataset Setup
+                        </span>
+                        <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-blue-600 text-white">REQUIRED FOR ALL 4 MEMBERS</span>
+                    </div>
+                    <p class="text-zinc-600 dark:text-zinc-300 text-[11px] leading-relaxed">
+                        <code class="font-mono bg-zinc-200 dark:bg-zinc-800 px-1 py-0.5 rounded">git pull origin main</code> &middot; Download SpaceNet 8 dataset (Germany + Louisiana East tarballs) locally &middot; Verify Python, PyTorch/CUDA, FastAPI &amp; React stack before writing code.
+                    </p>
+                </div>
+
+                <div class="p-3.5 rounded-lg bg-white dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 space-y-2.5 text-xs">
+                    <div class="flex items-center justify-between flex-wrap gap-2">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="kanban" class="w-4 h-4 text-blue-500"></i>
+                            <span class="font-bold text-zinc-900 dark:text-white">Project Sequential Execution Progress</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="font-mono font-bold text-zinc-900 dark:text-white">${totalDone} / ${totalTasks} Tasks Finished <span class="text-blue-600 dark:text-blue-400">(${overallPct}%)</span></span>
+                            <button onclick="resetAllTasks()" class="px-2 py-0.5 rounded text-[10px] font-mono bg-zinc-100 dark:bg-zinc-800 hover:bg-rose-500 hover:text-white text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 transition-colors cursor-pointer flex items-center gap-1">
+                                <i data-lucide="rotate-ccw" class="w-3 h-3"></i> Reset Checklist
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex h-2 rounded overflow-hidden bg-zinc-100 dark:bg-zinc-800">
+                        <div style="width: ${overallPct}%" class="bg-blue-500 transition-all duration-300 rounded"></div>
+                    </div>
+                </div>
+            `;
+
+            // Render each member card
+            TASK_MEMBERS.forEach(member => {
+                const color = MEMBER_COLORS[member.id];
+                const done = member.tasks.filter(t => progress[t.id]).length;
+                const total = member.tasks.length;
+                const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+                const memberAssignedStudentId = getRoleAssignedStudentId(member.id);
+
+                const isUserMemberCard = currentUser && (currentUser.assignedRoleId === member.id || currentUser.id === memberAssignedStudentId);
+                const youBadge = isUserMemberCard
+                    ? `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold mono bg-blue-600 text-white font-mono flex items-center gap-1"><i data-lucide="user" class="w-2.5 h-2.5"></i> YOUR WORKLOAD</span>`
+                    : '';
+
+                // Member Status Pill
+                let memberStatusBadge = '';
+                if (pct === 100) {
+                    memberStatusBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 flex items-center gap-1"><i data-lucide="check-circle" class="w-3 h-3"></i> COMPLETED</span>`;
+                } else if (done > 0) {
+                    memberStatusBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/30 flex items-center gap-1"><i data-lucide="play-circle" class="w-3 h-3"></i> IN PROGRESS</span>`;
+                } else {
+                    const firstTaskUnlocked = isTaskUnlocked(member.tasks[0].id, progress);
+                    if (firstTaskUnlocked) {
+                        memberStatusBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30 flex items-center gap-1"><i data-lucide="circle-dot" class="w-3 h-3"></i> READY TO START</span>`;
+                    } else {
+                        memberStatusBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-zinc-200 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border border-zinc-300 dark:border-zinc-700 flex items-center gap-1"><i data-lucide="lock" class="w-3 h-3"></i> WAITING ON PIPELINE</span>`;
+                    }
+                }
+
+                let tasksHtml = '';
+                member.tasks.forEach((task, idx) => {
+                    const isChecked = progress[task.id] === true;
+                    const unlocked = isTaskUnlocked(task.id, progress);
+                    const blocker = !unlocked ? getBlockingDep(task.id, progress) : null;
+                    const isMine = canUserToggleTask(currentUser, task.id);
+
+                    let checkboxClass = '';
+                    if (isChecked) {
+                        checkboxClass = `w-4 h-4 rounded border-2 ${color.checkBorderDone} flex items-center justify-center shrink-0 cursor-default`;
+                    } else if (unlocked) {
+                        checkboxClass = `w-4 h-4 rounded border-2 border-emerald-500/40 dark:border-emerald-500/60 bg-emerald-500/10 shrink-0 cursor-default`;
+                    } else {
+                        checkboxClass = `w-4 h-4 rounded border-2 border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800/50 shrink-0 cursor-default opacity-40`;
+                    }
+
+                    const textClass = isChecked
+                        ? 'line-through text-zinc-400 dark:text-zinc-500'
+                        : unlocked
+                            ? 'text-zinc-900 dark:text-white font-medium'
+                            : 'text-zinc-400 dark:text-zinc-600';
+
+                    const checkIcon = isChecked ? `<i data-lucide="check" class="w-2.5 h-2.5 text-white"></i>` : '';
+
+                    let depLabel = '';
+                    if (!unlocked && blocker) {
+                        const owner = getTaskOwner(blocker.id);
+                        const ownerStudentId = getRoleAssignedStudentId(owner.id);
+                        const ownerStudentDisplay = ownerStudentId ? `(${ownerStudentId})` : `(Unassigned)`;
+                        const ownerLabel = owner ? `${owner.name.split('—')[0].trim()} ${ownerStudentDisplay}` : 'Previous Member';
+                        const ownerColor = owner ? MEMBER_COLORS[owner.id] : null;
+                        const ownerBadgeCls = ownerColor ? ownerColor.badgeCls : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30';
+
+                        depLabel = `
+                            <div class="mt-1 flex items-center gap-1.5 flex-wrap text-[10px]">
+                                <span class="px-1.5 py-0.2 rounded font-mono font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30 flex items-center gap-1">
+                                    <i data-lucide="lock" class="w-3 h-3"></i> LOCKED
+                                </span>
+                                <span class="text-zinc-500 dark:text-zinc-400">Waiting on <span class="px-1.5 py-0.2 rounded font-mono font-bold ${ownerBadgeCls} border">${ownerLabel}</span> to complete:</span>
+                                <span class="font-mono text-zinc-700 dark:text-zinc-300 font-semibold">"${blocker.text}"</span>
+                            </div>
+                        `;
+                    }
+
+                    let assignedTag = (!isMine && unlocked && !isChecked)
+                        ? (memberAssignedStudentId
+                            ? `<span class="text-[9px] font-mono text-zinc-400 dark:text-zinc-500 block mt-0.5">(Assigned to Student ID: ${memberAssignedStudentId})</span>`
+                            : `<span class="text-[9px] font-mono text-amber-600 dark:text-amber-400 font-semibold block mt-0.5">(Role Currently Unassigned)</span>`)
+                        : '';
+
+                    tasksHtml += `
+                        <div class="flex items-start gap-2.5 py-2 ${idx > 0 ? 'border-t border-zinc-100 dark:border-zinc-800/50' : ''}">
+                            <div class="${checkboxClass}" style="margin-top:1px">${checkIcon}</div>
+                            <div class="flex-1 min-w-0">
+                                <span class="text-[11px] ${textClass}">${task.text}</span>
+                                ${assignedTag}
+                                ${depLabel}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                const studentHeaderDisplay = memberAssignedStudentId
+                    ? `<span class="font-mono text-[10px] ${color.idCls} font-bold">(${memberAssignedStudentId})</span>`
+                    : `<span class="font-sans text-[10px] text-amber-600 dark:text-amber-400 font-bold italic">(Unassigned)</span>`;
+
+                html += `
+                    <div class="rounded-lg bg-white dark:bg-zinc-900/60 border ${color.cardBorder} overflow-hidden">
+                        <div class="px-3.5 py-2.5 bg-zinc-50 dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between flex-wrap gap-2">
+                            <div class="flex items-center gap-2">
+                                <span class="font-bold text-xs text-zinc-900 dark:text-white">${member.name}</span>
+                                ${studentHeaderDisplay}
+                                <span class="px-1.5 py-0.5 rounded text-[9px] font-bold mono ${color.badgeCls} border">${color.label}</span>
+                                ${youBadge}
+                            </div>
+                            <div class="flex items-center gap-2">
+                                ${memberStatusBadge}
+                                <span class="font-mono text-[11px] font-bold text-zinc-900 dark:text-white">${done}/${total} <span class="text-zinc-400 font-normal">(${pct}%)</span></span>
+                            </div>
+                        </div>
+                        <div class="h-1 bg-zinc-100 dark:bg-zinc-800">
+                            <div style="width: ${pct}%" class="h-full ${color.barBg} transition-all duration-300"></div>
+                        </div>
+                        <div class="px-3.5 py-1">
+                            ${tasksHtml}
+                        </div>
+                    </div>
+                `;
+            });
+
+            containers.forEach(c => c.innerHTML = html);
+            lucide.createIcons();
+        }
+
+        // ==========================================
+        // NOTION-STYLE FLOATING SIDE NAV SCROLLSPY
+        // ==========================================
+        const sideNavSectionIds = ['sec-overview', 'sec1', 'sec2', 'sec3', 'sec4', 'sec5', 'sec6', 'sec7', 'sec8', 'sec9'];
+
+        function updateSideNavActive() {
+            let currentSecId = 'sec-overview';
+            const scrollPos = window.scrollY + 220;
+
+            for (const id of sideNavSectionIds) {
+                const el = document.getElementById(id);
+                if (el && el.offsetTop <= scrollPos) {
+                    currentSecId = id;
+                }
+            }
+
+            // Update mini dash indicators
+            document.querySelectorAll('.side-dash').forEach(dash => {
+                const target = dash.getAttribute('data-side-dash');
+                if (target === currentSecId) {
+                    dash.className = 'side-dash w-5 h-1.5 rounded-full bg-blue-500 shadow-xs shadow-blue-500/50 transition-all duration-200';
+                } else {
+                    dash.className = 'side-dash w-3.5 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700 hover:w-4 transition-all duration-200';
+                }
+            });
+
+            // Update popover items
+            document.querySelectorAll('.side-nav-item').forEach(item => {
+                const target = item.getAttribute('data-side-target');
+                const dot = item.querySelector('.side-dot');
+                if (target === currentSecId) {
+                    item.className = 'side-nav-item flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 font-bold text-xs transition-colors';
+                    if (dot) dot.className = 'w-1.5 h-1.5 rounded-full bg-blue-500 side-dot shrink-0';
+                } else {
+                    item.className = 'side-nav-item flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white text-xs font-medium';
+                    if (dot) dot.className = 'w-1.5 h-1.5 rounded-full bg-zinc-400 dark:bg-zinc-600 side-dot shrink-0';
+                }
+            });
+        }
+
+        function renderTeamOverviewSection() {
+            const container = document.getElementById('sec4-team-dynamic-container');
+            if (!container) return;
+
+            const m1Id = getRoleAssignedStudentId('m1') || '2300030929';
+            const m2Id = getRoleAssignedStudentId('m2');
+            const m3Id = getRoleAssignedStudentId('m3');
+            const m4Id = getRoleAssignedStudentId('m4');
+
+            const m1Display = `(ID: ${m1Id})`;
+            const m2Display = m2Id ? `(ID: ${m2Id})` : `<span class="italic text-zinc-400 font-sans text-[10px] font-normal">(Unassigned)</span>`;
+            const m3Display = m3Id ? `(ID: ${m3Id})` : `<span class="italic text-zinc-400 font-sans text-[10px] font-normal">(Unassigned)</span>`;
+            const m4Display = m4Id ? `(ID: ${m4Id})` : `<span class="italic text-zinc-400 font-sans text-[10px] font-normal">(Unassigned)</span>`;
+
+            container.innerHTML = `
+                <!-- TASK 0 SHARED ONBOARDING CARD -->
+                <div class="p-3.5 rounded-lg bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-amber-500/10 border border-blue-500/30 space-y-1.5 text-xs">
+                    <div class="flex items-center justify-between flex-wrap gap-2">
+                        <span class="font-bold text-zinc-900 dark:text-white flex items-center gap-1.5">
+                            <i data-lucide="sparkles" class="w-4 h-4 text-blue-500"></i>
+                            TASK 0 — Shared Team Onboarding &amp; Dataset Setup
+                        </span>
+                        <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-blue-600 text-white">REQUIRED FOR ALL 4 MEMBERS</span>
+                    </div>
+                    <p class="text-zinc-600 dark:text-zinc-300 text-[11px] leading-relaxed">
+                        <code class="font-mono bg-zinc-200 dark:bg-zinc-800 px-1 py-0.5 rounded">git pull origin main</code> &middot; Download SpaceNet 8 dataset (Germany + Louisiana East tarballs) locally &middot; Verify Python, PyTorch/CUDA, FastAPI &amp; React stack before writing code.
+                    </p>
+                </div>
+
+                <!-- 4 MEMBER BRIEF CARDS -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                    <!-- Member 1 -->
+                    <div class="p-3 rounded-lg bg-white dark:bg-zinc-900/60 border border-amber-500/40 dark:border-amber-500/50 hover:border-amber-500 transition-colors space-y-1">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <span class="font-bold text-zinc-900 dark:text-white">Member 1 — Team Lead &amp; Training Lead</span>
+                                <span class="font-mono text-[11px] text-amber-600 dark:text-amber-400 font-bold ml-1.5">${m1Display}</span>
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <span class="px-1.5 py-0.5 rounded text-[9px] font-bold mono bg-amber-500 text-white">ADMIN</span>
+                                <span class="px-1.5 py-0.5 rounded text-[10px] font-bold mono bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30">28%</span>
+                            </div>
+                        </div>
+                        <p class="text-zinc-500 text-[11px]">GPU Training, Baseline &amp; Fusion Runs, Docker Containerization, O5 Benchmarking, Review Defense Lead.</p>
+                    </div>
+
+                    <!-- Member 2 -->
+                    <div class="p-3 rounded-lg bg-white dark:bg-zinc-900/60 border border-blue-500/40 dark:border-blue-500/50 hover:border-blue-500 transition-colors space-y-1">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <span class="font-bold text-zinc-900 dark:text-white">Member 2 — AI Model Architect</span>
+                                <span class="font-mono text-[11px] text-blue-600 dark:text-blue-400 font-bold ml-1.5">${m2Display}</span>
+                            </div>
+                            <span class="px-1.5 py-0.5 rounded text-[10px] font-bold mono bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/30">24%</span>
+                        </div>
+                        <p class="text-zinc-500 text-[11px]">U-Net &amp; Siamese Architecture Design, BCE+Dice+Focal Losses, eval.py, Road Connectivity Graph Design.</p>
+                    </div>
+
+                    <!-- Member 3 -->
+                    <div class="p-3 rounded-lg bg-white dark:bg-zinc-900/60 border border-purple-500/40 dark:border-purple-500/50 hover:border-purple-500 transition-colors space-y-1">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <span class="font-bold text-zinc-900 dark:text-white">Member 3 — Geospatial Data Engineer</span>
+                                <span class="font-mono text-[11px] text-purple-600 dark:text-purple-400 font-bold ml-1.5">${m3Display}</span>
+                            </div>
+                            <span class="px-1.5 py-0.5 rounded text-[10px] font-bold mono bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/30">24%</span>
+                        </div>
+                        <p class="text-zinc-500 text-[11px]">GeoTIFF Ingestion, CRS Alignment, 512×512 Tiling, PyTorch DataLoader, Domain-Shift Robustness Eval.</p>
+                    </div>
+
+                    <!-- Member 4 -->
+                    <div class="p-3 rounded-lg bg-white dark:bg-zinc-900/60 border border-emerald-500/40 dark:border-emerald-500/50 hover:border-emerald-500 transition-colors space-y-1">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <span class="font-bold text-zinc-900 dark:text-white">Member 4 — Full-Stack &amp; MLOps Lead</span>
+                                <span class="font-mono text-[11px] text-emerald-600 dark:text-emerald-400 font-bold ml-1.5">${m4Display}</span>
+                            </div>
+                            <span class="px-1.5 py-0.5 rounded text-[10px] font-bold mono bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">24%</span>
+                        </div>
+                        <p class="text-zinc-500 text-[11px]">FastAPI Backend (Stub &amp; Real /predict, /route), React + Leaflet Map, Pytest Suite (≥80%), Demo Polish.</p>
+                    </div>
+                </div>
+
+                <!-- WORKLOAD SHARE PROGRESS BAR -->
+                <div class="p-3 rounded-lg bg-white dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 space-y-2 text-xs">
+                    <div class="flex h-2.5 rounded overflow-hidden">
+                        <div style="width: 28%" class="bg-amber-500" title="Member 1: 28%"></div>
+                        <div style="width: 24%" class="bg-blue-500" title="Member 2: 24%"></div>
+                        <div style="width: 24%" class="bg-purple-500" title="Member 3: 24%"></div>
+                        <div style="width: 24%" class="bg-emerald-500" title="Member 4: 24%"></div>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px] text-zinc-500">
+                        <div>M1 (${m1Id} Admin): <b class="text-amber-600 dark:text-amber-400">28%</b></div>
+                        <div>M2 (${m2Id || 'Unassigned'}): <b class="text-blue-600 dark:text-blue-400">24%</b></div>
+                        <div>M3 (${m3Id || 'Unassigned'}): <b class="text-purple-600 dark:text-purple-400">24%</b></div>
+                        <div>M4 (${m4Id || 'Unassigned'}): <b class="text-emerald-600 dark:text-emerald-400">24%</b></div>
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        window.addEventListener('scroll', updateSideNavActive);
+        window.addEventListener('resize', updateSideNavActive);
+
+        // Initialize Auth system on DOM load
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Fetch both users and task progress from server before rendering
+            await Promise.all([
+                fetchUsersFromServer(),
+                fetchTaskProgressFromServer()
+            ]);
+            await initAuth();
+            renderTeamOverviewSection();
+            renderTaskTracker();
+            updateSideNavActive();
+        });
+    </script>
+
+</body>
+</html>
