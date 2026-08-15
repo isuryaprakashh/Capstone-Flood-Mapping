@@ -171,16 +171,30 @@ def geographic_split(
     val_samples = [s for s in samples if s["region"] == val_region]
     remaining = [s for s in samples if s["region"] != val_region]
 
-    # Shuffle and split remaining into train/test
-    rng.shuffle(remaining)
-    test_count = max(1, int(len(remaining) * test_fraction))
-
-    test_samples = remaining[:test_count]
-    train_samples = remaining[test_count:]
+    # Handle case where only a single region (e.g. only Germany) is present
+    if not remaining or not val_samples:
+        logger.info(
+            "Single region dataset detected. Splitting single region into 70% train, 15% val, 15% test."
+        )
+        shuffled = list(samples)
+        rng.shuffle(shuffled)
+        n = len(shuffled)
+        n_val = max(1, int(n * 0.15))
+        n_test = max(1, int(n * 0.15))
+        
+        val_samples = shuffled[:n_val]
+        test_samples = shuffled[n_val : n_val + n_test]
+        train_samples = shuffled[n_val + n_test :]
+    else:
+        # Cross-region split: one region is val, other regions split into train/test
+        rng.shuffle(remaining)
+        test_count = max(1, int(len(remaining) * test_fraction))
+        test_samples = remaining[:test_count]
+        train_samples = remaining[test_count:]
 
     logger.info(
-        f"Geographic split: train={len(train_samples)}, "
-        f"val={len(val_samples)} ({val_region}), "
+        f"Dataset split: train={len(train_samples)}, "
+        f"val={len(val_samples)}, "
         f"test={len(test_samples)}"
     )
 
