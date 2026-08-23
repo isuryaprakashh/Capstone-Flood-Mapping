@@ -461,13 +461,15 @@ def create_dataloaders(
     """
     data_root = Path(data_root)
 
-    # Discover dataset directories
+    # Discover dataset directories (robust recursive search)
     dataset_dirs = []
-    for child in sorted(data_root.iterdir()):
-        if child.is_dir() and (child / "PRE-event").exists():
-            # Only include training sets (with annotations)
-            if (child / "annotations").exists():
-                dataset_dirs.append(child)
+    if (data_root / "PRE-event").exists() and (data_root / "annotations").exists():
+        dataset_dirs.append(data_root)
+
+    for pre_dir in sorted(data_root.glob("**/PRE-event")):
+        parent = pre_dir.parent
+        if (parent / "annotations").exists() and parent not in dataset_dirs:
+            dataset_dirs.append(parent)
 
     if not dataset_dirs:
         raise FileNotFoundError(

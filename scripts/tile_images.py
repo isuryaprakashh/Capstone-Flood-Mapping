@@ -82,12 +82,17 @@ def main():
         logger.error(f"Data root does not exist: {data_root}")
         sys.exit(1)
 
-    # Discover dataset directories
+    # Discover dataset directories (robust recursive search)
     dataset_dirs = []
-    for child in sorted(data_root.iterdir()):
-        if child.is_dir() and (child / "PRE-event").exists():
-            dataset_dirs.append(child)
-            logger.info(f"Found dataset: {child.name}")
+    if (data_root / "PRE-event").exists():
+        dataset_dirs.append(data_root)
+        logger.info(f"Found dataset at root: {data_root.name}")
+
+    for pre_dir in sorted(data_root.glob("**/PRE-event")):
+        parent = pre_dir.parent
+        if parent not in dataset_dirs:
+            dataset_dirs.append(parent)
+            logger.info(f"Found dataset: {parent.name} (at {parent})")
 
     if not dataset_dirs:
         logger.error(f"No SpaceNet 8 dataset directories found in {data_root}")
