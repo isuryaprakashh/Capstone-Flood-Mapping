@@ -5,7 +5,7 @@
 [![SpaceNet 8](https://img.shields.io/badge/Dataset-SpaceNet%208-blue.svg)](https://spacenet.ai/sn8-challenge/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-**Capstone Project ID: `KLCAP-2026-00010`**
+
 
 An end-to-end deep learning framework and rescue operations dashboard for automated detection of flooded roads and damaged buildings from multi-temporal (pre/post event) satellite imagery.
 
@@ -52,7 +52,7 @@ You can train both models in Google Colab with a free **NVIDIA Tesla T4 GPU**:
 
 Open [`notebooks/SpaceNet8_Colab_Training.ipynb`](notebooks/SpaceNet8_Colab_Training.ipynb) for step-by-step interactive training, automated Google Drive checkpoint backup, evaluation benchmarks, and visual qualitative inspections.
 
-### 1. Environment Setup (Local / HPC)
+### 1. Environment Setup
 
 ```bash
 # Clone the repository
@@ -70,14 +70,14 @@ pip install -r requirements.txt
 python scripts/tile_images.py --data-root ./CP1-DATASET --output-dir ./processed
 ```
 
-### 3. Model Training (HPC / GPU Server)
+### 3. Model Training (Google Colab / Local GPU)
 
 ```bash
-# Train the Baseline U-Net
-python train.py --model unet --data-root ./CP1-DATASET --epochs 50 --batch-size 8
+# Train the Novel Siamese Cross-Attention Fusion Network (O3)
+python train.py --model fusion --data-root ./CP1-DATASET --epochs 40 --batch-size 8 --amp
 
-# Train the Novel Siamese Cross-Attention Fusion Network
-python train.py --model fusion --data-root ./CP1-DATASET --epochs 100 --batch-size 8
+# Train the Baseline U-Net (O2)
+python train.py --model unet --data-root ./CP1-DATASET --epochs 25 --batch-size 8 --amp
 ```
 
 ### 4. Model Evaluation & Benchmark Comparison
