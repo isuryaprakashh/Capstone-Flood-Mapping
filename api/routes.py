@@ -117,8 +117,10 @@ async def predict_flood(
             flooded_building_mask=binary_mask[3] if binary_mask.shape[0] > 3 else None,
         )
 
-        # Convert masks and satellite photo to base64 PNG for frontend
+        # Convert masks and satellite photos to base64 for side-by-side frontend view
         mask_b64 = _mask_to_base64_png(binary_mask)
+        pre_b64 = _bytes_to_base64_image(pre_content) if 'pre_content' in locals() else ""
+        post_b64 = _bytes_to_base64_image(post_content) if 'post_content' in locals() else ""
 
         return JSONResponse(
             {
@@ -126,6 +128,8 @@ async def predict_flood(
                 "class_names": result["class_names"],
                 "statistics": stats,
                 "mask_png_base64": mask_b64,
+                "pre_image_base64": pre_b64,
+                "post_image_base64": post_b64,
                 "mask_shape": list(binary_mask.shape),
                 "road_network": road_geojson,
                 "building_footprints": building_geojson,
@@ -201,7 +205,8 @@ async def find_route(
 @router.get("/sample")
 async def sample_prediction(request: Request):
     """
-    Return a sample prediction with realistic road vectors and flood zones.
+    Return a sample prediction with realistic road vectors, flood zones,
+    and side-by-side pre/post satellite imagery.
     """
     from inference.predict import create_stub_prediction
     from graph.road_graph import (
@@ -224,6 +229,17 @@ async def sample_prediction(request: Request):
 
     mask_b64 = _mask_to_base64_png(result["binary_mask"])
 
+    # Load actual sample images if available on disk for true satellite textures
+    pre_sample_path = Path("CP1-DATASET/Germany_Training_Public/PRE-event/10500500C4DD7000_0_15_63.tif")
+    post_sample_path = Path("CP1-DATASET/Germany_Training_Public/POST-event/10500500E6DD3C00_0_15_63.tif")
+
+    pre_b64 = ""
+    post_b64 = ""
+    if pre_sample_path.exists():
+        pre_b64 = _file_to_base64_rgb(pre_sample_path)
+    if post_sample_path.exists():
+        post_b64 = _file_to_base64_rgb(post_sample_path)
+
     G = build_road_graph_from_prediction(result)
     request.app.state.last_graph = G
     request.app.state.last_prediction = result
@@ -240,6 +256,8 @@ async def sample_prediction(request: Request):
             "class_names": result["class_names"],
             "statistics": stats,
             "mask_png_base64": mask_b64,
+            "pre_image_base64": pre_b64,
+            "post_image_base64": post_b64,
             "road_network": road_geojson,
             "building_footprints": building_geojson,
             "num_road_segments": len(road_geojson.get("features", [])),
@@ -247,6 +265,53 @@ async def sample_prediction(request: Request):
             "is_stub": True,
         }
     )
+
+
+def _file_to_base64_rgb(file_path: Path) -> str:
+    """Read a GeoTIFF or image file and convert to base64 JPEG thumbnail."""
+    import base64
+    import io
+    from PIL import Image
+    try:
+        from data.dataset import read_geotiff
+        arr = read_geotiff(file_path, max_bands=3)
+        if arr.ndim == 3:
+            rgb = np.transpose(arr[:3], (1, 2, 0))
+            if rgb.max() <= 1.0:
+                rgb = (rgb * 255).astype(np.uint8)
+            else:
+                rgb = np.clip(rgb, 0, 255).astype(np.uint8)
+        else:
+            rgb = np.clip(arr, 0, 255).astype(np.uint8)
+
+        # Resize to thumbnail for fast UI transport
+        img = Image.fromarray(rgb)
+        img.thumbnail((768, 768))
+        buf = io.BytesIO()
+        img.save(buf, format="JPEG", quality=85)
+        return base64.b64encode(buf.getvalue()).decode("utf-8")
+    except Exception as e:
+        logger.warning(f"Error encoding file {file_path}: {e}")
+        return ""
+
+
+def _bytes_to_base64_image(image_bytes: bytes) -> str:
+    """Convert raw image bytes to base64 JPEG thumbnail."""
+    import base64
+    import io
+    from PIL import Image
+    try:
+        buf = io.BytesIO(image_bytes)
+        img = Image.open(buf)
+        if img.mode != "RGB":
+            img = img.convert("RGB")
+        img.thumbnail((768, 768))
+        out_buf = io.BytesIO()
+        img.save(out_buf, format="JPEG", quality=85)
+        return base64.b64encode(out_buf.getvalue()).decode("utf-8")
+    except Exception as e:
+        logger.warning(f"Error converting image bytes: {e}")
+        return ""
 
 
 def _mask_to_base64_png(binary_mask: np.ndarray) -> str:
@@ -267,8 +332,6 @@ def _mask_to_base64_png(binary_mask: np.ndarray) -> str:
         return base64.b64encode(buffer.read()).decode("utf-8")
 
     except ImportError:
-        # Fallback: return simple encoding
         import base64
-
         flat = binary_mask.astype(np.uint8).tobytes()
         return base64.b64encode(flat).decode("utf-8")

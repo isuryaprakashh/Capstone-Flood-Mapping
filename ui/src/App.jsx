@@ -3,46 +3,51 @@ import axios from 'axios';
 
 const API_BASE = '/api';
 
-const CLASS_COLORS = {
-  building: '#3b82f6',
-  road: '#94a3b8',
-  flood: '#06b6d4',
-  flooded_building: '#ef4444',
-  flooded_road: '#f59e0b',
+const METRIC_COLORS = {
+  building: { text: '#2563eb', bg: '#eff6ff', border: '#bfdbfe' },
+  road: { text: '#475569', bg: '#f8fafc', border: '#e2e8f0' },
+  flood: { text: '#0284c7', bg: '#f0f9ff', border: '#bae6fd' },
+  flooded_building: { text: '#dc2626', bg: '#fef2f2', border: '#fecaca' },
+  flooded_road: { text: '#d97706', bg: '#fffbeb', border: '#fde68a' },
 };
 
 export default function App() {
-  const [darkMode, setDarkMode] = useState(true);
   const [preFile, setPreFile] = useState(null);
   const [postFile, setPostFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
-  const [activeTab, setActiveTab] = useState('upload');
+  const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'side-by-side' | 'router'
   const [apiStatus, setApiStatus] = useState(null);
 
-  // Visualization settings
-  const [viewMode, setViewMode] = useState('hybrid'); // 'vectors' | 'raster' | 'hybrid'
+  // Visualization toggles
   const [showRoads, setShowRoads] = useState(true);
   const [showBuildings, setShowBuildings] = useState(true);
   const [showMask, setShowMask] = useState(true);
-  const [overlayOpacity, setOverlayOpacity] = useState(0.75);
+  const [showSatellite, setShowSatellite] = useState(true);
+  const [overlayOpacity, setOverlayOpacity] = useState(0.7);
 
-  // Routing state
+  // Routing State
   const [startPoint, setStartPoint] = useState(null);
   const [endPoint, setEndPoint] = useState(null);
   const [routeResult, setRouteResult] = useState(null);
   const [routingLoading, setRoutingLoading] = useState(false);
-  const [routingMode, setRoutingMode] = useState('start'); // 'start' | 'end'
+  const [routeStep, setRouteStep] = useState('start'); // 'start' | 'end'
 
-  // Canvas zoom & pan
+  // Canvas Pan & Zoom
   const [scale, setScale] = useState(1);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
-  const canvasRef = useRef(null);
-  const containerRef = useRef(null);
+  const mainCanvasRef = useRef(null);
+  const preCanvasRef = useRef(null);
+  const postCanvasRef = useRef(null);
+
+  // Images cache
+  const preImgObj = useRef(null);
+  const postImgObj = useRef(null);
+  const maskImgObj = useRef(null);
 
   /* ─── Health Check ─── */
   const checkHealth = useCallback(async () => {
@@ -58,10 +63,10 @@ export default function App() {
     checkHealth();
   }, [checkHealth]);
 
-  /* ─── Prediction Handler ─── */
+  /* ─── Load Model Predictions ─── */
   const handlePredict = async () => {
     if (!preFile || !postFile) {
-      setError('Please upload both pre-event and post-event images.');
+      setError('Please select both Pre-event and Post-event GeoTIFF images.');
       return;
     }
     setLoading(true);
@@ -82,17 +87,16 @@ export default function App() {
 
       if (res.data.ok) {
         setResult(res.data);
-        setActiveTab('results');
         resetView();
       }
     } catch (err) {
-      setError(err.response?.data?.detail || 'Prediction failed. Check backend API.');
+      setError(err.response?.data?.detail || 'Inference failed. Verify backend status.');
     } finally {
       setLoading(false);
     }
   };
 
-  /* ─── Load Sample Demo ─── */
+  /* ─── Sample Demo ─── */
   const handleSample = async () => {
     setLoading(true);
     setError(null);
@@ -100,17 +104,16 @@ export default function App() {
       const res = await axios.get(`${API_BASE}/sample`);
       if (res.data.ok) {
         setResult(res.data);
-        setActiveTab('results');
         resetView();
       }
     } catch (err) {
-      setError('Sample load failed.');
+      setError('Failed to load sample dataset.');
     } finally {
       setLoading(false);
     }
   };
 
-  /* ─── Route Computation ─── */
+  /* ─── Route Calculation (Dijkstra) ─── */
   const calculateRoute = async (start, end) => {
     if (!start || !end) return;
     setRoutingLoading(true);
@@ -126,7 +129,7 @@ export default function App() {
         setRouteResult(res.data);
       }
     } catch (err) {
-      setError('Routing calculation failed.');
+      setError('Route calculation error.');
     } finally {
       setRoutingLoading(false);
     }
@@ -137,17 +140,42 @@ export default function App() {
     setOffset({ x: 0, y: 0 });
   };
 
-  /* ─── Canvas Render Engine ─── */
-  const drawScene = useCallback(() => {
-    const canvas = canvasRef.current;
+  /* ─── Pre-load Images into Memory ─── */
+  useEffect(() => {
+    if (result?.pre_image_base64) {
+      const img = new Image();
+      img.src = `data:image/jpeg;base64,${result.pre_image_base64}`;
+      preImgObj.current = img;
+    } else {
+      preImgObj.current = null;
+    }
+
+    if (result?.post_image_base64) {
+      const img = new Image();
+      img.src = `data:image/jpeg;base64,${result.post_image_base64}`;
+      postImgObj.current = img;
+    } else {
+      postImgObj.current = null;
+    }
+
+    if (result?.mask_png_base64) {
+      const img = new Image();
+      img.src = `data:image/png;base64,${result.mask_png_base64}`;
+      maskImgObj.current = img;
+    } else {
+      maskImgObj.current = null;
+    }
+  }, [result]);
+
+  /* ─── Main Unified Canvas Renderer ─── */
+  const drawMainCanvas = useCallback(() => {
+    const canvas = mainCanvasRef.current;
     if (!canvas || !result) return;
     const ctx = canvas.getContext('2d');
     const width = canvas.width;
     const height = canvas.height;
 
     ctx.clearRect(0, 0, width, height);
-
-    // Save transform state
     ctx.save();
     ctx.translate(offset.x + width / 2, offset.y + height / 2);
     ctx.scale(scale, scale);
@@ -157,28 +185,26 @@ export default function App() {
     const H = maskShape[1] || 512;
     const W = maskShape[2] || 512;
 
-    // Draw background canvas
-    ctx.fillStyle = darkMode ? '#0a0d14' : '#f8fafc';
+    // Base background
+    ctx.fillStyle = '#0f172a';
     ctx.fillRect(0, 0, W, H);
-    ctx.strokeStyle = darkMode ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.12)';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(0, 0, W, H);
 
-    // 1. Draw Raster Mask Overlay if enabled
-    if (showMask && (viewMode === 'raster' || viewMode === 'hybrid') && result.mask_png_base64) {
-      const img = new Image();
-      img.src = `data:image/png;base64,${result.mask_png_base64}`;
-      if (img.complete) {
-        ctx.globalAlpha = overlayOpacity;
-        ctx.drawImage(img, 0, 0, W, H);
-        ctx.globalAlpha = 1.0;
-      } else {
-        img.onload = () => drawScene();
-      }
+    // 1. Satellite Base Image
+    if (showSatellite && postImgObj.current?.complete) {
+      ctx.drawImage(postImgObj.current, 0, 0, W, H);
+    } else if (showSatellite && preImgObj.current?.complete) {
+      ctx.drawImage(preImgObj.current, 0, 0, W, H);
     }
 
-    // 2. Draw Vector Buildings
-    if (showBuildings && (viewMode === 'vectors' || viewMode === 'hybrid') && result.building_footprints?.features) {
+    // 2. Semantic Damage Mask
+    if (showMask && maskImgObj.current?.complete) {
+      ctx.globalAlpha = overlayOpacity;
+      ctx.drawImage(maskImgObj.current, 0, 0, W, H);
+      ctx.globalAlpha = 1.0;
+    }
+
+    // 3. Vector Building Footprints (Pre vs Post)
+    if (showBuildings && result.building_footprints?.features) {
       result.building_footprints.features.forEach((feature) => {
         const coords = feature.geometry?.coordinates?.[0];
         if (!coords || coords.length < 3) return;
@@ -191,16 +217,16 @@ export default function App() {
         }
         ctx.closePath();
 
-        ctx.fillStyle = isFlooded ? 'rgba(239, 68, 68, 0.4)' : 'rgba(59, 130, 246, 0.35)';
+        ctx.fillStyle = isFlooded ? 'rgba(239, 68, 68, 0.45)' : 'rgba(37, 99, 235, 0.35)';
         ctx.fill();
-        ctx.strokeStyle = isFlooded ? '#ef4444' : '#3b82f6';
+        ctx.strokeStyle = isFlooded ? '#ef4444' : '#2563eb';
         ctx.lineWidth = 1.5;
         ctx.stroke();
       });
     }
 
-    // 3. Draw Vector Road Network (SpaceNet 8 Graph)
-    if (showRoads && (viewMode === 'vectors' || viewMode === 'hybrid') && result.road_network?.features) {
+    // 4. SpaceNet 8 Vector Road Graph Lines
+    if (showRoads && result.road_network?.features) {
       result.road_network.features.forEach((feature) => {
         const coords = feature.geometry?.coordinates;
         if (!coords || coords.length < 2) return;
@@ -212,8 +238,8 @@ export default function App() {
           ctx.lineTo(coords[i][0], coords[i][1]);
         }
 
-        // Flooded = Crimson Red/Amber; Non-flooded = Emerald Green
-        ctx.strokeStyle = isFlooded ? '#ef4444' : '#10b981';
+        // Green for flood-free passable road, Red for flooded/blocked road
+        ctx.strokeStyle = isFlooded ? '#dc2626' : '#059669';
         ctx.lineWidth = isFlooded ? 3.5 : 2.5;
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
@@ -221,14 +247,13 @@ export default function App() {
       });
     }
 
-    // 4. Draw Calculated Flood-Safe Route
+    // 5. Dijkstra Safe Navigation Path
     if (routeResult?.route?.geometry?.coordinates?.length > 1) {
       const coords = routeResult.route.geometry.coordinates;
       const isFloodedRoute = routeResult.has_flooded_segments;
 
-      // Glow effect
-      ctx.shadowColor = isFloodedRoute ? '#ef4444' : '#06b6d4';
-      ctx.shadowBlur = 12;
+      ctx.shadowColor = isFloodedRoute ? '#dc2626' : '#06b6d4';
+      ctx.shadowBlur = 10;
 
       ctx.beginPath();
       ctx.moveTo(coords[0][0], coords[0][1]);
@@ -236,25 +261,24 @@ export default function App() {
         ctx.lineTo(coords[i][0], coords[i][1]);
       }
       ctx.strokeStyle = isFloodedRoute ? '#f59e0b' : '#00f0ff';
-      ctx.lineWidth = 5;
+      ctx.lineWidth = 4.5;
       ctx.lineCap = 'round';
       ctx.stroke();
-
-      ctx.shadowBlur = 0; // Reset shadow
+      ctx.shadowBlur = 0;
     }
 
-    // 5. Draw Start (A) and Destination (B) Markers
+    // 6. Start (A) & Destination (B) Markers
     if (startPoint) {
       ctx.beginPath();
-      ctx.arc(startPoint.x, startPoint.y, 8, 0, Math.PI * 2);
-      ctx.fillStyle = '#06b6d4';
+      ctx.arc(startPoint.x, startPoint.y, 7, 0, Math.PI * 2);
+      ctx.fillStyle = '#0284c7';
       ctx.fill();
       ctx.strokeStyle = '#ffffff';
       ctx.lineWidth = 2;
       ctx.stroke();
 
       ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 10px sans-serif';
+      ctx.font = 'bold 9px sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText('A', startPoint.x, startPoint.y);
@@ -262,36 +286,144 @@ export default function App() {
 
     if (endPoint) {
       ctx.beginPath();
-      ctx.arc(endPoint.x, endPoint.y, 8, 0, Math.PI * 2);
-      ctx.fillStyle = '#f59e0b';
+      ctx.arc(endPoint.x, endPoint.y, 7, 0, Math.PI * 2);
+      ctx.fillStyle = '#d97706';
       ctx.fill();
       ctx.strokeStyle = '#ffffff';
       ctx.lineWidth = 2;
       ctx.stroke();
 
       ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 10px sans-serif';
+      ctx.font = 'bold 9px sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText('B', endPoint.x, endPoint.y);
     }
 
     ctx.restore();
-  }, [result, showMask, showRoads, showBuildings, viewMode, overlayOpacity, routeResult, startPoint, endPoint, scale, offset, darkMode]);
+  }, [result, showSatellite, showMask, showBuildings, showRoads, overlayOpacity, routeResult, startPoint, endPoint, scale, offset]);
+
+  /* ─── Side-by-Side Pre / Post Canvas Renderers ─── */
+  const drawSideBySide = useCallback(() => {
+    if (!result) return;
+    const maskShape = result.mask_shape || [5, 512, 512];
+    const H = maskShape[1] || 512;
+    const W = maskShape[2] || 512;
+
+    // 1. Pre Canvas (Before Disaster)
+    const preCanvas = preCanvasRef.current;
+    if (preCanvas) {
+      const ctx = preCanvas.getContext('2d');
+      ctx.clearRect(0, 0, preCanvas.width, preCanvas.height);
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(0, 0, W, H);
+
+      if (preImgObj.current?.complete) {
+        ctx.drawImage(preImgObj.current, 0, 0, W, H);
+      }
+
+      // Draw intact buildings & roads
+      if (result.building_footprints?.features) {
+        result.building_footprints.features.forEach((feature) => {
+          const coords = feature.geometry?.coordinates?.[0];
+          if (!coords || coords.length < 3) return;
+          ctx.beginPath();
+          ctx.moveTo(coords[0][0], coords[0][1]);
+          for (let i = 1; i < coords.length; i++) ctx.lineTo(coords[i][0], coords[i][1]);
+          ctx.closePath();
+          ctx.fillStyle = 'rgba(37, 99, 235, 0.35)';
+          ctx.fill();
+          ctx.strokeStyle = '#2563eb';
+          ctx.lineWidth = 1.2;
+          ctx.stroke();
+        });
+      }
+
+      if (result.road_network?.features) {
+        result.road_network.features.forEach((feature) => {
+          const coords = feature.geometry?.coordinates;
+          if (!coords || coords.length < 2) return;
+          ctx.beginPath();
+          ctx.moveTo(coords[0][0], coords[0][1]);
+          for (let i = 1; i < coords.length; i++) ctx.lineTo(coords[i][0], coords[i][1]);
+          ctx.strokeStyle = '#059669';
+          ctx.lineWidth = 2.0;
+          ctx.stroke();
+        });
+      }
+    }
+
+    // 2. Post Canvas (After Flood Disaster)
+    const postCanvas = postCanvasRef.current;
+    if (postCanvas) {
+      const ctx = postCanvas.getContext('2d');
+      ctx.clearRect(0, 0, postCanvas.width, postCanvas.height);
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(0, 0, W, H);
+
+      if (postImgObj.current?.complete) {
+        ctx.drawImage(postImgObj.current, 0, 0, W, H);
+      }
+
+      // Damage mask overlay
+      if (maskImgObj.current?.complete) {
+        ctx.globalAlpha = 0.65;
+        ctx.drawImage(maskImgObj.current, 0, 0, W, H);
+        ctx.globalAlpha = 1.0;
+      }
+
+      // Flooded buildings
+      if (result.building_footprints?.features) {
+        result.building_footprints.features.forEach((feature) => {
+          const coords = feature.geometry?.coordinates?.[0];
+          if (!coords || coords.length < 3) return;
+          const isFlooded = feature.properties?.flooded;
+          ctx.beginPath();
+          ctx.moveTo(coords[0][0], coords[0][1]);
+          for (let i = 1; i < coords.length; i++) ctx.lineTo(coords[i][0], coords[i][1]);
+          ctx.closePath();
+          ctx.fillStyle = isFlooded ? 'rgba(220, 38, 38, 0.5)' : 'rgba(37, 99, 235, 0.2)';
+          ctx.fill();
+          ctx.strokeStyle = isFlooded ? '#dc2626' : '#2563eb';
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+        });
+      }
+
+      // Flooded roads
+      if (result.road_network?.features) {
+        result.road_network.features.forEach((feature) => {
+          const coords = feature.geometry?.coordinates;
+          if (!coords || coords.length < 2) return;
+          const isFlooded = feature.properties?.flooded;
+          ctx.beginPath();
+          ctx.moveTo(coords[0][0], coords[0][1]);
+          for (let i = 1; i < coords.length; i++) ctx.lineTo(coords[i][0], coords[i][1]);
+          ctx.strokeStyle = isFlooded ? '#dc2626' : '#059669';
+          ctx.lineWidth = isFlooded ? 3.0 : 1.8;
+          ctx.stroke();
+        });
+      }
+    }
+  }, [result]);
 
   useEffect(() => {
-    drawScene();
-  }, [drawScene]);
+    if (activeTab === 'side-by-side') {
+      drawSideBySide();
+    } else {
+      drawMainCanvas();
+    }
+  }, [activeTab, drawMainCanvas, drawSideBySide]);
 
-  /* ─── Canvas Interaction Handlers ─── */
-  const handleCanvasMouseDown = (e) => {
-    if (e.button === 0 && !e.shiftKey && activeTab !== 'route') {
+  /* ─── Canvas Mouse / Drag Handlers ─── */
+  const handleMouseDown = (e) => {
+    if (e.button === 0 && activeTab !== 'router') {
       setIsDragging(true);
       setDragStart({ x: e.clientX - offset.x, y: e.clientY - offset.y });
     }
   };
 
-  const handleCanvasMouseMove = (e) => {
+  const handleMouseMove = (e) => {
     if (isDragging) {
       setOffset({
         x: e.clientX - dragStart.x,
@@ -300,338 +432,332 @@ export default function App() {
     }
   };
 
-  const handleCanvasMouseUp = () => {
-    setIsDragging(false);
-  };
+  const handleMouseUp = () => setIsDragging(false);
 
-  const handleCanvasWheel = (e) => {
+  const handleWheel = (e) => {
     e.preventDefault();
     const zoomFactor = e.deltaY < 0 ? 1.15 : 0.85;
-    setScale((prev) => Math.min(Math.max(prev * zoomFactor, 0.3), 8));
+    setScale((prev) => Math.min(Math.max(prev * zoomFactor, 0.4), 6.0));
   };
 
   const handleCanvasClick = (e) => {
-    if (!result) return;
-    const canvas = canvasRef.current;
+    if (!result || activeTab !== 'router') return;
+    const canvas = mainCanvasRef.current;
     if (!canvas) return;
     const rect = canvas.getBoundingClientRect();
 
     const clickX = e.clientX - rect.left;
     const clickY = e.clientY - rect.top;
-
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
 
     const imgX = (clickX - (offset.x + centerX)) / scale + centerX;
     const imgY = (clickY - (offset.y + centerY)) / scale + centerY;
 
-    if (activeTab === 'route') {
-      if (routingMode === 'start' || !startPoint) {
-        const pt = { x: imgX, y: imgY };
-        setStartPoint(pt);
-        setRoutingMode('end');
-        if (endPoint) calculateRoute(pt, endPoint);
-      } else {
-        const pt = { x: imgX, y: imgY };
-        setEndPoint(pt);
-        setRoutingMode('start');
-        calculateRoute(startPoint, pt);
-      }
+    if (routeStep === 'start' || !startPoint) {
+      const pt = { x: imgX, y: imgY };
+      setStartPoint(pt);
+      setRouteStep('end');
+      if (endPoint) calculateRoute(pt, endPoint);
+    } else {
+      const pt = { x: imgX, y: imgY };
+      setEndPoint(pt);
+      setRouteStep('start');
+      calculateRoute(startPoint, pt);
     }
   };
 
-  const themeClass = darkMode ? 'dark' : '';
-
   return (
-    <div className={`app-root ${themeClass}`}>
-      {/* ─ Navbar ─ */}
-      <nav className="navbar">
-        <div className="nav-brand">
-          <div className="brand-icon">SN8</div>
-          <div className="brand-text">
-            <span className="brand-title">SpaceNet 8 Flood Mapping</span>
-            <span className="brand-subtitle">Siamese Cross-Attention & Vector Routing</span>
+    <div className="swiss-app">
+      {/* ── Header ── */}
+      <header className="swiss-header">
+        <div className="header-left">
+          <div className="swiss-logo">
+            <span className="logo-badge">SN8</span>
+          </div>
+          <div>
+            <h1 className="swiss-title">SpaceNet 8 Flood Intelligence</h1>
+            <p className="swiss-subtitle">Siamese Cross-Attention & Vector Routing Platform</p>
           </div>
         </div>
 
-        <div className="nav-tabs">
-          {[
-            { id: 'upload', label: '1. Upload & Inference', icon: '📡' },
-            { id: 'results', label: '2. Damage Vector Paths', icon: '📊' },
-            { id: 'route', label: '3. Safe Routing', icon: '🚗' },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              className={`nav-tab ${activeTab === tab.id ? 'active' : ''}`}
-              onClick={() => setActiveTab(tab.id)}
-            >
-              <span>{tab.icon}</span> {tab.label}
-            </button>
-          ))}
-        </div>
-
-        <div className="nav-actions">
-          <div
-            className={`status-dot ${apiStatus?.status === 'ok' ? 'online' : 'offline'}`}
-            title={apiStatus?.status === 'ok' ? 'Backend API Live' : 'Backend Disconnected'}
-          />
-          <button className="theme-btn" onClick={() => setDarkMode(!darkMode)}>
-            {darkMode ? '☀ Light' : '🌙 Dark'}
+        {/* Segmented Navigation Tabs */}
+        <div className="segmented-tabs">
+          <button
+            className={`tab-pill ${activeTab === 'overview' ? 'active' : ''}`}
+            onClick={() => setActiveTab('overview')}
+          >
+            🗺 Interactive Map
+          </button>
+          <button
+            className={`tab-pill ${activeTab === 'side-by-side' ? 'active' : ''}`}
+            onClick={() => setActiveTab('side-by-side')}
+          >
+            ⚖ Before / After
+          </button>
+          <button
+            className={`tab-pill ${activeTab === 'router' ? 'active' : ''}`}
+            onClick={() => setActiveTab('router')}
+          >
+            🚗 Safe Route Planner
           </button>
         </div>
-      </nav>
 
-      {/* ─ Main Layout ─ */}
-      <div className="main-layout">
-        {/* Left Sidebar */}
-        <aside className="sidebar">
+        <div className="header-right">
+          <div className="api-badge" title="API Status">
+            <span className={`status-indicator ${apiStatus?.status === 'ok' ? 'online' : 'offline'}`} />
+            <span>{apiStatus?.status === 'ok' ? 'API Online' : 'API Offline'}</span>
+          </div>
+        </div>
+      </header>
+
+      {/* ── Main Layout ── */}
+      <div className="swiss-body">
+        {/* Left Control & Metrics Sidebar */}
+        <aside className="swiss-sidebar">
           {error && (
-            <div className="alert alert-error">
+            <div className="swiss-alert error">
               <span>⚠</span> {error}
-              <button onClick={() => setError(null)}>×</button>
+              <button className="alert-close" onClick={() => setError(null)}>×</button>
             </div>
           )}
 
-          {/* TAB 1: UPLOAD */}
-          {activeTab === 'upload' && (
-            <div className="panel">
-              <h2 className="panel-title">
-                <span className="panel-icon">📡</span>
-                Satellite Image Pair
-              </h2>
-              <p className="panel-desc">
-                Upload pre-disaster and post-flood GeoTIFFs to run multi-scale Siamese cross-attention change detection and extract vector damage paths.
-              </p>
+          {/* Upload Section */}
+          <div className="card">
+            <div className="card-header">
+              <span className="card-tag">INPUTS</span>
+              <h2 className="card-title">Satellite Imagery</h2>
+            </div>
 
-              <div className="upload-group">
-                <label className="upload-label">
-                  <span className="upload-badge pre">PRE</span> Pre-Event Image
-                </label>
-                <div className="upload-dropzone" onClick={() => document.getElementById('pre-input').click()}>
-                  <input id="pre-input" type="file" accept=".tif,.tiff" hidden onChange={(e) => setPreFile(e.target.files[0])} />
-                  {preFile ? <span className="upload-filename">✓ {preFile.name}</span> : <span className="upload-placeholder">Click to select Pre-event .tif</span>}
+            <div className="upload-row">
+              <div className="file-box" onClick={() => document.getElementById('pre-upload').click()}>
+                <input id="pre-upload" type="file" accept=".tif,.tiff" hidden onChange={(e) => setPreFile(e.target.files[0])} />
+                <span className="file-tag pre">PRE</span>
+                <span className="file-name">{preFile ? preFile.name : 'Select Pre-event .tif'}</span>
+              </div>
+
+              <div className="file-box" onClick={() => document.getElementById('post-upload').click()}>
+                <input id="post-upload" type="file" accept=".tif,.tiff" hidden onChange={(e) => setPostFile(e.target.files[0])} />
+                <span className="file-tag post">POST</span>
+                <span className="file-name">{postFile ? postFile.name : 'Select Post-event .tif'}</span>
+              </div>
+            </div>
+
+            <button className="btn-primary" onClick={handlePredict} disabled={loading}>
+              {loading ? '⟳ Running Siamese Inference...' : 'Analyze Flood Damage'}
+            </button>
+
+            <button className="btn-secondary" onClick={handleSample} disabled={loading}>
+              Load SpaceNet 8 Sample Demo
+            </button>
+          </div>
+
+          {/* Results Summary */}
+          {result && (
+            <div className="card">
+              <div className="card-header">
+                <span className="card-tag">DETECTION</span>
+                <h2 className="card-title">Damage Telemetry</h2>
+              </div>
+
+              <div className="stat-pill-row">
+                <div className="stat-pill">
+                  <span className="stat-num">{result.num_road_segments || 0}</span>
+                  <span className="stat-lbl">Road Vectors</span>
+                </div>
+                <div className="stat-pill">
+                  <span className="stat-num">{result.num_buildings || 0}</span>
+                  <span className="stat-lbl">Buildings</span>
                 </div>
               </div>
 
-              <div className="upload-group">
-                <label className="upload-label">
-                  <span className="upload-badge post">POST</span> Post-Event Image
-                </label>
-                <div className="upload-dropzone" onClick={() => document.getElementById('post-input').click()}>
-                  <input id="post-input" type="file" accept=".tif,.tiff" hidden onChange={(e) => setPostFile(e.target.files[0])} />
-                  {postFile ? <span className="upload-filename">✓ {postFile.name}</span> : <span className="upload-placeholder">Click to select Post-event .tif</span>}
-                </div>
+              <div className="metrics-list">
+                {result.class_names?.map((name) => {
+                  const stat = result.statistics?.[name];
+                  if (!stat) return null;
+                  const c = METRIC_COLORS[name] || METRIC_COLORS.road;
+                  return (
+                    <div key={name} className="metric-row">
+                      <div className="metric-info">
+                        <span className="metric-dot" style={{ background: c.text }} />
+                        <span className="metric-name">{name.replace('_', ' ')}</span>
+                      </div>
+                      <div className="metric-val" style={{ color: c.text }}>
+                        {stat.coverage_pct}%
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-
-              <button className="btn btn-primary" onClick={handlePredict} disabled={loading}>
-                {loading ? '⟳ Running Deep Inference...' : '🔍 Run Flood & Path Analysis'}
-              </button>
-
-              <div className="divider">
-                <span>or</span>
-              </div>
-
-              <button className="btn btn-outline" onClick={handleSample} disabled={loading}>
-                📋 Load SpaceNet 8 Sample Demo
-              </button>
             </div>
           )}
 
-          {/* TAB 2: RESULTS & DAMAGE METRICS */}
-          {activeTab === 'results' && (
-            <div className="panel">
-              <h2 className="panel-title">
-                <span className="panel-icon">📊</span>
-                Detection & Vector Summary
-              </h2>
+          {/* Routing Controller */}
+          {activeTab === 'router' && (
+            <div className="card">
+              <div className="card-header">
+                <span className="card-tag">NAVIGATION</span>
+                <h2 className="card-title">Dijkstra Safe Router</h2>
+              </div>
+              <p className="card-desc">Click two road intersections on the map to compute flood-safe shortest path.</p>
 
-              {result ? (
-                <>
-                  <div className="vector-stats-badge">
-                    <div><strong>{result.num_road_segments || 0}</strong> Road Segments</div>
-                    <div><strong>{result.num_buildings || 0}</strong> Buildings</div>
-                  </div>
-
-                  <div className="results-grid">
-                    {result.class_names?.map((name) => {
-                      const stat = result.statistics?.[name];
-                      if (!stat) return null;
-                      return (
-                        <div key={name} className="result-card" style={{ borderColor: CLASS_COLORS[name] }}>
-                          <div className="result-header">
-                            <div className="result-dot" style={{ background: CLASS_COLORS[name] }} />
-                            <span className="result-name">{name.replace('_', ' ')}</span>
-                          </div>
-                          <div className="result-value">{stat.coverage_pct}%</div>
-                          <div className="result-bar">
-                            <div
-                              className="result-bar-fill"
-                              style={{
-                                width: `${Math.min(stat.coverage_pct * 2, 100)}%`,
-                                background: CLASS_COLORS[name],
-                              }}
-                            />
-                          </div>
-                          <div className="result-detail">
-                            {stat.positive_pixels?.toLocaleString()} px detected
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  <button className="btn btn-primary" style={{ marginTop: '1.25rem' }} onClick={() => setActiveTab('route')}>
-                    🚗 Test Safe Route Navigation →
-                  </button>
-                </>
-              ) : (
-                <div className="empty-notice">No prediction results yet. Please upload an image pair or load demo.</div>
-              )}
-            </div>
-          )}
-
-          {/* TAB 3: ROUTING */}
-          {activeTab === 'route' && (
-            <div className="panel">
-              <h2 className="panel-title">
-                <span className="panel-icon">🚗</span>
-                Flood-Safe Dijkstra Router
-              </h2>
-              <p className="panel-desc">
-                Click anywhere on the road paths to select <strong>Start (A)</strong> and <strong>Destination (B)</strong>. The routing engine navigates the graph avoiding flooded roads.
-              </p>
-
-              <div className="route-points">
-                <div className={`route-point ${routingMode === 'start' ? 'active' : ''}`} onClick={() => setRoutingMode('start')}>
-                  <span className="route-marker start">A</span>
-                  <span>{startPoint ? `(${Math.round(startPoint.x)}, ${Math.round(startPoint.y)})` : 'Click road to set Start'}</span>
+              <div className="route-pickers">
+                <div className={`picker-box ${routeStep === 'start' ? 'active' : ''}`} onClick={() => setRouteStep('start')}>
+                  <span className="picker-badge a">A</span>
+                  <span>{startPoint ? `(${Math.round(startPoint.x)}, ${Math.round(startPoint.y)})` : 'Click map to set Start'}</span>
                 </div>
-                <div className={`route-point ${routingMode === 'end' ? 'active' : ''}`} onClick={() => setRoutingMode('end')}>
-                  <span className="route-marker end">B</span>
-                  <span>{endPoint ? `(${Math.round(endPoint.x)}, ${Math.round(endPoint.y)})` : 'Click road to set Destination'}</span>
+                <div className={`picker-box ${routeStep === 'end' ? 'active' : ''}`} onClick={() => setRouteStep('end')}>
+                  <span className="picker-badge b">B</span>
+                  <span>{endPoint ? `(${Math.round(endPoint.x)}, ${Math.round(endPoint.y)})` : 'Click map to set End'}</span>
                 </div>
               </div>
 
-              {routingLoading && <div className="loading-spinner">Calculating safe route along road network...</div>}
+              {routingLoading && <div className="loading-bar">Computing shortest safe path along network...</div>}
 
               {routeResult && (
-                <div className="route-result">
+                <div className="route-report">
                   <div className={`route-status ${routeResult.route_type}`}>
-                    {routeResult.route_type === 'safe' ? '✅ Flood-Safe Route Found' : '⚠ Warning: Route Crosses Flood Zones'}
+                    {routeResult.route_type === 'safe' ? '✓ Safe Flood-Free Route' : '⚠ Route Uses Flooded Segment'}
                   </div>
-                  <div className="route-distance">
-                    Total Distance: <strong>{routeResult.distance_m} meters</strong>
+                  <div className="route-stat">
+                    <span>Distance:</span> <strong>{routeResult.distance_m} meters</strong>
                   </div>
-                  <div className="route-nodes">
-                    Waypoints traversed: {routeResult.path_nodes?.length || 0} nodes
+                  <div className="route-stat">
+                    <span>Waypoints:</span> <strong>{routeResult.path_nodes?.length || 0} nodes</strong>
                   </div>
                 </div>
               )}
 
-              <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
-                <button
-                  className="btn btn-outline"
-                  onClick={() => {
-                    setStartPoint(null);
-                    setEndPoint(null);
-                    setRouteResult(null);
-                    setRoutingMode('start');
-                  }}
-                >
-                  🔄 Clear Route
-                </button>
-              </div>
+              <button
+                className="btn-secondary"
+                style={{ marginTop: '0.75rem' }}
+                onClick={() => {
+                  setStartPoint(null);
+                  setEndPoint(null);
+                  setRouteResult(null);
+                  setRouteStep('start');
+                }}
+              >
+                Clear Route
+              </button>
             </div>
           )}
         </aside>
 
-        {/* Right Map / Vector Canvas Area */}
-        <div className="map-view-container" ref={containerRef}>
-          {/* Top Floating Control Bar */}
-          <div className="floating-controls">
-            <div className="control-group">
-              <span className="control-label">View:</span>
-              <button className={`control-btn ${viewMode === 'hybrid' ? 'active' : ''}`} onClick={() => setViewMode('hybrid')}>
-                Hybrid
-              </button>
-              <button className={`control-btn ${viewMode === 'vectors' ? 'active' : ''}`} onClick={() => setViewMode('vectors')}>
-                Vector Paths
-              </button>
-              <button className={`control-btn ${viewMode === 'raster' ? 'active' : ''}`} onClick={() => setViewMode('raster')}>
-                Damage Mask
-              </button>
-            </div>
-
-            <div className="control-group">
-              <label className="toggle-label">
+        {/* Main Visual Viewport */}
+        <main className="swiss-viewport">
+          {/* Top Layer & View Controls */}
+          <div className="viewport-controls">
+            <div className="toggle-group">
+              <label className="toggle-chip">
+                <input type="checkbox" checked={showSatellite} onChange={(e) => setShowSatellite(e.target.checked)} />
+                Satellite Image
+              </label>
+              <label className="toggle-chip">
                 <input type="checkbox" checked={showRoads} onChange={(e) => setShowRoads(e.target.checked)} />
-                🛣 Roads
+                Road Vectors
               </label>
-              <label className="toggle-label">
+              <label className="toggle-chip">
                 <input type="checkbox" checked={showBuildings} onChange={(e) => setShowBuildings(e.target.checked)} />
-                🏢 Buildings
+                Buildings
               </label>
-              <label className="toggle-label">
+              <label className="toggle-chip">
                 <input type="checkbox" checked={showMask} onChange={(e) => setShowMask(e.target.checked)} />
-                🌊 Flood
+                Damage Mask
               </label>
             </div>
 
-            <div className="control-group">
-              <span className="control-label">Zoom:</span>
-              <button className="control-btn" onClick={() => setScale((s) => Math.min(s * 1.25, 8))}>+</button>
-              <button className="control-btn" onClick={() => setScale((s) => Math.max(s * 0.8, 0.3))}>-</button>
-              <button className="control-btn" onClick={resetView}>Reset</button>
+            <div className="zoom-controls">
+              <span className="zoom-lbl">Zoom</span>
+              <button className="btn-zoom" onClick={() => setScale((s) => Math.min(s * 1.2, 5))}>+</button>
+              <button className="btn-zoom" onClick={() => setScale((s) => Math.max(s * 0.8, 0.4))}>-</button>
+              <button className="btn-zoom" onClick={resetView}>Reset</button>
             </div>
           </div>
 
-          {/* Interactive Canvas */}
-          <div className="canvas-wrapper">
-            <canvas
-              ref={canvasRef}
-              width={result?.mask_shape?.[2] || 512}
-              height={result?.mask_shape?.[1] || 512}
-              className="flood-canvas"
-              onMouseDown={handleCanvasMouseDown}
-              onMouseMove={handleCanvasMouseMove}
-              onMouseUp={handleCanvasMouseUp}
-              onWheel={handleCanvasWheel}
-              onClick={handleCanvasClick}
-            />
+          {/* VIEW MODE 1: Interactive Unified Map or Router */}
+          {activeTab !== 'side-by-side' && (
+            <div className="canvas-stage">
+              <canvas
+                ref={mainCanvasRef}
+                width={result?.mask_shape?.[2] || 512}
+                height={result?.mask_shape?.[1] || 512}
+                className="main-canvas"
+                onMouseDown={handleMouseDown}
+                onMouseMove={handleMouseMove}
+                onMouseUp={handleMouseUp}
+                onWheel={handleWheel}
+                onClick={handleCanvasClick}
+              />
 
-            {!result && (
-              <div className="canvas-empty-state">
-                <div className="empty-icon">🛰</div>
-                <h3>SpaceNet 8 Interactive Map</h3>
-                <p>Upload a Pre/Post GeoTIFF pair on the left or click <strong>Load SpaceNet 8 Sample Demo</strong> to view vector paths and flood damage.</p>
-                <button className="btn btn-primary" onClick={handleSample}>
-                  📋 Load SpaceNet 8 Sample Demo
-                </button>
+              {!result && (
+                <div className="empty-placeholder">
+                  <div className="empty-circle">🛰</div>
+                  <h3>SpaceNet 8 Geospatial Intelligence</h3>
+                  <p>Upload a Pre/Post GeoTIFF pair or load the sample demo to view vector road networks, building footprints, and evacuation routing.</p>
+                  <button className="btn-primary" style={{ maxWidth: '240px' }} onClick={handleSample}>
+                    Load Sample Demo
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* VIEW MODE 2: Side-by-Side Before vs After Comparison */}
+          {activeTab === 'side-by-side' && (
+            <div className="side-by-side-grid">
+              <div className="comparison-pane">
+                <div className="pane-header">
+                  <span className="pane-badge pre">PRE-EVENT</span>
+                  <span>Intact Infrastructure (Before)</span>
+                </div>
+                <div className="pane-canvas-box">
+                  <canvas
+                    ref={preCanvasRef}
+                    width={result?.mask_shape?.[2] || 512}
+                    height={result?.mask_shape?.[1] || 512}
+                    className="side-canvas"
+                  />
+                </div>
               </div>
-            )}
-          </div>
 
-          {/* Legend */}
-          <div className="map-legend">
-            <div className="legend-title">SpaceNet 8 Vector Legend</div>
-            <div className="legend-item">
-              <div className="legend-swatch" style={{ background: '#10b981' }} />
-              <span>Passable Road (Navigable)</span>
+              <div className="comparison-pane">
+                <div className="pane-header">
+                  <span className="pane-badge post">POST-EVENT</span>
+                  <span>Flood Inundation & Damage (After)</span>
+                </div>
+                <div className="pane-canvas-box">
+                  <canvas
+                    ref={postCanvasRef}
+                    width={result?.mask_shape?.[2] || 512}
+                    height={result?.mask_shape?.[1] || 512}
+                    className="side-canvas"
+                  />
+                </div>
+              </div>
             </div>
-            <div className="legend-item">
-              <div className="legend-swatch" style={{ background: '#ef4444' }} />
-              <span>Flooded Road (Blocked)</span>
+          )}
+
+          {/* Modern Minimal Legend */}
+          <div className="swiss-legend">
+            <div className="legend-row">
+              <span className="swatch" style={{ background: '#059669' }} />
+              <span>Passable Road</span>
             </div>
-            <div className="legend-item">
-              <div className="legend-swatch" style={{ background: '#3b82f6' }} />
-              <span>Building Footprint</span>
+            <div className="legend-row">
+              <span className="swatch" style={{ background: '#dc2626' }} />
+              <span>Flooded Road</span>
             </div>
-            <div className="legend-item">
-              <div className="legend-swatch" style={{ background: '#00f0ff' }} />
+            <div className="legend-row">
+              <span className="swatch" style={{ background: '#2563eb' }} />
+              <span>Building</span>
+            </div>
+            <div className="legend-row">
+              <span className="swatch" style={{ background: '#00f0ff' }} />
               <span>Safe Evacuation Route</span>
             </div>
           </div>
-        </div>
+        </main>
       </div>
     </div>
   );
