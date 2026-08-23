@@ -134,7 +134,7 @@ def train_one_epoch(
 
         optimizer.zero_grad(set_to_none=True)
 
-        with autocast(device_type="cuda", enabled=scaler.is_enabled()):
+        with autocast(enabled=scaler.is_enabled()):
             logits = model(pre_img, post_img)
             loss_dict = criterion(logits, mask)
             loss = loss_dict["total"]
