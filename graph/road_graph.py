@@ -55,26 +55,37 @@ def skeleton_to_graph(
     skeleton: np.ndarray,
     flood_mask: Optional[np.ndarray] = None,
     pixel_scale: float = 1.0,
+    dilation_radius: int = 3,
 ) -> "nx.Graph":
     """
-    Convert a skeletonized road mask into a NetworkX graph.
-
-    Each skeleton pixel becomes a node. Adjacent skeleton pixels
-    are connected by edges. Edge weights represent road length.
-    Flooded edges are marked with a penalty weight.
+    Convert a skeletonized road mask into a NetworkX graph using SpaceNet 8 winning techniques:
+      - Morphological dilation on flood mask (compensates for pre/post image misalignment)
+      - Edge-chain majority voting for flood attribution
+      - Graph simplification with topology preservation
 
     Args:
         skeleton: Skeletonized binary mask (H, W).
         flood_mask: Optional flood mask (H, W) for marking flooded edges.
         pixel_scale: Meters per pixel for distance calculation.
+        dilation_radius: Dilation kernel size for spatial alignment tolerance.
 
     Returns:
-        NetworkX Graph with road network topology.
+        NetworkX Graph with road network topology and flood attribution.
     """
     if nx is None:
         raise ImportError("NetworkX required for graph operations")
 
     G = nx.Graph()
+
+    # Pre-process flood mask with morphological dilation (Motokimura / 5th place trick)
+    processed_flood = None
+    if flood_mask is not None and flood_mask.sum() > 0:
+        try:
+            from scipy.ndimage import binary_dilation
+            struct = np.ones((dilation_radius, dilation_radius), dtype=bool)
+            processed_flood = binary_dilation(flood_mask > 0, structure=struct)
+        except Exception:
+            processed_flood = flood_mask > 0
 
     # Find all skeleton pixels
     ys, xs = np.where(skeleton > 0)
@@ -94,21 +105,19 @@ def skeleton_to_graph(
         for dy, dx in offsets:
             ny, nx_coord = y + dy, x + dx
             if (ny, nx_coord) in G:
-                # Diagonal distance = sqrt(2), cardinal = 1
                 dist = np.sqrt(dy ** 2 + dx ** 2) * pixel_scale
 
                 # Check if edge crosses flooded region
                 is_flooded = False
-                if flood_mask is not None:
+                if processed_flood is not None:
                     mid_y = (y + ny) // 2
                     mid_x = (x + nx_coord) // 2
                     is_flooded = bool(
-                        flood_mask[y, x] > 0
-                        or flood_mask[ny, nx_coord] > 0
-                        or flood_mask[mid_y, mid_x] > 0
+                        processed_flood[y, x]
+                        or processed_flood[ny, nx_coord]
+                        or processed_flood[mid_y, mid_x]
                     )
 
-                # Higher weight for flooded roads to discourage routing
                 weight = dist if not is_flooded else dist * 1000.0
 
                 G.add_edge(
@@ -119,7 +128,7 @@ def skeleton_to_graph(
                     flooded=is_flooded,
                 )
 
-    # Simplify: contract degree-2 nodes into longer edges
+    # Simplify with majority-voting along contracted chains (SpaceNet 8 Baseline & 1st place)
     G = _simplify_graph(G)
 
     logger.info(
@@ -132,9 +141,8 @@ def skeleton_to_graph(
 
 def _simplify_graph(G: "nx.Graph") -> "nx.Graph":
     """
-    Simplify graph by contracting chains of degree-2 nodes.
-
-    This reduces the graph size dramatically while preserving topology.
+    Simplify graph by contracting chains of degree-2 nodes into longer edges.
+    Applies majority-voting on flood attribution across all intermediate pixels.
     """
     if nx is None or G.number_of_nodes() == 0:
         return G
@@ -146,7 +154,6 @@ def _simplify_graph(G: "nx.Graph") -> "nx.Graph":
             keep_nodes.add(node)
 
     if not keep_nodes:
-        # All nodes are degree-2 → it's a simple cycle, keep a few
         nodes = list(G.nodes())
         if len(nodes) > 10:
             keep_nodes = set(nodes[::max(1, len(nodes) // 10)])
@@ -170,8 +177,8 @@ def _simplify_graph(G: "nx.Graph") -> "nx.Graph":
             # Walk along the chain
             path = [start, neighbor]
             total_dist = G[start][neighbor].get("distance", 1.0)
-            total_weight = G[start][neighbor].get("weight", 1.0)
-            any_flooded = G[start][neighbor].get("flooded", False)
+            flooded_count = 1 if G[start][neighbor].get("flooded", False) else 0
+            total_edges = 1
 
             visited_edges.add(edge_key)
             current = neighbor
@@ -187,20 +194,25 @@ def _simplify_graph(G: "nx.Graph") -> "nx.Graph":
                 visited_edges.add(edge_key)
 
                 total_dist += G[current][nxt].get("distance", 1.0)
-                total_weight += G[current][nxt].get("weight", 1.0)
-                any_flooded = any_flooded or G[current][nxt].get("flooded", False)
+                if G[current][nxt].get("flooded", False):
+                    flooded_count += 1
+                total_edges += 1
 
                 path.append(nxt)
                 current = nxt
 
             end = path[-1]
             if end in keep_nodes and start != end:
+                # Majority vote: if > 30% of intermediate pixels are flooded, mark edge as flooded
+                is_edge_flooded = (flooded_count / max(total_edges, 1)) > 0.30
+                edge_weight = total_dist if not is_edge_flooded else total_dist * 1000.0
+
                 simple.add_edge(
                     start,
                     end,
-                    weight=total_weight,
+                    weight=edge_weight,
                     distance=total_dist,
-                    flooded=any_flooded,
+                    flooded=is_edge_flooded,
                     path_length=len(path),
                 )
 
