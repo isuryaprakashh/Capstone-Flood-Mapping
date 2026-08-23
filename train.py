@@ -196,12 +196,21 @@ def validate(
     loader,
     criterion: CombinedLoss,
     device: torch.device,
+    thresholds: list[float] = None,
 ) -> dict:
-    """Run validation."""
+    """
+    Run validation with global confusion matrix accumulation.
+    Accumulates TP, FP, FN across all batches to avoid batch-averaging
+    artifacts on tiles with sparse/empty ground truth flood labels.
+    """
     model.eval()
     running_loss = 0.0
-    all_metrics = []
     num_batches = 0
+    thresh = thresholds or DEFAULT_THRESHOLDS
+
+    total_tp = torch.zeros(len(CLASS_NAMES), device=device)
+    total_fp = torch.zeros(len(CLASS_NAMES), device=device)
+    total_fn = torch.zeros(len(CLASS_NAMES), device=device)
 
     for batch in loader:
         pre_img = batch["pre_image"].to(device, non_blocking=True)
@@ -212,17 +221,44 @@ def validate(
         loss_dict = criterion(logits, mask)
 
         running_loss += loss_dict["total"].item()
-        all_metrics.append(compute_metrics(logits, mask))
         num_batches += 1
 
-    n = max(num_batches, 1)
-    avg_metrics = {}
-    if all_metrics:
-        for key in all_metrics[0]:
-            avg_metrics[key] = np.mean([m[key] for m in all_metrics])
+        probs = torch.sigmoid(logits)
+        for c in range(min(probs.shape[1], len(CLASS_NAMES))):
+            t = thresh[c] if c < len(thresh) else 0.5
+            pred_c = (probs[:, c] > t).float()
+            targ_c = mask[:, c]
 
-    avg_metrics["val_loss"] = running_loss / n
-    return avg_metrics
+            total_tp[c] += (pred_c * targ_c).sum()
+            total_fp[c] += (pred_c * (1.0 - targ_c)).sum()
+            total_fn[c] += ((1.0 - pred_c) * targ_c).sum()
+
+    metrics = {}
+    ious = []
+    f1s = []
+
+    for c in range(len(CLASS_NAMES)):
+        tp = total_tp[c].item()
+        fp = total_fp[c].item()
+        fn = total_fn[c].item()
+
+        precision = tp / (tp + fp + 1e-8)
+        recall = tp / (tp + fn + 1e-8)
+        f1 = 2 * precision * recall / (precision + recall + 1e-8)
+        iou = tp / (tp + fp + fn + 1e-8)
+
+        name = CLASS_NAMES[c]
+        metrics[f"iou_{name}"] = iou
+        metrics[f"f1_{name}"] = f1
+        metrics[f"precision_{name}"] = precision
+        metrics[f"recall_{name}"] = recall
+        ious.append(iou)
+        f1s.append(f1)
+
+    metrics["mean_iou"] = float(np.mean(ious))
+    metrics["mean_f1"] = float(np.mean(f1s))
+    metrics["val_loss"] = running_loss / max(num_batches, 1)
+    return metrics
 
 
 # ─── Logging ────────────────────────────────────────────────────────────────

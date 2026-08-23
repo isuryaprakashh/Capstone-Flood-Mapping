@@ -28,7 +28,14 @@ NUM_CLASSES = 5  # building, road, flood, flooded_building, flooded_road
 
 def read_geotiff(path: Union[str, Path], max_bands: int = 3) -> np.ndarray:
     """
-    Read a GeoTIFF and return as a float32 numpy array.
+    Read a GeoTIFF and return as a float32 numpy array normalized to [0, 1].
+
+    Auto-detects the value range:
+      - Already [0, 1]: no rescaling
+      - 8-bit  [0, 255]: divide by 255
+      - 12-bit [0, 4095]: divide by 4095
+      - 16-bit [0, 65535]: divide by 65535
+      - Other: percentile-based robust normalization
 
     Args:
         path: Path to the GeoTIFF file.
@@ -41,12 +48,26 @@ def read_geotiff(path: Union[str, Path], max_bands: int = 3) -> np.ndarray:
         bands = min(src.count, max_bands)
         data = src.read(list(range(1, bands + 1))).astype(np.float32)
 
-        # Handle different data ranges
-        if data.max() > 1.0:
-            # Satellite imagery often has values > 255 (e.g., 12-bit)
-            # Clip to reasonable range and normalize
-            data = np.clip(data, 0, 10000)
-            data = data / 10000.0
+        # Auto-detect value range and normalize to [0, 1]
+        max_val = data.max()
+
+        if max_val <= 1.0:
+            # Already normalized
+            pass
+        elif max_val <= 255.0:
+            # 8-bit imagery (SpaceNet 8 typical)
+            data = np.clip(data, 0, 255) / 255.0
+        elif max_val <= 4095.0:
+            # 12-bit imagery
+            data = np.clip(data, 0, 4095) / 4095.0
+        elif max_val <= 65535.0:
+            # 16-bit imagery
+            data = np.clip(data, 0, 65535) / 65535.0
+        else:
+            # Unknown range: use robust percentile normalization
+            p2, p98 = np.percentile(data, [2, 98])
+            data = np.clip(data, p2, p98)
+            data = (data - p2) / (p98 - p2 + 1e-8)
 
     return data
 

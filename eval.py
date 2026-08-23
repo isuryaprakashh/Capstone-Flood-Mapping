@@ -79,13 +79,15 @@ def evaluate_model(
 ) -> dict:
     """
     Run full evaluation on a dataset using TTA and winning SpaceNet 8 post-processing.
-
-    Returns:
-        Aggregated metrics dictionary.
+    Accumulates true/false positives globally across the entire dataset.
     """
     model.eval()
-    all_metrics = []
     thresh = thresholds or DEFAULT_THRESHOLDS
+
+    total_tp = torch.zeros(len(CLASS_NAMES), device=device)
+    total_fp = torch.zeros(len(CLASS_NAMES), device=device)
+    total_fn = torch.zeros(len(CLASS_NAMES), device=device)
+    total_tn = torch.zeros(len(CLASS_NAMES), device=device)
 
     for batch_idx, batch in enumerate(loader):
         pre_img = batch["pre_image"].to(device, non_blocking=True)
@@ -105,19 +107,46 @@ def evaluate_model(
             probs = torch.sigmoid(logits)
             binary = (probs > 0.5).float()
 
-        metrics = compute_detailed_metrics(binary, mask)
-        all_metrics.append(metrics)
+        for c in range(min(binary.shape[1], len(CLASS_NAMES))):
+            pred_c = binary[:, c]
+            targ_c = mask[:, c]
+
+            total_tp[c] += (pred_c * targ_c).sum()
+            total_fp[c] += (pred_c * (1.0 - targ_c)).sum()
+            total_fn[c] += ((1.0 - pred_c) * targ_c).sum()
+            total_tn[c] += ((1.0 - pred_c) * (1.0 - targ_c)).sum()
 
         if (batch_idx + 1) % 10 == 0:
             logger.info(f"  [{model_name}] Evaluated {batch_idx + 1}/{len(loader)} batches")
 
-    # Average all metrics
-    avg = {}
-    if all_metrics:
-        for key in all_metrics[0]:
-            avg[key] = float(np.mean([m[key] for m in all_metrics]))
+    metrics = {}
+    ious = []
+    f1s = []
 
-    return avg
+    for c in range(len(CLASS_NAMES)):
+        tp = total_tp[c].item()
+        fp = total_fp[c].item()
+        fn = total_fn[c].item()
+        tn = total_tn[c].item()
+
+        precision = tp / (tp + fp + 1e-8)
+        recall = tp / (tp + fn + 1e-8)
+        f1 = 2 * precision * recall / (precision + recall + 1e-8)
+        iou = tp / (tp + fp + fn + 1e-8)
+        accuracy = (tp + tn) / (tp + tn + fp + fn + 1e-8)
+
+        name = CLASS_NAMES[c]
+        metrics[f"iou_{name}"] = iou
+        metrics[f"f1_{name}"] = f1
+        metrics[f"precision_{name}"] = precision
+        metrics[f"recall_{name}"] = recall
+        metrics[f"accuracy_{name}"] = accuracy
+        ious.append(iou)
+        f1s.append(f1)
+
+    metrics["mean_iou"] = float(np.mean(ious))
+    metrics["mean_f1"] = float(np.mean(f1s))
+    return metrics
 
 
 def load_model_from_checkpoint(

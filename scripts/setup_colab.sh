@@ -56,12 +56,12 @@ else
 fi
 
 # 6. Train Siamese Cross-Attention Network (O3)
-echo "🧠 Training Siamese Cross-Attention Network (40 epochs with OneCycleLR & AMP)..."
+echo "🧠 Training Siamese Cross-Attention Network (50 epochs with OneCycleLR & AMP)..."
 python3 train.py \
     --model fusion \
     --data-root ./CP1-DATASET \
     --mask-dir ./processed/masks \
-    --epochs 40 \
+    --epochs 50 \
     --batch-size 8 \
     --num-workers 2 \
     --lr 0.0003 \
@@ -75,12 +75,12 @@ python3 train.py \
     --no-wandb
 
 # 7. Train Baseline U-Net (O2)
-echo "🔬 Training Baseline U-Net (25 epochs)..."
+echo "🔬 Training Baseline U-Net (35 epochs)..."
 python3 train.py \
     --model unet \
     --data-root ./CP1-DATASET \
     --mask-dir ./processed/masks \
-    --epochs 25 \
+    --epochs 35 \
     --batch-size 8 \
     --num-workers 2 \
     --lr 0.0003 \
@@ -88,7 +88,7 @@ python3 train.py \
     --focal-weight 1.0 \
     --bce-weight 0.3 \
     --amp \
-    --patience 10 \
+    --patience 12 \
     --checkpoint-dir ./checkpoints \
     --log-dir ./logs \
     --no-wandb
