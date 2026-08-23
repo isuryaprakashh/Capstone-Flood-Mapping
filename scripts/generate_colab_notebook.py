@@ -155,7 +155,7 @@ def create_colab_notebook():
     })
 
     # -------------------------------------------------------------
-    # Cell 5: Dataset Setup
+    # Cell 5: Dataset Setup (Direct AWS S3 or Google Drive)
     # -------------------------------------------------------------
     cells.append({
         "cell_type": "markdown",
@@ -163,10 +163,17 @@ def create_colab_notebook():
         "source": [
             "## 4️⃣ Dataset Setup (SpaceNet 8 / CP1-DATASET)\n",
             "\n",
-            "> **💡 Recommended Speed Optimization:**\n",
-            "> Always extract your dataset `.zip` into Colab's **local SSD storage** (`/content/CP1-DATASET`). Reading thousands of GeoTIFFs directly over the Google Drive FUSE mount causes massive I/O delays. Extracting to local SSD makes data loading **10x faster** during training.\n",
-            "\n",
-            "Choose **Option A** (Google Drive zip) or **Option B** (Existing repository dataset):"
+            "You can choose between two methods to load the dataset into Colab:\n",
+            "- **Option A (Recommended & Fastest)**: Download official SpaceNet 8 datasets directly from AWS S3 in ~1–2 minutes.\n",
+            "- **Option B**: Extract an existing `CP1-DATASET.zip` from your mounted Google Drive."
+        ]
+    })
+
+    cells.append({
+        "cell_type": "markdown",
+        "metadata": {},
+        "source": [
+            "### 📥 Option A: Download Directly from Official SpaceNet 8 AWS S3 (1-Click)"
         ]
     })
 
@@ -176,28 +183,68 @@ def create_colab_notebook():
         "metadata": {},
         "outputs": [],
         "source": [
-            "#@title Configure Dataset Location\n",
-            "import shutil\n",
-            "import zipfile\n",
+            "#@title Download SpaceNet 8 Datasets from AWS S3\n",
+            "import os\n",
+            "from pathlib import Path\n",
             "\n",
-            "# Path to your zip file on Google Drive (modify if your file is named differently)\n",
+            "DATASET_DIR = Path(\"/content/Capstone-Flood-Mapping/CP1-DATASET\")\n",
+            "DATASET_DIR.mkdir(parents=True, exist_ok=True)\n",
+            "\n",
+            "DATA_URLS = {\n",
+            "    \"Germany_Training_Public\": \"https://spacenet-dataset.s3.amazonaws.com/spacenet/SN8_floods/tarballs/Germany_Training_Public.tar.gz\",\n",
+            "    \"Louisiana-East_Training_Public\": \"https://spacenet-dataset.s3.amazonaws.com/spacenet/SN8_floods/tarballs/Louisiana-East_Training_Public.tar.gz\",\n",
+            "    \"Louisiana-West_Test_Public\": \"https://spacenet-dataset.s3.amazonaws.com/spacenet/SN8_floods/tarballs/Louisiana-West_Test_Public.tar.gz\",\n",
+            "}\n",
+            "\n",
+            "# Download and extract datasets\n",
+            "for name, url in DATA_URLS.items():\n",
+            "    target_folder = DATASET_DIR / name\n",
+            "    if target_folder.exists() and len(list(target_folder.glob(\"*\"))) > 0:\n",
+            "        print(f\"✅ {name} already extracted. Skipping.\")\n",
+            "        continue\n",
+            "\n",
+            "    tar_file = DATASET_DIR / f\"{name}.tar.gz\"\n",
+            "    print(f\"⬇️ Downloading {name} from AWS S3...\")\n",
+            "    !wget -c -q --show-progress {url} -O {tar_file}\n",
+            "    \n",
+            "    print(f\"📦 Extracting {name}...\")\n",
+            "    !tar -xzf {tar_file} -C {DATASET_DIR}\n",
+            "    !rm -f {tar_file}\n",
+            "    print(f\"✅ {name} extracted successfully!\")\n",
+            "\n",
+            "print(\"\\n📁 Dataset Directory Structure:\")\n",
+            "!ls -lh /content/Capstone-Flood-Mapping/CP1-DATASET"
+        ]
+    })
+
+    cells.append({
+        "cell_type": "markdown",
+        "metadata": {},
+        "source": [
+            "### 💾 Option B (Alternative): Load from Google Drive Zip\n",
+            "Run this only if you already have a `CP1-DATASET.zip` on your Google Drive and prefer to use it."
+        ]
+    })
+
+    cells.append({
+        "cell_type": "code",
+        "execution_count": None,
+        "metadata": {},
+        "outputs": [],
+        "source": [
+            "#@title (Optional) Extract Dataset from Google Drive\n",
+            "import zipfile\n",
             "drive_zip_path = \"/content/drive/MyDrive/CP1-DATASET.zip\" #@param {type:\"string\"}\n",
             "local_dataset_path = \"/content/Capstone-Flood-Mapping/CP1-DATASET\"\n",
             "\n",
             "if os.path.exists(drive_zip_path):\n",
-            "    print(f\"📦 Extracting {drive_zip_path} to local SSD {local_dataset_path}...\")\n",
+            "    print(f\"📦 Extracting {drive_zip_path} to {local_dataset_path}...\")\n",
             "    os.makedirs(local_dataset_path, exist_ok=True)\n",
             "    with zipfile.ZipFile(drive_zip_path, 'r') as zip_ref:\n",
             "        zip_ref.extractall(local_dataset_path)\n",
-            "    print(\"✅ Dataset extracted to fast local SSD!\")\n",
-            "elif os.path.exists(local_dataset_path) and len(os.listdir(local_dataset_path)) > 0:\n",
-            "    print(f\"✅ Using existing dataset found in {local_dataset_path}\")\n",
+            "    print(\"✅ Dataset extracted from Drive!\")\n",
             "else:\n",
-            "    print(f\"⚠️ Zip file not found at '{drive_zip_path}'.\")\n",
-            "    print(\"Please upload your CP1-DATASET.zip to Google Drive or place the dataset inside /content/Capstone-Flood-Mapping/CP1-DATASET\")\n",
-            "\n",
-            "# Verify dataset contents\n",
-            "!ls -lh /content/Capstone-Flood-Mapping/CP1-DATASET"
+            "    print(f\"ℹ️ No zip found at {drive_zip_path}. (Skipped if Option A was used)\")"
         ]
     })
 
