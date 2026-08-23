@@ -134,7 +134,7 @@ def train_one_epoch(
     loader,
     criterion: CombinedLoss,
     optimizer,
-    scaler: GradScaler,
+    scaler: AMPGradScaler,
     device: torch.device,
     epoch: int,
     scheduler=None,
