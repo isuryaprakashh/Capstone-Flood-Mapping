@@ -159,6 +159,12 @@ class CrossAttentionBlock(nn.Module):
         Returns:
             Fused features (B, C, H, W) highlighting temporal changes.
         """
+        # Ensure identical spatial resolution for cross-attention
+        if pre_feat.shape[2:] != post_feat.shape[2:]:
+            post_feat = F.interpolate(
+                post_feat, size=pre_feat.shape[2:], mode="bilinear", align_corners=False
+            )
+
         # Pre → Post cross-attention (what changed in post?)
         q_pre = self.q_pre(pre_feat)
         k_post = self.k_post(post_feat)

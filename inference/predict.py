@@ -108,9 +108,17 @@ class FloodPredictor:
         # Ensure CHW format
         if pre_image.ndim == 3 and pre_image.shape[2] <= 4:
             pre_image = pre_image.transpose(2, 0, 1)
+        if post_image.ndim == 3 and post_image.shape[2] <= 4:
             post_image = post_image.transpose(2, 0, 1)
 
-        _, H, W = pre_image.shape
+        # Align spatial dimensions (use common overlapping area)
+        _, h1, w1 = pre_image.shape
+        _, h2, w2 = post_image.shape
+        H = min(h1, h2)
+        W = min(w1, w2)
+
+        pre_image = pre_image[:, :H, :W]
+        post_image = post_image[:, :H, :W]
 
         # Normalize
         pre_norm = normalize_image(pre_image.copy())
@@ -161,24 +169,19 @@ class FloodPredictor:
 
         for y in range(0, H, stride):
             for x in range(0, W, stride):
-                # Extract tile
+                # Extract tile boundaries
                 y_end = min(y + self.tile_size, H)
                 x_end = min(x + self.tile_size, W)
 
-                pre_tile = pre[:, y:y_end, x:x_end]
-                post_tile = post[:, y:y_end, x:x_end]
+                th = y_end - y
+                tw = x_end - x
 
-                # Pad if needed
-                _, th, tw = pre_tile.shape
-                if th < self.tile_size or tw < self.tile_size:
-                    pre_padded = np.zeros(
-                        (3, self.tile_size, self.tile_size), dtype=pre.dtype
-                    )
-                    post_padded = np.zeros_like(pre_padded)
-                    pre_padded[:, :th, :tw] = pre_tile
-                    post_padded[:, :th, :tw] = post_tile
-                    pre_tile = pre_padded
-                    post_tile = post_padded
+                # Always pad to exact tile_size x tile_size for consistent network input
+                pre_tile = np.zeros((3, self.tile_size, self.tile_size), dtype=pre.dtype)
+                post_tile = np.zeros((3, self.tile_size, self.tile_size), dtype=post.dtype)
+
+                pre_tile[:, :th, :tw] = pre[:, y:y_end, x:x_end]
+                post_tile[:, :th, :tw] = post[:, y:y_end, x:x_end]
 
                 # Convert to tensor
                 pre_t = torch.from_numpy(pre_tile).unsqueeze(0).to(self.device)
@@ -186,9 +189,9 @@ class FloodPredictor:
 
                 # Inference
                 logits = self.model(pre_t, post_t)
-                probs = torch.sigmoid(logits).cpu().numpy()[0]  # (C, TH, TW)
+                probs = torch.sigmoid(logits).cpu().numpy()[0]  # (C, tile_size, tile_size)
 
-                # Accumulate
+                # Accumulate only the valid unpadded region
                 result[:, y:y_end, x:x_end] += probs[:, :th, :tw]
                 counts[y:y_end, x:x_end] += 1.0
 
