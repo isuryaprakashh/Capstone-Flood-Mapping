@@ -96,23 +96,6 @@ export default function App() {
     }
   };
 
-  /* ─── Sample Demo ─── */
-  const handleSample = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await axios.get(`${API_BASE}/sample`);
-      if (res.data.ok) {
-        setResult(res.data);
-        resetView();
-      }
-    } catch (err) {
-      setError('Failed to load sample dataset.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   /* ─── Route Calculation (Dijkstra) ─── */
   const calculateRoute = async (start, end) => {
     if (!start || !end) return;
@@ -543,12 +526,8 @@ export default function App() {
               </div>
             </div>
 
-            <button className="btn-primary" onClick={handlePredict} disabled={loading}>
+            <button className="btn-primary" onClick={handlePredict} disabled={loading || !preFile || !postFile}>
               {loading ? '⟳ Running Siamese Inference...' : 'Analyze Flood Damage'}
-            </button>
-
-            <button className="btn-secondary" onClick={handleSample} disabled={loading}>
-              Load SpaceNet 8 Sample Demo
             </button>
           </div>
 
@@ -694,10 +673,7 @@ export default function App() {
                 <div className="empty-placeholder">
                   <div className="empty-circle">🛰</div>
                   <h3>SpaceNet 8 Geospatial Intelligence</h3>
-                  <p>Upload a Pre/Post GeoTIFF pair or load the sample demo to view vector road networks, building footprints, and evacuation routing.</p>
-                  <button className="btn-primary" style={{ maxWidth: '240px' }} onClick={handleSample}>
-                    Load Sample Demo
-                  </button>
+                  <p>Upload a Pre-event and Post-event GeoTIFF image pair on the left to run deep flood change detection and vector routing.</p>
                 </div>
               )}
             </div>
