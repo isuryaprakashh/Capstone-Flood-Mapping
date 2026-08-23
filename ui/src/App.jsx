@@ -168,9 +168,12 @@ export default function App() {
     const H = maskShape[1] || 512;
     const W = maskShape[2] || 512;
 
-    // Base background
-    ctx.fillStyle = '#0f172a';
+    // Pure White background for simple, clean layout
+    ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, W, H);
+    ctx.strokeStyle = '#e2e8f0';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(0, 0, W, H);
 
     // 1. Satellite Base Image
     if (showSatellite && postImgObj.current?.complete) {
@@ -293,13 +296,16 @@ export default function App() {
     const H = maskShape[1] || 512;
     const W = maskShape[2] || 512;
 
-    // 1. Pre Canvas (Before Disaster)
+    // 1. Pre Canvas (Before Disaster) - Clean White
     const preCanvas = preCanvasRef.current;
     if (preCanvas) {
       const ctx = preCanvas.getContext('2d');
       ctx.clearRect(0, 0, preCanvas.width, preCanvas.height);
-      ctx.fillStyle = '#1e293b';
+      ctx.fillStyle = '#ffffff';
       ctx.fillRect(0, 0, W, H);
+      ctx.strokeStyle = '#e2e8f0';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(0, 0, W, H);
 
       if (preImgObj.current?.complete) {
         ctx.drawImage(preImgObj.current, 0, 0, W, H);
@@ -336,13 +342,16 @@ export default function App() {
       }
     }
 
-    // 2. Post Canvas (After Flood Disaster)
+    // 2. Post Canvas (After Flood Disaster) - Clean White
     const postCanvas = postCanvasRef.current;
     if (postCanvas) {
       const ctx = postCanvas.getContext('2d');
       ctx.clearRect(0, 0, postCanvas.width, postCanvas.height);
-      ctx.fillStyle = '#1e293b';
+      ctx.fillStyle = '#ffffff';
       ctx.fillRect(0, 0, W, H);
+      ctx.strokeStyle = '#e2e8f0';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(0, 0, W, H);
 
       if (postImgObj.current?.complete) {
         ctx.drawImage(postImgObj.current, 0, 0, W, H);
