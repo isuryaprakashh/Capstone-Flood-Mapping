@@ -376,7 +376,7 @@ def generate_mask(
                 ch4="flooded_road",
             )
 
-        logger.info(f"Generated mask: {output_path.name} ({mask.sum()} positive pixels)")
+        logger.debug(f"Generated mask: {output_path.name} ({mask.sum()} positive pixels)")
 
     return mask
 
@@ -428,8 +428,10 @@ def batch_generate_masks(
     skipped = 0
 
     with open(mapping_csv, "r") as f:
-        reader = csv.DictReader(f)
-        for row in reader:
+        rows = list(csv.DictReader(f))
+        total_rows = len(rows)
+
+        for idx, row in enumerate(rows):
             label_name = row.get("label", "").strip()
             pre_image_name = row.get("pre-event image", "").strip()
 
@@ -447,6 +449,11 @@ def batch_generate_masks(
             mask_stem = label_name.replace(".geojson", "")
             mask_path = output_dir / f"{mask_stem}_mask.tif"
 
+            # Skip generation if valid mask file already exists
+            if mask_path.exists() and mask_path.stat().st_size > 0:
+                generated.append(mask_path)
+                continue
+
             try:
                 generate_mask(
                     geojson_path=geojson_path,
@@ -460,8 +467,13 @@ def batch_generate_masks(
                 logger.error(f"Failed to generate mask for {label_name}: {e}")
                 skipped += 1
 
+            if (idx + 1) % 50 == 0 or (idx + 1) == total_rows:
+                logger.info(
+                    f"  [{dataset_dir.name}] Progress: {idx + 1}/{total_rows} masks processed"
+                )
+
     logger.info(
-        f"Generated {len(generated)} masks, skipped {skipped} "
+        f"Generated/verified {len(generated)} masks, skipped {skipped} "
         f"in {dataset_dir.name}"
     )
     return generated

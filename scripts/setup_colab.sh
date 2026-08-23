@@ -48,7 +48,7 @@ download_and_extract "Louisiana-East_Training_Public" "https://spacenet-dataset.
 download_and_extract "Louisiana-West_Test_Public" "https://spacenet-dataset.s3.amazonaws.com/spacenet/SN8_floods/tarballs/Louisiana-West_Test_Public.tar.gz"
 
 # 5. Generate Masks if not already generated
-if [ ! -d "processed/masks/Germany_Training_Public" ]; then
+if [ ! -d "processed/masks/Germany_Training_Public" ] || [ ! -d "processed/masks/Louisiana-East_Training_Public" ]; then
     echo "🗺️ Generating 5-channel segmentation masks..."
     python3 scripts/tile_images.py --data-root ./CP1-DATASET --output-dir ./processed --val-region Germany_Training_Public --road-buffer 4.0
 else
