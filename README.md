@@ -44,9 +44,15 @@ CAPSTONE-PROJECT/
 
 ---
 
-## 🚀 Quickstart Guide
+### 0. Training on Google Colab (T4 GPU)
 
-### 1. Environment Setup
+You can train both models in Google Colab with a free **NVIDIA Tesla T4 GPU**:
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/isuryaprakashh/Capstone-Flood-Mapping/blob/main/notebooks/SpaceNet8_Colab_Training.ipynb)
+
+Open [`notebooks/SpaceNet8_Colab_Training.ipynb`](notebooks/SpaceNet8_Colab_Training.ipynb) for step-by-step interactive training, automated Google Drive checkpoint backup, evaluation benchmarks, and visual qualitative inspections.
+
+### 1. Environment Setup (Local / HPC)
 
 ```bash
 # Clone the repository

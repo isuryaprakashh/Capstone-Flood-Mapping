@@ -115,6 +115,7 @@ def train_one_epoch(
     scaler: GradScaler,
     device: torch.device,
     epoch: int,
+    scheduler=None,
 ) -> dict:
     """Train for one epoch."""
     model.train()
@@ -141,6 +142,9 @@ def train_one_epoch(
         torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
         scaler.step(optimizer)
         scaler.update()
+
+        if scheduler is not None:
+            scheduler.step()
 
         running_loss += loss.item()
         running_dice += loss_dict["dice"].item()
@@ -395,11 +399,8 @@ def main():
 
         # Train
         train_metrics = train_one_epoch(
-            model, loaders["train"], criterion, optimizer, scaler, device, epoch
+            model, loaders["train"], criterion, optimizer, scaler, device, epoch, scheduler=scheduler
         )
-
-        # Step scheduler
-        scheduler.step()
 
         # Validate
         val_metrics = validate(model, loaders["val"], criterion, device)
