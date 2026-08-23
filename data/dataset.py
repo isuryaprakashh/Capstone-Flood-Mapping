@@ -13,7 +13,11 @@ from pathlib import Path
 from typing import Optional, Union
 
 import numpy as np
-import rasterio
+try:
+    import rasterio
+except ImportError:
+    rasterio = None
+
 import torch
 from torch.utils.data import Dataset, DataLoader
 
@@ -44,30 +48,41 @@ def read_geotiff(path: Union[str, Path], max_bands: int = 3) -> np.ndarray:
     Returns:
         Array of shape (C, H, W) in float32, scaled to [0, 1].
     """
-    with rasterio.open(path) as src:
-        bands = min(src.count, max_bands)
-        data = src.read(list(range(1, bands + 1))).astype(np.float32)
-
-        # Auto-detect value range and normalize to [0, 1]
-        max_val = data.max()
-
-        if max_val <= 1.0:
-            # Already normalized
-            pass
-        elif max_val <= 255.0:
-            # 8-bit imagery (SpaceNet 8 typical)
-            data = np.clip(data, 0, 255) / 255.0
-        elif max_val <= 4095.0:
-            # 12-bit imagery
-            data = np.clip(data, 0, 4095) / 4095.0
-        elif max_val <= 65535.0:
-            # 16-bit imagery
-            data = np.clip(data, 0, 65535) / 65535.0
+    if rasterio is not None:
+        with rasterio.open(path) as src:
+            bands = min(src.count, max_bands)
+            data = src.read(list(range(1, bands + 1))).astype(np.float32)
+    else:
+        from PIL import Image
+        img = Image.open(path)
+        arr = np.array(img).astype(np.float32)
+        if arr.ndim == 2:
+            data = arr[np.newaxis, :, :]
+        elif arr.ndim == 3:
+            data = arr.transpose(2, 0, 1)[:max_bands]
         else:
-            # Unknown range: use robust percentile normalization
-            p2, p98 = np.percentile(data, [2, 98])
-            data = np.clip(data, p2, p98)
-            data = (data - p2) / (p98 - p2 + 1e-8)
+            data = arr[:max_bands]
+
+    # Auto-detect value range and normalize to [0, 1]
+    max_val = data.max()
+
+    if max_val <= 1.0:
+        # Already normalized
+        pass
+    elif max_val <= 255.0:
+        # 8-bit imagery (SpaceNet 8 typical)
+        data = np.clip(data, 0, 255) / 255.0
+    elif max_val <= 4095.0:
+        # 12-bit imagery
+        data = np.clip(data, 0, 4095) / 4095.0
+    elif max_val <= 65535.0:
+        # 16-bit imagery
+        data = np.clip(data, 0, 65535) / 65535.0
+    else:
+        # Unknown range: use robust percentile normalization
+        p2, p98 = np.percentile(data, [2, 98])
+        data = np.clip(data, p2, p98)
+        data = (data - p2) / (p98 - p2 + 1e-8)
 
     return data
 
@@ -332,8 +347,19 @@ class SpaceNet8Dataset(Dataset):
         """Load or generate mask for a sample."""
         # Try precomputed mask first
         if self.use_precomputed_masks and "mask_path" in sample:
-            with rasterio.open(sample["mask_path"]) as src:
-                mask = src.read().astype(np.float32)
+            if rasterio is not None:
+                with rasterio.open(sample["mask_path"]) as src:
+                    mask = src.read().astype(np.float32)
+            else:
+                from PIL import Image
+                img = Image.open(sample["mask_path"])
+                arr = np.array(img).astype(np.float32)
+                if arr.ndim == 2:
+                    mask = arr[np.newaxis, :, :]
+                elif arr.ndim == 3:
+                    mask = arr.transpose(2, 0, 1)
+                else:
+                    mask = arr
                 # Crop/pad to match image
                 _, mh, mw = mask.shape
                 if mh != height or mw != width:
