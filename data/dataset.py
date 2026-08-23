@@ -89,6 +89,8 @@ def build_sample_manifest(
         List of sample dictionaries.
     """
     samples = []
+    mask_found_count = 0
+    mask_missing_count = 0
 
     for dataset_dir in dataset_dirs:
         dataset_dir = Path(dataset_dir)
@@ -133,15 +135,29 @@ def build_sample_manifest(
                     sample["geojson_path"] = str(geojson_path)
 
                 # Add mask path if precomputed
+                # Masks are stored in region subdirectories:
+                #   mask_dir/{region}/{stem}_mask.tif
                 if mask_dir:
                     mask_stem = label.replace(".geojson", "")
-                    mask_path = Path(mask_dir) / f"{mask_stem}_mask.tif"
+                    # Primary: look in region subdirectory
+                    mask_path = Path(mask_dir) / region / f"{mask_stem}_mask.tif"
+                    if not mask_path.exists():
+                        # Fallback: look in flat mask_dir
+                        mask_path = Path(mask_dir) / f"{mask_stem}_mask.tif"
                     if mask_path.exists():
                         sample["mask_path"] = str(mask_path)
+                        mask_found_count += 1
+                    else:
+                        mask_missing_count += 1
 
                 samples.append(sample)
 
     logger.info(f"Built manifest: {len(samples)} samples from {len(dataset_dirs)} dirs")
+    if mask_dir:
+        logger.info(
+            f"  Mask lookup: {mask_found_count} found, {mask_missing_count} missing "
+            f"({100 * mask_found_count / max(1, mask_found_count + mask_missing_count):.0f}% coverage)"
+        )
     return samples
 
 

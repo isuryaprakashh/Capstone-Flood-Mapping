@@ -284,7 +284,7 @@ def main():
 
     # Training
     parser.add_argument("--epochs", type=int, default=40)
-    parser.add_argument("--lr", type=float, default=1e-3)
+    parser.add_argument("--lr", type=float, default=3e-4)
     parser.add_argument("--weight-decay", type=float, default=1e-4)
     parser.add_argument("--amp", action="store_true", default=True)
     parser.add_argument("--no-amp", dest="amp", action="store_false")
@@ -292,9 +292,9 @@ def main():
     parser.add_argument("--resume", type=str, default=None, help="Checkpoint path to resume")
 
     # Loss
-    parser.add_argument("--dice-weight", type=float, default=1.0)
+    parser.add_argument("--dice-weight", type=float, default=2.0)
     parser.add_argument("--focal-weight", type=float, default=1.0)
-    parser.add_argument("--bce-weight", type=float, default=0.5)
+    parser.add_argument("--bce-weight", type=float, default=0.3)
 
     # Output
     parser.add_argument("--checkpoint-dir", type=str, default="./checkpoints")
@@ -334,6 +334,26 @@ def main():
         num_workers=args.num_workers,
         val_region=args.val_region,
     )
+
+    # Data sanity check: verify masks have positive pixels
+    logger.info("Running data sanity check...")
+    _check_count = 0
+    _pos_count = 0
+    for _i, _batch in enumerate(loaders["train"]):
+        _mask = _batch["mask"]
+        _pos = (_mask > 0).any(dim=(2, 3)).any(dim=0)  # per-class has positives
+        _pos_count += _pos.sum().item()
+        _check_count += 1
+        if _check_count >= 5:  # Check first 5 batches
+            break
+    _total_checked = _check_count * args.batch_size
+    logger.info(
+        f"  Sanity check: {_pos_count}/{5 * _check_count} class-batch slots have positive pixels "
+        f"(checked {_total_checked} samples)"
+    )
+    if _pos_count == 0:
+        logger.error("  ⚠️ WARNING: No positive pixels found in masks! Check mask generation.")
+    del _check_count, _pos_count
 
     # Model
     logger.info(f"Building model: {args.model}")
@@ -380,7 +400,7 @@ def main():
         max_lr=args.lr,
         epochs=args.epochs,
         steps_per_epoch=len(loaders["train"]),
-        pct_start=0.15,
+        pct_start=0.3,
         anneal_strategy="cos",
     )
 

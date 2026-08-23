@@ -55,7 +55,7 @@ else
     echo "✅ Masks already present in ./processed/masks. Skipping generation."
 fi
 
-# 5. Train Siamese Cross-Attention Network (O3)
+# 6. Train Siamese Cross-Attention Network (O3)
 echo "🧠 Training Siamese Cross-Attention Network (40 epochs with OneCycleLR & AMP)..."
 python3 train.py \
     --model fusion \
@@ -64,14 +64,17 @@ python3 train.py \
     --epochs 40 \
     --batch-size 8 \
     --num-workers 2 \
-    --lr 0.001 \
+    --lr 0.0003 \
+    --dice-weight 2.0 \
+    --focal-weight 1.0 \
+    --bce-weight 0.3 \
     --amp \
-    --patience 12 \
+    --patience 15 \
     --checkpoint-dir ./checkpoints \
     --log-dir ./logs \
     --no-wandb
 
-# 6. Train Baseline U-Net (O2)
+# 7. Train Baseline U-Net (O2)
 echo "🔬 Training Baseline U-Net (25 epochs)..."
 python3 train.py \
     --model unet \
@@ -80,9 +83,12 @@ python3 train.py \
     --epochs 25 \
     --batch-size 8 \
     --num-workers 2 \
-    --lr 0.001 \
+    --lr 0.0003 \
+    --dice-weight 2.0 \
+    --focal-weight 1.0 \
+    --bce-weight 0.3 \
     --amp \
-    --patience 8 \
+    --patience 10 \
     --checkpoint-dir ./checkpoints \
     --log-dir ./logs \
     --no-wandb

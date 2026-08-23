@@ -2,9 +2,9 @@
 Combined Loss Function for Multi-Class Segmentation.
 
 Implements a weighted combination of:
-  - Binary Cross-Entropy (BCE) Loss
+  - Binary Cross-Entropy (BCE) Loss with pos_weight
   - Dice Loss (spatial overlap)
-  - Focal Loss (class imbalance handling)
+  - Focal Loss (class imbalance handling, Lin et al. 2017)
 
 All losses operate per-class and are averaged across classes.
 """
@@ -58,10 +58,17 @@ class DiceLoss(nn.Module):
 
 class FocalLoss(nn.Module):
     """
-    Focal Loss for addressing extreme class imbalance in flood mapping.
+    Focal Loss for addressing extreme class imbalance (Lin et al., 2017).
+
+    Uses proper alpha-balanced formulation:
+      alpha_t = alpha for positives, (1 - alpha) for negatives
+      FL(p_t) = -alpha_t * (1 - p_t)^gamma * log(p_t)
+
+    For flood mapping with <5% positive pixels, alpha=0.75 upweights
+    positives 3× relative to negatives.
     """
 
-    def __init__(self, alpha: float = 0.25, gamma: float = 2.0, class_weights: torch.Tensor = None):
+    def __init__(self, alpha: float = 0.75, gamma: float = 2.0, class_weights: torch.Tensor = None):
         super().__init__()
         self.alpha = alpha
         self.gamma = gamma
@@ -77,7 +84,10 @@ class FocalLoss(nn.Module):
         probs = torch.sigmoid(logits)
         pt = targets * probs + (1 - targets) * (1 - probs)
 
-        focal_weight = self.alpha * (1 - pt) ** self.gamma
+        # Alpha-balanced: α for positive pixels, (1-α) for negative pixels
+        alpha_t = targets * self.alpha + (1 - targets) * (1 - self.alpha)
+
+        focal_weight = alpha_t * (1 - pt) ** self.gamma
         focal_loss = focal_weight * bce
 
         if self.class_weights is not None:
@@ -91,9 +101,12 @@ class FocalLoss(nn.Module):
 class CombinedLoss(nn.Module):
     """
     Optimized Combined Loss Function: α·Dice + β·Focal + γ·BCE with Class Weighting.
-    
-    Default class weights [1.0, 1.2, 2.0, 2.5, 2.5] prioritize hard-to-detect
-    flooded roads and flooded buildings for maximum mIoU score.
+
+    Default class weights [1.0, 1.5, 3.0, 4.0, 4.0] heavily prioritize
+    rare flooded classes to prevent mode collapse to all-zero predictions.
+
+    BCE uses pos_weight to upweight positive pixels (~10:1) since most
+    pixels in satellite flood imagery are background.
     """
 
     def __init__(
@@ -101,20 +114,22 @@ class CombinedLoss(nn.Module):
         dice_weight: float = 1.0,
         focal_weight: float = 1.0,
         bce_weight: float = 0.5,
-        focal_alpha: float = 0.25,
+        focal_alpha: float = 0.75,
         focal_gamma: float = 2.0,
         dice_smooth: float = 1.0,
         class_weights: torch.Tensor = None,
+        bce_pos_weight: float = 10.0,
     ):
         super().__init__()
 
         self.dice_weight = dice_weight
         self.focal_weight = focal_weight
         self.bce_weight = bce_weight
+        self.bce_pos_weight = bce_pos_weight
 
         # Default class weighting if none provided: [bldg, road, flood, f_bldg, f_road]
         if class_weights is None:
-            class_weights = torch.tensor([1.0, 1.2, 2.0, 2.5, 2.5], dtype=torch.float32)
+            class_weights = torch.tensor([1.0, 1.5, 3.0, 4.0, 4.0], dtype=torch.float32)
 
         self.register_buffer("class_weights", class_weights)
 
@@ -128,13 +143,20 @@ class CombinedLoss(nn.Module):
         dice = self.dice_loss(logits, targets)
         focal = self.focal_loss(logits, targets)
 
+        # BCE with pos_weight to upweight positive (foreground) pixels
+        # This prevents mode collapse to all-zero predictions
+        num_classes = logits.shape[1]
+        pw = torch.full((num_classes,), self.bce_pos_weight, device=logits.device).reshape(1, -1, 1, 1)
+
         if self.class_weights is not None:
             weights = self.class_weights.to(logits.device).reshape(1, -1, 1, 1)
             bce = F.binary_cross_entropy_with_logits(
-                logits, targets, weight=weights
+                logits, targets, weight=weights, pos_weight=pw,
             )
         else:
-            bce = F.binary_cross_entropy_with_logits(logits, targets)
+            bce = F.binary_cross_entropy_with_logits(
+                logits, targets, pos_weight=pw,
+            )
 
         total = (
             self.dice_weight * dice
@@ -148,3 +170,4 @@ class CombinedLoss(nn.Module):
             "focal": focal.detach(),
             "bce": bce.detach(),
         }
+
