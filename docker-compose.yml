@@ -14,9 +14,9 @@ services:
       - API_PORT=8000
       - API_DEBUG=false
       - USE_STUB=false
-      - O3_FUSION_WEIGHTS=/app/checkpoints/fusion_net_best.pth
+      - O3_FUSION_WEIGHTS=/app/weights/fusion_net_best.pth
     volumes:
-      - ./checkpoints:/app/checkpoints
+      - ./weights:/app/weights
       - ./CP1-DATASET:/app/CP1-DATASET
     deploy:
       resources:

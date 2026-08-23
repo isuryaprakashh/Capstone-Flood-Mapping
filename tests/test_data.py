@@ -7,14 +7,14 @@ import numpy as np
 import pytest
 from rasterio.transform import Affine
 
-from data.tiling import compute_tile_windows
-from data.mask_generator import (
+from dataloader.tiling import compute_tile_windows
+from dataloader.mask_generator import (
     rasterize_pixel_geometries,
     parse_geojson_annotations,
     MASK_CHANNELS,
     NUM_MASK_CHANNELS,
 )
-from data.dataset import normalize_image, MEAN, STD
+from dataloader.dataset import normalize_image, MEAN, STD
 from shapely.geometry import LineString, Polygon
 
 

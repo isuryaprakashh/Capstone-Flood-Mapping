@@ -1,6 +1,6 @@
 """Road graph module for flood-safe routing."""
 
-from graph.road_graph import (
+from routing.road_graph import (
     mask_to_skeleton,
     skeleton_to_graph,
     find_safe_route,

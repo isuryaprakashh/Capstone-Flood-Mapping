@@ -35,16 +35,16 @@ ENV/
 .coverage
 htmlcov/
 
-# Logs & Checkpoints
+# Logs & Model Weights
 logs/
-checkpoints/*.pth
-checkpoints/*.pt
+weights/*.pth
+weights/*.pt
 wandb/
 
-# Node / UI
-ui/node_modules/
-ui/dist/
-ui/.env.local
+# Node / Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.env.local
 
 # Dataset (large files)
 CP1-DATASET/

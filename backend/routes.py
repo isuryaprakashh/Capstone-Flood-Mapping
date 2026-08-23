@@ -101,7 +101,7 @@ async def predict_flood(
                 }
 
         # Build road graph & extract vector features
-        from graph.road_graph import (
+        from routing.road_graph import (
             build_road_graph_from_prediction,
             graph_to_geojson,
             extract_building_polygons,
@@ -162,7 +162,7 @@ async def find_route(
     """
     try:
         from inference.predict import create_stub_prediction
-        from graph.road_graph import (
+        from routing.road_graph import (
             build_road_graph_from_prediction,
             find_safe_route,
             route_to_geojson,
@@ -209,7 +209,7 @@ async def sample_prediction(request: Request):
     and side-by-side pre/post satellite imagery.
     """
     from inference.predict import create_stub_prediction
-    from graph.road_graph import (
+    from routing.road_graph import (
         build_road_graph_from_prediction,
         graph_to_geojson,
         extract_building_polygons,
@@ -273,7 +273,7 @@ def _file_to_base64_rgb(file_path: Path) -> str:
     import io
     from PIL import Image
     try:
-        from data.dataset import read_geotiff
+        from dataloader.dataset import read_geotiff
         arr = read_geotiff(file_path, max_bands=3)
         if arr.ndim == 3:
             rgb = np.transpose(arr[:3], (1, 2, 0))

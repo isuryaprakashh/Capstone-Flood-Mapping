@@ -13,7 +13,7 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 
-from data.dataset import read_geotiff, normalize_image, NUM_CLASSES
+from dataloader.dataset import read_geotiff, normalize_image, NUM_CLASSES
 
 logger = logging.getLogger(__name__)
 

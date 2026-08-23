@@ -58,7 +58,7 @@ except (ImportError, TypeError):
     def get_autocast_context(device_type: str = "cuda", enabled: bool = True):
         return amp_autocast(enabled=enabled)
 
-from data.dataset import create_dataloaders, NUM_CLASSES
+from dataloader.dataset import create_dataloaders, NUM_CLASSES
 from losses.combined_loss import CombinedLoss
 from models import build_model, count_parameters
 

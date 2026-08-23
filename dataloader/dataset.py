@@ -383,7 +383,7 @@ class SpaceNet8Dataset(Dataset):
 
         # Generate mask on-the-fly from GeoJSON
         if "geojson_path" in sample:
-            from data.mask_generator import generate_mask
+            from dataloader.mask_generator import generate_mask
 
             ref_csv = self.reference_csv_paths.get(sample.get("region"))
             mask = generate_mask(

@@ -13,7 +13,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from api.routes import router
+from backend.routes import router
 
 logging.basicConfig(
     level=logging.INFO,
@@ -53,7 +53,7 @@ app.add_middleware(
 app.include_router(router, prefix="/api")
 
 # Serve frontend static files (React build)
-frontend_build = Path(__file__).parent.parent / "ui" / "dist"
+frontend_build = Path(__file__).parent.parent / "frontend" / "dist"
 if frontend_build.exists():
     app.mount("/", StaticFiles(directory=str(frontend_build), html=True))
     logger.info(f"Serving frontend from {frontend_build}")
@@ -73,7 +73,7 @@ async def startup():
             from inference.predict import FloodPredictor
 
             ckpt = os.getenv(
-                "O3_FUSION_WEIGHTS", "./checkpoints/fusion_net_best.pth"
+                "O3_FUSION_WEIGHTS", "./weights/fusion_net_best.pth"
             )
             model_type = os.getenv("MODEL_TYPE", "fusion")
 
@@ -96,7 +96,7 @@ def run():
     import uvicorn
 
     uvicorn.run(
-        "api.main:app",
+        "backend.main:app",
         host=API_HOST,
         port=API_PORT,
         reload=API_DEBUG,

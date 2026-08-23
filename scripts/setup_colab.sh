@@ -14,7 +14,7 @@ echo "📦 Installing required packages..."
 pip install -q rasterio geopandas shapely albumentations timm wandb networkx scikit-image pytest
 
 # 2. Create directories
-mkdir -p logs checkpoints processed/masks
+mkdir -p logs weights processed/masks
 
 # 3. Check GPU
 python3 -c "import torch; print(f'GPU Active: {torch.cuda.get_device_name(0) if torch.cuda.is_available() else \"None (CPU)\"}')"
@@ -70,7 +70,7 @@ python3 train.py \
     --bce-weight 0.3 \
     --amp \
     --patience 15 \
-    --checkpoint-dir ./checkpoints \
+    --checkpoint-dir ./weights \
     --log-dir ./logs \
     --no-wandb
 
@@ -89,32 +89,32 @@ python3 train.py \
     --bce-weight 0.3 \
     --amp \
     --patience 12 \
-    --checkpoint-dir ./checkpoints \
+    --checkpoint-dir ./weights \
     --log-dir ./logs \
     --no-wandb
 
-# 7. Evaluate with Test-Time Augmentation (TTA) & Overlap Attribution
+# 8. Evaluate with Test-Time Augmentation (TTA) & Overlap Attribution
 echo "📊 Evaluating models with TTA & SpaceNet 8 Overlap Heuristics..."
-python3 eval.py \
+python3 scripts/eval.py \
     --data-root ./CP1-DATASET \
     --mask-dir ./processed/masks \
-    --unet-ckpt ./checkpoints/unet_net_best.pth \
-    --fusion-ckpt ./checkpoints/fusion_net_best.pth \
+    --unet-ckpt ./weights/unet_net_best.pth \
+    --fusion-ckpt ./weights/fusion_net_best.pth \
     --tta \
     --heuristics \
     --output ./logs/final_eval_benchmark.json
 
-# 8. Automatic Google Drive Backup (if Drive is mounted)
+# 9. Automatic Google Drive Backup (if Drive is mounted)
 if [ -d "/content/drive/MyDrive" ]; then
     echo "💾 Backing up trained checkpoints & benchmarks to Google Drive..."
     mkdir -p /content/drive/MyDrive/SpaceNet8_Checkpoints
-    cp -u ./checkpoints/*.pth /content/drive/MyDrive/SpaceNet8_Checkpoints/ 2>/dev/null || cp ./checkpoints/*.pth /content/drive/MyDrive/SpaceNet8_Checkpoints/ 2>/dev/null || true
-    cp -u ./logs/*.json ./logs/*.csv /content/drive/MyDrive/SpaceNet8_Checkpoints/ 2>/dev/null || true
+    cp -u ./weights/*.pth /content/drive/MyDrive/SpaceNet8_Checkpoints/ 2>/dev/null || cp ./weights/*.pth /content/drive/MyDrive/SpaceNet8_Checkpoints/ 2>/dev/null || true
+    cp -u ./logs/*.json ./logs/*.csv ./weights/*.csv ./weights/*.json /content/drive/MyDrive/SpaceNet8_Checkpoints/ 2>/dev/null || true
     echo "✅ Successfully backed up to /content/drive/MyDrive/SpaceNet8_Checkpoints/"
 fi
 
 echo "=========================================================="
 echo "🎉 Colab Training & Benchmark Complete!"
-echo "Checkpoints: ./checkpoints/"
-echo "Logs:        ./logs/"
+echo "Weights: ./weights/"
+echo "Logs:    ./logs/"
 echo "=========================================================="

@@ -22,7 +22,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 
-from data.dataset import create_dataloaders, NUM_CLASSES
+from dataloader.dataset import create_dataloaders, NUM_CLASSES
 from models import build_model
 
 logging.basicConfig(
@@ -239,8 +239,8 @@ def main():
 
     parser.add_argument("--data-root", type=str, default="./CP1-DATASET")
     parser.add_argument("--mask-dir", type=str, default=None)
-    parser.add_argument("--unet-ckpt", type=str, default="checkpoints/unet_net_best.pth")
-    parser.add_argument("--fusion-ckpt", type=str, default="checkpoints/fusion_net_best.pth")
+    parser.add_argument("--unet-ckpt", type=str, default="weights/unet_net_best.pth")
+    parser.add_argument("--fusion-ckpt", type=str, default="weights/fusion_net_best.pth")
     parser.add_argument("--split", type=str, default="val", choices=["val", "test"])
     parser.add_argument("--batch-size", type=int, default=4)
     parser.add_argument("--tile-size", type=int, default=512)

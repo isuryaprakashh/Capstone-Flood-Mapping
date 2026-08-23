@@ -22,8 +22,8 @@ from pathlib import Path
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from data.mask_generator import batch_generate_masks
-from data.dataset import build_sample_manifest, geographic_split
+from dataloader.mask_generator import batch_generate_masks
+from dataloader.dataset import build_sample_manifest, geographic_split
 
 logging.basicConfig(
     level=logging.INFO,

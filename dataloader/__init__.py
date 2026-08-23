@@ -5,19 +5,19 @@ Provides CRS reprojection, image tiling, mask generation,
 and PyTorch Dataset/DataLoader utilities.
 """
 
-from data.crs import (
+from dataloader.crs import (
     get_crs_info,
     reproject_raster,
     check_crs_alignment,
     batch_reproject,
 )
-from data.tiling import (
+from dataloader.tiling import (
     tile_geotiff,
     tile_image_and_mask,
     reconstruct_from_tiles,
     compute_tile_windows,
 )
-from data.mask_generator import (
+from dataloader.mask_generator import (
     generate_mask,
     batch_generate_masks,
     parse_geojson_annotations,
@@ -25,7 +25,7 @@ from data.mask_generator import (
     MASK_CHANNELS,
     NUM_MASK_CHANNELS,
 )
-from data.dataset import (
+from dataloader.dataset import (
     SpaceNet8Dataset,
     create_dataloaders,
     build_sample_manifest,
