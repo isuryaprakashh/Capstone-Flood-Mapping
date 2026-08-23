@@ -98,6 +98,15 @@ python3 eval.py \
     --heuristics \
     --output ./logs/final_eval_benchmark.json
 
+# 8. Automatic Google Drive Backup (if Drive is mounted)
+if [ -d "/content/drive/MyDrive" ]; then
+    echo "💾 Backing up trained checkpoints & benchmarks to Google Drive..."
+    mkdir -p /content/drive/MyDrive/SpaceNet8_Checkpoints
+    cp -u ./checkpoints/*.pth /content/drive/MyDrive/SpaceNet8_Checkpoints/ 2>/dev/null || cp ./checkpoints/*.pth /content/drive/MyDrive/SpaceNet8_Checkpoints/ 2>/dev/null || true
+    cp -u ./logs/*.json ./logs/*.csv /content/drive/MyDrive/SpaceNet8_Checkpoints/ 2>/dev/null || true
+    echo "✅ Successfully backed up to /content/drive/MyDrive/SpaceNet8_Checkpoints/"
+fi
+
 echo "=========================================================="
 echo "🎉 Colab Training & Benchmark Complete!"
 echo "Checkpoints: ./checkpoints/"
