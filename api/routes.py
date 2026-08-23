@@ -100,7 +100,24 @@ async def predict_flood(
                     ),
                 }
 
-        # Convert mask to base64 PNG for frontend
+        # Build road graph & extract vector features
+        from graph.road_graph import (
+            build_road_graph_from_prediction,
+            graph_to_geojson,
+            extract_building_polygons,
+        )
+
+        G = build_road_graph_from_prediction(result)
+        request.app.state.last_graph = G
+        request.app.state.last_prediction = result
+
+        road_geojson = graph_to_geojson(G)
+        building_geojson = extract_building_polygons(
+            binary_mask[0] if binary_mask.shape[0] > 0 else np.zeros((512, 512)),
+            flooded_building_mask=binary_mask[3] if binary_mask.shape[0] > 3 else None,
+        )
+
+        # Convert masks and satellite photo to base64 PNG for frontend
         mask_b64 = _mask_to_base64_png(binary_mask)
 
         return JSONResponse(
@@ -110,6 +127,10 @@ async def predict_flood(
                 "statistics": stats,
                 "mask_png_base64": mask_b64,
                 "mask_shape": list(binary_mask.shape),
+                "road_network": road_geojson,
+                "building_footprints": building_geojson,
+                "num_road_segments": len(road_geojson.get("features", [])),
+                "num_buildings": len(building_geojson.get("features", [])),
             }
         )
 
@@ -143,13 +164,14 @@ async def find_route(
             route_to_geojson,
         )
 
-        # Use stored prediction or generate stub
-        prediction = create_stub_prediction(512, 512)
+        # Use stored prediction or live graph
+        G = getattr(request.app.state, "last_graph", None)
+        if G is None or G.number_of_nodes() == 0:
+            prediction = getattr(request.app.state, "last_prediction", None) or create_stub_prediction(512, 512)
+            G = build_road_graph_from_prediction(prediction)
+            request.app.state.last_graph = G
 
-        # Build road graph
-        G = build_road_graph_from_prediction(prediction)
-
-        # Find safe route
+        # Find safe route avoiding flooded roads
         route = find_safe_route(
             G,
             start=(start_y, start_x),
@@ -164,9 +186,10 @@ async def find_route(
             {
                 "ok": True,
                 "route": geojson,
-                "distance_m": route["distance"],
-                "has_flooded_segments": route["has_flooded_segments"],
-                "route_type": route["route_type"],
+                "distance_m": route.get("distance", 0),
+                "has_flooded_segments": route.get("has_flooded_segments", False),
+                "route_type": route.get("route_type", "unknown"),
+                "path_nodes": route.get("path", []),
             }
         )
 
@@ -176,12 +199,16 @@ async def find_route(
 
 
 @router.get("/sample")
-async def sample_prediction():
+async def sample_prediction(request: Request):
     """
-    Return a sample prediction for demo/testing purposes.
-    Uses stub data — no model required.
+    Return a sample prediction with realistic road vectors and flood zones.
     """
     from inference.predict import create_stub_prediction
+    from graph.road_graph import (
+        build_road_graph_from_prediction,
+        graph_to_geojson,
+        extract_building_polygons,
+    )
 
     result = create_stub_prediction(512, 512)
 
@@ -197,12 +224,26 @@ async def sample_prediction():
 
     mask_b64 = _mask_to_base64_png(result["binary_mask"])
 
+    G = build_road_graph_from_prediction(result)
+    request.app.state.last_graph = G
+    request.app.state.last_prediction = result
+
+    road_geojson = graph_to_geojson(G)
+    building_geojson = extract_building_polygons(
+        result["binary_mask"][0],
+        flooded_building_mask=result["binary_mask"][3] if result["binary_mask"].shape[0] > 3 else None,
+    )
+
     return JSONResponse(
         {
             "ok": True,
             "class_names": result["class_names"],
             "statistics": stats,
             "mask_png_base64": mask_b64,
+            "road_network": road_geojson,
+            "building_footprints": building_geojson,
+            "num_road_segments": len(road_geojson.get("features", [])),
+            "num_buildings": len(building_geojson.get("features", [])),
             "is_stub": True,
         }
     )
