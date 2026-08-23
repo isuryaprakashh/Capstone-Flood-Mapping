@@ -255,21 +255,75 @@ class UNetBaseline(nn.Module):
         self,
         pre_image: torch.Tensor,
         post_image: torch.Tensor,
-        threshold: float = 0.5,
+        thresholds: list[float] = None,
+        use_tta: bool = False,
+        use_heuristics: bool = True,
     ) -> torch.Tensor:
         """
-        Run inference and return binary predictions.
+        Run inference with optional Test-Time Augmentation (TTA) and
+        calibrated thresholds.
 
         Args:
             pre_image: Pre-event image (B, 3, H, W).
             post_image: Post-event image (B, 3, H, W).
-            threshold: Binarization threshold.
+            thresholds: Per-class thresholds [bldg, road, flood, f_bldg, f_road].
+            use_tta: If True, averages predictions across 4 geometric views.
+            use_heuristics: If True, applies overlap heuristics.
 
         Returns:
             Binary predictions (B, num_classes, H, W).
         """
+        if thresholds is None:
+            thresholds = [0.45, 0.38, 0.35, 0.30, 0.30]
+
         self.eval()
         with torch.no_grad():
-            logits = self.forward(pre_image, post_image)
-            probs = torch.sigmoid(logits)
-            return (probs > threshold).float()
+            if use_tta:
+                # 1. Original
+                p1 = torch.sigmoid(self.forward(pre_image, post_image))
+                # 2. Horizontal Flip
+                p2 = torch.flip(
+                    torch.sigmoid(
+                        self.forward(
+                            torch.flip(pre_image, [3]),
+                            torch.flip(post_image, [3]),
+                        )
+                    ),
+                    [3],
+                )
+                # 3. Vertical Flip
+                p3 = torch.flip(
+                    torch.sigmoid(
+                        self.forward(
+                            torch.flip(pre_image, [2]),
+                            torch.flip(post_image, [2]),
+                        )
+                    ),
+                    [2],
+                )
+                # 4. Rotate 90
+                p4 = torch.rot90(
+                    torch.sigmoid(
+                        self.forward(
+                            torch.rot90(pre_image, 1, [2, 3]),
+                            torch.rot90(post_image, 1, [2, 3]),
+                        )
+                    ),
+                    -1,
+                    [2, 3],
+                )
+                probs = (p1 + p2 + p3 + p4) / 4.0
+            else:
+                logits = self.forward(pre_image, post_image)
+                probs = torch.sigmoid(logits)
+
+            binary = torch.zeros_like(probs)
+            for c in range(min(probs.shape[1], len(thresholds))):
+                binary[:, c] = (probs[:, c] > thresholds[c]).float()
+
+            if use_heuristics and binary.shape[1] >= 5:
+                bldg, road, flood = binary[:, 0], binary[:, 1], binary[:, 2]
+                binary[:, 3] = torch.clamp(binary[:, 3] + (bldg * flood), 0.0, 1.0) * bldg
+                binary[:, 4] = torch.clamp(binary[:, 4] + (road * flood), 0.0, 1.0) * road
+
+            return binary

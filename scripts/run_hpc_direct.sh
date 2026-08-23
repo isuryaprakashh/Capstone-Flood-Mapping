@@ -24,8 +24,9 @@ python3 train.py \
     --model fusion \
     --data-root ./CP1-DATASET \
     --mask-dir ./processed/masks \
-    --epochs 100 \
+    --epochs 40 \
     --batch-size 8 \
+    --num-workers 4 \
     --lr 0.001 \
     --amp \
     --checkpoint-dir ./checkpoints \
@@ -38,8 +39,9 @@ python3 train.py \
     --model unet \
     --data-root ./CP1-DATASET \
     --mask-dir ./processed/masks \
-    --epochs 50 \
+    --epochs 25 \
     --batch-size 8 \
+    --num-workers 4 \
     --lr 0.001 \
     --amp \
     --checkpoint-dir ./checkpoints \
@@ -47,12 +49,14 @@ python3 train.py \
 
 # Step 4: Run Evaluation & Generate Benchmark Table
 echo ""
-echo "📊 Evaluating models and generating comparison report..."
+echo "📊 Evaluating models with TTA & Overlap Heuristics..."
 python3 eval.py \
     --data-root ./CP1-DATASET \
     --mask-dir ./processed/masks \
     --unet-ckpt ./checkpoints/unet_net_best.pth \
     --fusion-ckpt ./checkpoints/fusion_net_best.pth \
+    --tta \
+    --heuristics \
     --output ./logs/final_eval_benchmark.json
 
 echo ""

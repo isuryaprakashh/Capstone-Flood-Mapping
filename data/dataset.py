@@ -369,7 +369,8 @@ class SpaceNet8Dataset(Dataset):
 
 def get_train_transforms(tile_size: int = 512):
     """
-    Get albumentations training augmentation pipeline.
+    Get optimized albumentations training augmentation pipeline
+    incorporating SpaceNet 8 winning strategies (geometric + photometric).
 
     Returns:
         Albumentations Compose transform.
@@ -387,13 +388,26 @@ def get_train_transforms(tile_size: int = 512):
                 A.HorizontalFlip(p=0.5),
                 A.VerticalFlip(p=0.5),
                 A.RandomRotate90(p=0.5),
+                A.ShiftScaleRotate(shift_limit=0.0625, scale_limit=0.1, rotate_limit=30, p=0.4),
                 A.RandomBrightnessContrast(
-                    brightness_limit=0.2,
-                    contrast_limit=0.2,
+                    brightness_limit=0.25,
+                    contrast_limit=0.25,
+                    p=0.4,
+                ),
+                A.HueSaturationValue(
+                    hue_shift_limit=10,
+                    sat_shift_limit=20,
+                    val_shift_limit=15,
                     p=0.3,
                 ),
-                A.GaussNoise(p=0.2),
-                A.GaussianBlur(blur_limit=(3, 5), p=0.1),
+                A.GaussNoise(p=0.25),
+                A.OneOf(
+                    [
+                        A.MotionBlur(blur_limit=5, p=1.0),
+                        A.GaussianBlur(blur_limit=(3, 5), p=1.0),
+                    ],
+                    p=0.2,
+                ),
             ],
             additional_targets={"image2": "image"},
         )

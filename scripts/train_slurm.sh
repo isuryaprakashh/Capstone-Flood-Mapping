@@ -37,12 +37,12 @@ else
 fi
 
 # 4. Step 2: Train Novel Siamese Cross-Attention Fusion Network (O3)
-echo ">>> Step 2: Training Siamese Cross-Attention Network (100 epochs)..."
+echo ">>> Step 2: Training Siamese Cross-Attention Network (40 epochs with OneCycleLR)..."
 python3 train.py \
     --model fusion \
     --data-root ./CP1-DATASET \
     --mask-dir ./processed/masks \
-    --epochs 100 \
+    --epochs 40 \
     --batch-size 8 \
     --lr 0.001 \
     --amp \
@@ -50,12 +50,12 @@ python3 train.py \
     --log-dir ./logs
 
 # 5. Step 3: Train Baseline U-Net (O2) for comparative benchmark
-echo ">>> Step 3: Training Baseline U-Net Model (50 epochs)..."
+echo ">>> Step 3: Training Baseline U-Net Model (25 epochs)..."
 python3 train.py \
     --model unet \
     --data-root ./CP1-DATASET \
     --mask-dir ./processed/masks \
-    --epochs 50 \
+    --epochs 25 \
     --batch-size 8 \
     --lr 0.001 \
     --amp \
@@ -63,12 +63,14 @@ python3 train.py \
     --log-dir ./logs
 
 # 6. Step 4: Run Comparative Evaluation
-echo ">>> Step 4: Evaluating both models & generating benchmark table..."
+echo ">>> Step 4: Evaluating both models with TTA & Overlap Heuristics..."
 python3 eval.py \
     --data-root ./CP1-DATASET \
     --mask-dir ./processed/masks \
     --unet-ckpt ./checkpoints/unet_net_best.pth \
     --fusion-ckpt ./checkpoints/fusion_net_best.pth \
+    --tta \
+    --heuristics \
     --output ./logs/final_eval_benchmark.json
 
 echo "=================================================================="

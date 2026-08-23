@@ -412,24 +412,110 @@ class SiameseFusionNet(nn.Module):
         self,
         pre_image: torch.Tensor,
         post_image: torch.Tensor,
-        threshold: float = 0.5,
+        thresholds: list[float] = None,
+        use_tta: bool = False,
+        use_heuristics: bool = True,
     ) -> torch.Tensor:
         """
-        Run inference and return binary predictions.
+        Run inference with optional Test-Time Augmentation (TTA) and
+        winning SpaceNet 8 overlap attribution post-processing heuristics.
 
         Args:
             pre_image: Pre-event image (B, 3, H, W).
             post_image: Post-event image (B, 3, H, W).
-            threshold: Binarization threshold.
+            thresholds: Per-class thresholds [bldg, road, flood, f_bldg, f_road].
+            use_tta: If True, averages predictions across 4 geometric views.
+            use_heuristics: If True, applies 2nd-place overlap heuristics.
 
         Returns:
             Binary predictions (B, num_classes, H, W).
         """
+        if thresholds is None:
+            thresholds = [0.45, 0.38, 0.35, 0.30, 0.30]
+
         self.eval()
         with torch.no_grad():
-            logits = self.forward(pre_image, post_image)
-            probs = torch.sigmoid(logits)
-            return (probs > threshold).float()
+            if use_tta:
+                # 1. Original
+                p1 = torch.sigmoid(self.forward(pre_image, post_image))
+                # 2. Horizontal Flip
+                p2 = torch.flip(
+                    torch.sigmoid(
+                        self.forward(
+                            torch.flip(pre_image, [3]),
+                            torch.flip(post_image, [3]),
+                        )
+                    ),
+                    [3],
+                )
+                # 3. Vertical Flip
+                p3 = torch.flip(
+                    torch.sigmoid(
+                        self.forward(
+                            torch.flip(pre_image, [2]),
+                            torch.flip(post_image, [2]),
+                        )
+                    ),
+                    [2],
+                )
+                # 4. Rotate 90
+                p4 = torch.rot90(
+                    torch.sigmoid(
+                        self.forward(
+                            torch.rot90(pre_image, 1, [2, 3]),
+                            torch.rot90(post_image, 1, [2, 3]),
+                        )
+                    ),
+                    -1,
+                    [2, 3],
+                )
+                probs = (p1 + p2 + p3 + p4) / 4.0
+            else:
+                logits = self.forward(pre_image, post_image)
+                probs = torch.sigmoid(logits)
+
+            # Apply per-class calibrated thresholds
+            binary = torch.zeros_like(probs)
+            for c in range(min(probs.shape[1], len(thresholds))):
+                binary[:, c] = (probs[:, c] > thresholds[c]).float()
+
+            if use_heuristics:
+                binary = self.apply_overlap_heuristics(binary)
+
+            return binary
+
+    @staticmethod
+    def apply_overlap_heuristics(binary: torch.Tensor) -> torch.Tensor:
+        """
+        SpaceNet 8 Winning Post-Processing Heuristic (number13):
+        - Enforces topological consistency: flooded structures must belong to their base class
+        - Expands flood attribution where infrastructure intersects with high water
+        """
+        if binary.shape[1] < 5:
+            return binary
+
+        out = binary.clone()
+        bldg = out[:, 0]
+        road = out[:, 1]
+        flood = out[:, 2]
+        f_bldg = out[:, 3]
+        f_road = out[:, 4]
+
+        # 1. Building overlap: Flooded building must be a building
+        f_bldg = torch.clamp(f_bldg + (bldg * flood), 0.0, 1.0) * bldg
+        # Ensure base building includes flooded building
+        bldg = torch.clamp(bldg + f_bldg, 0.0, 1.0)
+
+        # 2. Road overlap: Flooded road must be a road
+        f_road = torch.clamp(f_road + (road * flood), 0.0, 1.0) * road
+        # Ensure base road includes flooded road
+        road = torch.clamp(road + f_road, 0.0, 1.0)
+
+        out[:, 0] = bldg
+        out[:, 1] = road
+        out[:, 3] = f_bldg
+        out[:, 4] = f_road
+        return out
 
     def get_change_maps(
         self,

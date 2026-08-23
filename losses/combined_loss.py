@@ -16,37 +16,22 @@ import torch.nn.functional as F
 
 class DiceLoss(nn.Module):
     """
-    Differentiable Dice Loss for binary/multi-class segmentation.
-
-    Dice = 2 * |A ∩ B| / (|A| + |B|)
-    Loss = 1 - Dice
-
-    Args:
-        smooth: Smoothing factor to avoid division by zero.
-        per_class: If True, compute Dice per class and average.
+    Differentiable Dice Loss with optional class weighting.
     """
 
-    def __init__(self, smooth: float = 1.0, per_class: bool = True):
+    def __init__(self, smooth: float = 1.0, per_class: bool = True, class_weights: torch.Tensor = None):
         super().__init__()
         self.smooth = smooth
         self.per_class = per_class
+        self.register_buffer("class_weights", class_weights)
 
     def forward(
         self, logits: torch.Tensor, targets: torch.Tensor
     ) -> torch.Tensor:
-        """
-        Args:
-            logits: Model output (B, C, H, W) — raw logits.
-            targets: Ground truth (B, C, H, W) — binary masks.
-
-        Returns:
-            Scalar Dice loss.
-        """
         probs = torch.sigmoid(logits)
         B, C, H, W = probs.shape
 
         if self.per_class:
-            # Flatten spatial dims: (B, C, H*W)
             probs_flat = probs.reshape(B, C, -1)
             targets_flat = targets.reshape(B, C, -1)
 
@@ -55,6 +40,10 @@ class DiceLoss(nn.Module):
 
             dice = (2.0 * intersection + self.smooth) / (union + self.smooth)
             loss = 1.0 - dice  # (B, C)
+
+            if self.class_weights is not None:
+                w = self.class_weights.to(loss.device).view(1, -1)
+                return (loss * w).sum() / (w.sum() * B + 1e-8)
             return loss.mean()
         else:
             probs_flat = probs.reshape(-1)
@@ -69,35 +58,18 @@ class DiceLoss(nn.Module):
 
 class FocalLoss(nn.Module):
     """
-    Focal Loss for addressing class imbalance.
-
-    FL(p) = -α * (1 - p)^γ * log(p)
-
-    Down-weights easy examples and focuses on hard negatives,
-    which is critical for satellite imagery where flood pixels
-    are a small fraction of the total.
-
-    Args:
-        alpha: Balancing factor (default: 0.25).
-        gamma: Focusing parameter (default: 2.0).
+    Focal Loss for addressing extreme class imbalance in flood mapping.
     """
 
-    def __init__(self, alpha: float = 0.25, gamma: float = 2.0):
+    def __init__(self, alpha: float = 0.25, gamma: float = 2.0, class_weights: torch.Tensor = None):
         super().__init__()
         self.alpha = alpha
         self.gamma = gamma
+        self.register_buffer("class_weights", class_weights)
 
     def forward(
         self, logits: torch.Tensor, targets: torch.Tensor
     ) -> torch.Tensor:
-        """
-        Args:
-            logits: Model output (B, C, H, W) — raw logits.
-            targets: Ground truth (B, C, H, W) — binary masks.
-
-        Returns:
-            Scalar Focal loss.
-        """
         bce = F.binary_cross_entropy_with_logits(
             logits, targets, reduction="none"
         )
@@ -108,26 +80,20 @@ class FocalLoss(nn.Module):
         focal_weight = self.alpha * (1 - pt) ** self.gamma
         focal_loss = focal_weight * bce
 
+        if self.class_weights is not None:
+            w = self.class_weights.to(focal_loss.device).reshape(1, -1, 1, 1)
+            focal_loss = focal_loss * w
+            return focal_loss.sum() / (w.sum() * focal_loss.shape[0] * focal_loss.shape[2] * focal_loss.shape[3] + 1e-8)
+
         return focal_loss.mean()
 
 
 class CombinedLoss(nn.Module):
     """
-    Combined loss function: α·Dice + β·Focal + γ·BCE.
-
-    This combination provides:
-    - Dice: Global overlap optimization (fights class imbalance)
-    - Focal: Hard example mining (focuses on difficult pixels)
-    - BCE: Stable per-pixel classification baseline
-
-    Args:
-        dice_weight: Weight for Dice loss (default: 1.0).
-        focal_weight: Weight for Focal loss (default: 1.0).
-        bce_weight: Weight for BCE loss (default: 0.5).
-        focal_alpha: Focal loss alpha parameter.
-        focal_gamma: Focal loss gamma parameter.
-        dice_smooth: Dice loss smoothing factor.
-        class_weights: Optional per-class weights (tensor of shape [C]).
+    Optimized Combined Loss Function: α·Dice + β·Focal + γ·BCE with Class Weighting.
+    
+    Default class weights [1.0, 1.2, 2.0, 2.5, 2.5] prioritize hard-to-detect
+    flooded roads and flooded buildings for maximum mIoU score.
     """
 
     def __init__(
@@ -146,42 +112,30 @@ class CombinedLoss(nn.Module):
         self.focal_weight = focal_weight
         self.bce_weight = bce_weight
 
-        self.dice_loss = DiceLoss(smooth=dice_smooth, per_class=True)
-        self.focal_loss = FocalLoss(alpha=focal_alpha, gamma=focal_gamma)
+        # Default class weighting if none provided: [bldg, road, flood, f_bldg, f_road]
+        if class_weights is None:
+            class_weights = torch.tensor([1.0, 1.2, 2.0, 2.5, 2.5], dtype=torch.float32)
 
-        self.register_buffer(
-            "class_weights",
-            class_weights if class_weights is not None else None,
-        )
+        self.register_buffer("class_weights", class_weights)
+
+        self.dice_loss = DiceLoss(smooth=dice_smooth, per_class=True, class_weights=class_weights)
+        self.focal_loss = FocalLoss(alpha=focal_alpha, gamma=focal_gamma, class_weights=class_weights)
 
     def forward(
         self, logits: torch.Tensor, targets: torch.Tensor
     ) -> dict[str, torch.Tensor]:
-        """
-        Compute combined loss.
-
-        Args:
-            logits: Model predictions (B, C, H, W) — raw logits.
-            targets: Ground truth masks (B, C, H, W) — binary.
-
-        Returns:
-            Dictionary with 'total', 'dice', 'focal', 'bce' loss values.
-        """
-        # Compute individual losses
+        """Compute weighted multi-task loss."""
         dice = self.dice_loss(logits, targets)
         focal = self.focal_loss(logits, targets)
 
-        # BCE with optional class weights
         if self.class_weights is not None:
-            # Reshape class_weights to (1, C, 1, 1) for broadcasting
-            weights = self.class_weights.reshape(1, -1, 1, 1)
+            weights = self.class_weights.to(logits.device).reshape(1, -1, 1, 1)
             bce = F.binary_cross_entropy_with_logits(
                 logits, targets, weight=weights
             )
         else:
             bce = F.binary_cross_entropy_with_logits(logits, targets)
 
-        # Weighted combination
         total = (
             self.dice_weight * dice
             + self.focal_weight * focal

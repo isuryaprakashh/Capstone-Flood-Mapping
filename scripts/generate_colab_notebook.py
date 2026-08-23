@@ -301,7 +301,7 @@ def create_colab_notebook():
         "outputs": [],
         "source": [
             "#@title Training Parameters for Baseline U-Net\n",
-            "unet_epochs = 50 #@param {type:\"integer\"}\n",
+            "unet_epochs = 25 #@param {type:\"integer\"}\n",
             "unet_batch_size = 8 #@param {type:\"integer\"}\n",
             "unet_lr = 0.001 #@param {type:\"number\"}\n",
             "use_amp = True #@param {type:\"boolean\"}\n",
@@ -333,7 +333,7 @@ def create_colab_notebook():
         "metadata": {},
         "source": [
             "## 7️⃣ Step 3: Train Novel Siamese Cross-Attention Network (O3 Novel Model)\n",
-            "Trains the dual-stream Siamese encoder with multi-scale bidirectional cross-attention modules."
+            "Trains the dual-stream Siamese encoder with multi-scale bidirectional cross-attention modules and class-weighted multi-task loss."
         ]
     })
 
@@ -344,10 +344,10 @@ def create_colab_notebook():
         "outputs": [],
         "source": [
             "#@title Training Parameters for Siamese Fusion Network\n",
-            "fusion_epochs = 100 #@param {type:\"integer\"}\n",
+            "fusion_epochs = 40 #@param {type:\"integer\"}\n",
             "fusion_batch_size = 8 #@param {type:\"integer\"}\n",
             "fusion_lr = 0.001 #@param {type:\"number\"}\n",
-            "fusion_patience = 15 #@param {type:\"integer\"}\n",
+            "fusion_patience = 12 #@param {type:\"integer\"}\n",
             "\n",
             "!python train.py \\\n",
             "    --model fusion \\\n",
@@ -376,8 +376,8 @@ def create_colab_notebook():
         "cell_type": "markdown",
         "metadata": {},
         "source": [
-            "## 8️⃣ Step 4: Comparative Evaluation & Benchmark Metrics\n",
-            "Evaluates both models on the holdout test/validation dataset and outputs a comparative metric table with $\\Delta$ (Fusion vs. U-Net)."
+            "## 8️⃣ Step 4: Comparative Evaluation with TTA & Overlap Heuristics\n",
+            "Evaluates both models on the holdout validation dataset using **Test-Time Augmentation (TTA)** and **SpaceNet 8 Overlap Attribution Heuristics** for peak benchmark accuracy."
         ]
     })
 
@@ -393,6 +393,8 @@ def create_colab_notebook():
             "    --unet-ckpt ./checkpoints/unet_net_best.pth \\\n",
             "    --fusion-ckpt ./checkpoints/fusion_net_best.pth \\\n",
             "    --split val \\\n",
+            "    --tta \\\n",
+            "    --heuristics \\\n",
             "    --output ./logs/final_eval_benchmark.json\n",
             "\n",
             "# Backup evaluation results to Drive\n",

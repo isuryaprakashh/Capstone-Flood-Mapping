@@ -46,44 +46,46 @@ else
 fi
 
 # 5. Train Siamese Cross-Attention Network (O3)
-echo "🧠 Training Siamese Cross-Attention Network..."
+echo "🧠 Training Siamese Cross-Attention Network (40 epochs with OneCycleLR & AMP)..."
 python3 train.py \
     --model fusion \
     --data-root ./CP1-DATASET \
     --mask-dir ./processed/masks \
-    --epochs 100 \
+    --epochs 40 \
     --batch-size 8 \
     --num-workers 2 \
     --lr 0.001 \
     --amp \
-    --patience 15 \
+    --patience 12 \
     --checkpoint-dir ./checkpoints \
     --log-dir ./logs \
     --no-wandb
 
 # 6. Train Baseline U-Net (O2)
-echo "🔬 Training Baseline U-Net..."
+echo "🔬 Training Baseline U-Net (25 epochs)..."
 python3 train.py \
     --model unet \
     --data-root ./CP1-DATASET \
     --mask-dir ./processed/masks \
-    --epochs 50 \
+    --epochs 25 \
     --batch-size 8 \
     --num-workers 2 \
     --lr 0.001 \
     --amp \
-    --patience 10 \
+    --patience 8 \
     --checkpoint-dir ./checkpoints \
     --log-dir ./logs \
     --no-wandb
 
-# 7. Evaluate and Compare
-echo "📊 Evaluating models and generating benchmark table..."
+# 7. Evaluate with Test-Time Augmentation (TTA) & Overlap Attribution
+echo "📊 Evaluating models with TTA & SpaceNet 8 Overlap Heuristics..."
 python3 eval.py \
     --data-root ./CP1-DATASET \
     --mask-dir ./processed/masks \
     --unet-ckpt ./checkpoints/unet_net_best.pth \
     --fusion-ckpt ./checkpoints/fusion_net_best.pth \
+    --tta \
+    --heuristics \
     --output ./logs/final_eval_benchmark.json
 
 echo "=========================================================="

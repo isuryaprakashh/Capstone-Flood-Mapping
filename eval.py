@@ -33,19 +33,17 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 CLASS_NAMES = ["building", "road", "flood", "flooded_building", "flooded_road"]
+DEFAULT_THRESHOLDS = [0.45, 0.38, 0.35, 0.30, 0.30]
 
 
 def compute_detailed_metrics(
-    preds: torch.Tensor, targets: torch.Tensor, threshold: float = 0.5
+    binary: torch.Tensor, targets: torch.Tensor
 ) -> dict:
-    """Compute per-class and aggregate metrics."""
+    """Compute per-class and aggregate metrics from binary predictions."""
     with torch.no_grad():
-        probs = torch.sigmoid(preds)
-        binary = (probs > threshold).float()
-
         metrics = {}
 
-        for c in range(min(preds.shape[1], len(CLASS_NAMES))):
+        for c in range(min(binary.shape[1], len(CLASS_NAMES))):
             pred_c = binary[:, c].flatten()
             targ_c = targets[:, c].flatten()
 
@@ -61,8 +59,8 @@ def compute_detailed_metrics(
             metrics[f"recall_{name}"] = tp / (tp + fn + 1e-8)
             metrics[f"accuracy_{name}"] = (tp + tn) / (tp + tn + fp + fn + 1e-8)
 
-        ious = [metrics[f"iou_{n}"] for n in CLASS_NAMES[: preds.shape[1]]]
-        f1s = [metrics[f"f1_{n}"] for n in CLASS_NAMES[: preds.shape[1]]]
+        ious = [metrics[f"iou_{n}"] for n in CLASS_NAMES[: binary.shape[1]]]
+        f1s = [metrics[f"f1_{n}"] for n in CLASS_NAMES[: binary.shape[1]]]
         metrics["mean_iou"] = np.mean(ious)
         metrics["mean_f1"] = np.mean(f1s)
 
@@ -75,23 +73,39 @@ def evaluate_model(
     loader,
     device: torch.device,
     model_name: str = "model",
+    use_tta: bool = True,
+    use_heuristics: bool = True,
+    thresholds: list[float] = None,
 ) -> dict:
     """
-    Run full evaluation on a dataset.
+    Run full evaluation on a dataset using TTA and winning SpaceNet 8 post-processing.
 
     Returns:
         Aggregated metrics dictionary.
     """
     model.eval()
     all_metrics = []
+    thresh = thresholds or DEFAULT_THRESHOLDS
 
     for batch_idx, batch in enumerate(loader):
         pre_img = batch["pre_image"].to(device, non_blocking=True)
         post_img = batch["post_image"].to(device, non_blocking=True)
         mask = batch["mask"].to(device, non_blocking=True)
 
-        logits = model(pre_img, post_img)
-        metrics = compute_detailed_metrics(logits, mask)
+        if hasattr(model, "predict"):
+            binary = model.predict(
+                pre_img,
+                post_img,
+                thresholds=thresh,
+                use_tta=use_tta,
+                use_heuristics=use_heuristics,
+            )
+        else:
+            logits = model(pre_img, post_img)
+            probs = torch.sigmoid(logits)
+            binary = (probs > 0.5).float()
+
+        metrics = compute_detailed_metrics(binary, mask)
         all_metrics.append(metrics)
 
         if (batch_idx + 1) % 10 == 0:
@@ -202,11 +216,15 @@ def main():
     parser.add_argument("--batch-size", type=int, default=4)
     parser.add_argument("--tile-size", type=int, default=512)
     parser.add_argument("--output", type=str, default="eval_results.json")
+    parser.add_argument("--tta", action="store_true", default=True, help="Use Test-Time Augmentation (4-way average)")
+    parser.add_argument("--no-tta", dest="tta", action="store_false", help="Disable Test-Time Augmentation")
+    parser.add_argument("--heuristics", action="store_true", default=True, help="Use SpaceNet 8 winning overlap heuristics")
+    parser.add_argument("--no-heuristics", dest="heuristics", action="store_false", help="Disable overlap heuristics")
 
     args = parser.parse_args()
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    logger.info(f"Device: {device}")
+    logger.info(f"Device: {device} | TTA: {args.tta} | Overlap Heuristics: {args.heuristics}")
 
     # Create DataLoader
     loaders = create_dataloaders(
@@ -225,7 +243,9 @@ def main():
     if Path(args.unet_ckpt).exists():
         logger.info("\n--- Evaluating U-Net Baseline ---")
         unet = load_model_from_checkpoint("unet", args.unet_ckpt, device)
-        results["UNet Baseline"] = evaluate_model(unet, eval_loader, device, "U-Net")
+        results["UNet Baseline"] = evaluate_model(
+            unet, eval_loader, device, "U-Net", use_tta=args.tta, use_heuristics=args.heuristics
+        )
         del unet
         torch.cuda.empty_cache() if device.type == "cuda" else None
     else:
@@ -235,7 +255,9 @@ def main():
     if Path(args.fusion_ckpt).exists():
         logger.info("\n--- Evaluating Siamese Fusion ---")
         fusion = load_model_from_checkpoint("fusion", args.fusion_ckpt, device)
-        results["Siamese Fusion"] = evaluate_model(fusion, eval_loader, device, "Fusion")
+        results["Siamese Fusion"] = evaluate_model(
+            fusion, eval_loader, device, "Fusion", use_tta=args.tta, use_heuristics=args.heuristics
+        )
         del fusion
         torch.cuda.empty_cache() if device.type == "cuda" else None
     else:

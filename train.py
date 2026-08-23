@@ -50,28 +50,30 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-# ─── Metrics ────────────────────────────────────────────────────────────────
-
 CLASS_NAMES = ["building", "road", "flood", "flooded_building", "flooded_road"]
+DEFAULT_THRESHOLDS = [0.45, 0.38, 0.35, 0.30, 0.30]
 
 
 def compute_metrics(
-    preds: torch.Tensor, targets: torch.Tensor, threshold: float = 0.5
+    preds: torch.Tensor, targets: torch.Tensor, thresholds: list[float] = None
 ) -> dict:
     """
-    Compute per-class IoU, F1, Precision, Recall.
+    Compute per-class IoU, F1, Precision, Recall using calibrated thresholds.
 
     Args:
         preds: Predicted logits (B, C, H, W).
         targets: Ground truth masks (B, C, H, W).
-        threshold: Binarization threshold.
+        thresholds: Per-class thresholds.
 
     Returns:
         Dictionary of metric name → value.
     """
+    thresh = thresholds or DEFAULT_THRESHOLDS
     with torch.no_grad():
         probs = torch.sigmoid(preds)
-        binary = (probs > threshold).float()
+        binary = torch.zeros_like(probs)
+        for c in range(min(probs.shape[1], len(thresh))):
+            binary[:, c] = (probs[:, c] > thresh[c]).float()
 
         metrics = {}
         ious = []
@@ -258,15 +260,15 @@ def main():
     parser.add_argument("--val-region", type=str, default="Germany_Training_Public")
     parser.add_argument("--tile-size", type=int, default=512)
     parser.add_argument("--batch-size", type=int, default=8)
-    parser.add_argument("--num-workers", type=int, default=4)
+    parser.add_argument("--num-workers", type=int, default=2)
 
     # Training
-    parser.add_argument("--epochs", type=int, default=100)
+    parser.add_argument("--epochs", type=int, default=40)
     parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--weight-decay", type=float, default=1e-4)
     parser.add_argument("--amp", action="store_true", default=True)
     parser.add_argument("--no-amp", dest="amp", action="store_false")
-    parser.add_argument("--patience", type=int, default=15, help="Early stopping patience")
+    parser.add_argument("--patience", type=int, default=12, help="Early stopping patience")
     parser.add_argument("--resume", type=str, default=None, help="Checkpoint path to resume")
 
     # Loss
@@ -358,7 +360,7 @@ def main():
         max_lr=args.lr,
         epochs=args.epochs,
         steps_per_epoch=len(loaders["train"]),
-        pct_start=0.1,
+        pct_start=0.15,
         anneal_strategy="cos",
     )
 
