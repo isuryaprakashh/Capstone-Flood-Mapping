@@ -25,21 +25,83 @@ An end-to-end deep learning framework and rescue operations dashboard for automa
 
 ```
 CAPSTONE-PROJECT/
-├── api/                  # FastAPI backend server & endpoints (/predict, /route)
-├── checkpoints/          # Saved model weights (.pth)
-├── CP1-DATASET/          # SpaceNet 8 dataset (Germany, Louisiana East/West)
-├── data/                 # CRS normalization, GeoTIFF tiling, mask generator, PyTorch dataset
-├── graph/                # NetworkX road network topology & flood-safe routing engine
-├── inference/            # Prediction pipeline & sliding-window inference with overlap stitching
-├── losses/               # Multi-task loss functions (Dice + Focal + BCE)
-├── models/               # U-Net Baseline & Siamese Cross-Attention Fusion Network
-├── scripts/              # Data preprocessing and manifest generation tools
-├── tests/                # Comprehensive unit and integration test suite
-├── ui/                   # React + Leaflet interactive frontend dashboard
-├── Dockerfile            # CUDA-enabled container definition
-├── docker-compose.yml    # Multi-container service orchestrator
-├── train.py              # Mixed-precision training pipeline with OneCycleLR
-└── eval.py               # Comparative model evaluation script
+│
+├── api/                              # FastAPI Backend Server
+│   ├── __init__.py
+│   ├── main.py                       # Application entrypoint, CORS, static file serving
+│   └── routes.py                     # /api/predict, /api/route, /api/sample, /api/health endpoints
+│
+├── checkpoints/                      # Saved Model Weights & Metrics
+│   ├── .gitkeep
+│   ├── final_eval_benchmark.json     # Comparative evaluation results (Fusion vs U-Net)
+│   ├── fusion_metrics.csv            # Per-epoch training metrics for Siamese Fusion model
+│   └── unet_metrics.csv             # Per-epoch training metrics for U-Net baseline
+│   # NOTE: .pth weights excluded from git (>500MB). Train via Colab or download from Releases.
+│
+├── data/                             # Data Pipeline & Preprocessing
+│   ├── __init__.py
+│   ├── crs.py                        # Coordinate Reference System normalization (EPSG reprojection)
+│   ├── dataset.py                    # PyTorch Dataset, manifest builder, GeoTIFF loader, train/val/test splits
+│   ├── mask_generator.py             # 5-channel binary mask rasterizer from GeoJSON & CSV annotations
+│   └── tiling.py                     # Satellite image tiling with configurable overlap
+│
+├── graph/                            # Road Network Topology & Routing Engine
+│   ├── __init__.py
+│   └── road_graph.py                 # Skeletonization → NetworkX graph → Flood attribution → Dijkstra routing
+│
+├── inference/                        # Model Inference Pipeline
+│   ├── __init__.py
+│   ├── eval.py                       # Per-class IoU evaluation with global confusion matrix
+│   └── predict.py                    # FloodPredictor: sliding-window tiled inference with overlap stitching
+│
+├── losses/                           # Loss Functions
+│   ├── __init__.py
+│   └── combined_loss.py              # Multi-task loss: Dice + Focal + Cross-Entropy with class weighting
+│
+├── models/                           # Neural Network Architectures
+│   ├── __init__.py
+│   ├── siamese_fusion.py             # O3: Dual-stream Siamese encoder + Cross-Attention + FPN decoder
+│   └── unet_baseline.py              # O2: Standard ResNet34 U-Net (6-channel early concatenation)
+│
+├── scripts/                          # Utility Scripts
+│   ├── generate_colab_notebook.py    # Auto-generates the Colab training notebook
+│   ├── setup_colab.sh                # One-click Colab environment setup (dataset download + preprocessing)
+│   └── tile_images.py                # CLI tool for GeoTIFF tiling and mask generation
+│
+├── tests/                            # Automated Test Suite
+│   ├── __init__.py
+│   ├── conftest.py                   # Pytest fixtures and shared test configuration
+│   ├── test_api.py                   # API endpoint integration tests
+│   ├── test_data.py                  # Dataset loading and mask generation tests
+│   ├── test_models.py                # Model forward pass shape validation tests
+│   └── test_predict_stub.py          # Stub-mode prediction pipeline tests
+│
+├── ui/                               # React Frontend Dashboard
+│   ├── index.html                    # HTML entry point
+│   ├── package.json                  # NPM dependencies (React, Axios, Leaflet)
+│   ├── vite.config.js                # Vite dev server config (port 3000, API proxy → 8000)
+│   ├── public/
+│   │   └── .gitkeep
+│   └── src/
+│       ├── main.jsx                  # React DOM mount point
+│       ├── App.jsx                   # Main application: canvas rendering, tabs, routing UI
+│       └── index.css                 # Swiss Minimalist White design system
+│
+├── notebooks/
+│   └── SpaceNet8_Colab_Training.ipynb  # Interactive Colab notebook for cloud GPU training
+│
+├── colab1-train-logs.md              # Training logs: initial run (pre-fix metrics)
+├── colab2-train-logs.md              # Training logs: second run (architecture debugging)
+├── colab3.1-train-logs.md            # Training logs: final run (50 epochs Fusion + 25 epochs U-Net)
+│
+├── train.py                          # Training loop: AMP, OneCycleLR, global confusion matrix mIoU
+├── eval.py                           # Comparative model evaluation and benchmark generation
+├── requirements.txt                  # Python dependencies
+├── Dockerfile                        # CUDA-enabled container definition
+├── docker-compose.yml                # Multi-container service orchestrator
+├── .env                              # Environment variables
+├── .gitignore                        # Git exclusions (datasets, weights, node_modules)
+└── README.md                         # Project documentation (this file)
 ```
 
 ---
