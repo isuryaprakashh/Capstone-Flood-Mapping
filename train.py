@@ -34,9 +34,29 @@ from pathlib import Path
 import numpy as np
 import torch
 import torch.nn as nn
-from torch.cuda.amp import GradScaler, autocast
 from torch.optim import AdamW
 from torch.optim.lr_scheduler import OneCycleLR
+
+# Modern PyTorch AMP support with fallback
+try:
+    from torch.amp import GradScaler as AMPGradScaler
+    from torch.amp import autocast as amp_autocast
+
+    def create_grad_scaler(device_type: str = "cuda", enabled: bool = True):
+        return AMPGradScaler(device_type, enabled=enabled)
+
+    def get_autocast_context(device_type: str = "cuda", enabled: bool = True):
+        return amp_autocast(device_type, enabled=enabled)
+
+except (ImportError, TypeError):
+    from torch.cuda.amp import GradScaler as AMPGradScaler
+    from torch.cuda.amp import autocast as amp_autocast
+
+    def create_grad_scaler(device_type: str = "cuda", enabled: bool = True):
+        return AMPGradScaler(enabled=enabled)
+
+    def get_autocast_context(device_type: str = "cuda", enabled: bool = True):
+        return amp_autocast(enabled=enabled)
 
 from data.dataset import create_dataloaders, NUM_CLASSES
 from losses.combined_loss import CombinedLoss
@@ -134,7 +154,7 @@ def train_one_epoch(
 
         optimizer.zero_grad(set_to_none=True)
 
-        with autocast(enabled=scaler.is_enabled()):
+        with get_autocast_context(device_type=device.type, enabled=scaler.is_enabled()):
             logits = model(pre_img, post_img)
             loss_dict = criterion(logits, mask)
             loss = loss_dict["total"]
@@ -364,7 +384,10 @@ def main():
         anneal_strategy="cos",
     )
 
-    scaler = GradScaler(enabled=args.amp and device.type == "cuda")
+    scaler = create_grad_scaler(
+        device_type="cuda" if device.type == "cuda" else "cpu",
+        enabled=args.amp and device.type == "cuda",
+    )
 
     # Resume checkpoint
     start_epoch = 0
