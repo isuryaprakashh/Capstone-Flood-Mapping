@@ -107,33 +107,110 @@ CAPSTONE-PROJECT/
 
 ---
 
-### 0. Training on Google Colab (T4 GPU)
+### 0. Model Checkpoints & Pre-trained Weights
 
-You can train both models in Google Colab with a free **NVIDIA Tesla T4 GPU**:
+Pre-trained model weights for both the Siamese Fusion Network and Baseline U-Net can be downloaded directly from Google Drive:
+
+[![Google Drive](https://img.shields.io/badge/Google%20Drive-Download%20Weights-4285F4.svg?style=for-the-badge&logo=googledrive&logoColor=white)](https://drive.google.com/drive/folders/1FYg7WhwLALRmfS8VdveY_0WzItsQ2L22?usp=sharing)
+
+🔗 **Direct Download Link:** [Google Drive Weights Folder](https://drive.google.com/drive/folders/1FYg7WhwLALRmfS8VdveY_0WzItsQ2L22?usp=sharing)
+
+#### Included Checkpoints:
+- `fusion_net_best.pth` (~584 MB) — Novel Siamese Cross-Attention Network (O3)
+- `unet_net_best.pth` (~572 MB) — Baseline ResNet34 U-Net (O2)
+
+> **Setup:** Download the `.pth` files and place them into the `weights/` directory:
+> ```
+> CAPSTONE-PROJECT/
+> └── weights/
+>     ├── fusion_net_best.pth
+>     └── unet_net_best.pth
+> ```
+
+---
+
+### 1. Training on Google Colab (T4 GPU)
+
+You can also train or fine-tune both models in Google Colab with a free **NVIDIA Tesla T4 GPU**:
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/isuryaprakashh/Capstone-Flood-Mapping/blob/main/notebooks/SpaceNet8_Colab_Training.ipynb)
 
 Open [`notebooks/SpaceNet8_Colab_Training.ipynb`](notebooks/SpaceNet8_Colab_Training.ipynb) for step-by-step interactive training, automated Google Drive checkpoint backup, evaluation benchmarks, and visual qualitative inspections.
 
-### 1. Environment Setup
+---
+
+### 2. Environment Setup
 
 ```bash
 # Clone the repository
 git clone https://github.com/isuryaprakashh/Capstone-Flood-Mapping.git
 cd Capstone-Flood-Mapping
 
-# Install dependencies
+# Install Python dependencies
 pip install -r requirements.txt
+
+# Install Frontend dependencies
+cd frontend
+npm install
+cd ..
 ```
 
-### 2. Data Preprocessing & Mask Generation
+---
+
+### 3. Running the Web Platform & API
+
+#### Option A: Running with Trained Model Weights (Real Inference)
+
+1. **Start the FastAPI Backend:**
+   - **PowerShell (Windows):**
+     ```powershell
+     $env:USE_STUB="false"
+     $env:MODEL_TYPE="fusion"
+     $env:O3_FUSION_WEIGHTS="./weights/fusion_net_best.pth"
+     python backend/main.py
+     ```
+   - **Linux / macOS (Bash):**
+     ```bash
+     USE_STUB=false MODEL_TYPE=fusion O3_FUSION_WEIGHTS=./weights/fusion_net_best.pth python backend/main.py
+     ```
+   - **Command Prompt (CMD):**
+     ```cmd
+     set USE_STUB=false
+     set MODEL_TYPE=fusion
+     set O3_FUSION_WEIGHTS=./weights/fusion_net_best.pth
+     python backend/main.py
+     ```
+
+2. **Start the React Frontend Dashboard (in a second terminal):**
+   ```bash
+   cd frontend
+   npm run dev
+   ```
+   - Frontend UI: `http://localhost:3000`
+   - Backend API Docs: `http://localhost:8000/api/docs`
+
+#### Option B: Running in Stub / Development Mode (Without GPU / Weights)
+```bash
+# Terminal 1: Backend
+python backend/main.py
+
+# Terminal 2: Frontend
+cd frontend
+npm run dev
+```
+
+---
+
+### 4. Data Preprocessing & Mask Generation
 
 ```bash
 # Generate 5-channel segmentation masks from GeoJSON & reference CSVs
 python scripts/tile_images.py --data-root ./CP1-DATASET --output-dir ./processed
 ```
 
-### 3. Model Training (Google Colab / Local GPU)
+---
+
+### 5. Local / Cloud Model Training
 
 ```bash
 # Train the Novel Siamese Cross-Attention Fusion Network (O3)
@@ -143,7 +220,9 @@ python train.py --model fusion --data-root ./CP1-DATASET --epochs 50 --batch-siz
 python train.py --model unet --data-root ./CP1-DATASET --epochs 35 --batch-size 8 --amp
 ```
 
-### 4. Model Evaluation & Benchmark Comparison
+---
+
+### 6. Model Evaluation & Benchmark Comparison
 
 ```bash
 python scripts/eval.py \
@@ -152,25 +231,11 @@ python scripts/eval.py \
   --fusion-ckpt weights/fusion_net_best.pth
 ```
 
-### 5. Running the Web System & API
-
-```bash
-# Start FastAPI backend (with stub mode fallback or trained weights)
-python backend/main.py
-
-# In another terminal, run the React frontend
-cd frontend
-npm install
-npm run dev
-```
-
-Visit the interactive platform at `http://localhost:3000`.
-
 ---
 
 ## 🧪 Testing Suite
 
-Run full automated tests:
+Run the full automated test suite:
 
 ```bash
 python -m pytest tests/ -v
