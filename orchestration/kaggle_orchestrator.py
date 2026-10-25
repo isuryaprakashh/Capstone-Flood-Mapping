@@ -58,6 +58,7 @@ STUCK_AFTER_S = 13 * 3600
 QUOTA_WAIT_S = 6 * 3600
 MAX_PHASE_RETRIES = 2
 MAX_RUN_ATTEMPTS = 3
+TICK_ERRORS_BEFORE_ALERT = 3  # consecutive failing ticks (1.5 h) before one alert email
 PIP_PACKAGES = ["rasterio>=1.3.8", "timm>=1.0.20", "filelock>=3.12", "pyyaml>=6.0"]
 DOWNLOAD_PATTERN = r"^(?!processed/)(?!.*checkpoints/).*$"
 
@@ -216,6 +217,7 @@ DEFAULT_STATE = {
     "last_good_train": None,
     "phase_retries": 0,
     "stop_reason": None,
+    "tick_errors": 0,
     "events": [],
 }
 
@@ -269,6 +271,7 @@ class Orchestrator:
                 self.save(st)
                 return st
             self.finish(st, status if age < STUCK_AFTER_S else "error")
+            self.save(st)  # a failed launch below must not redo this session's bookkeeping
 
         if st["phase"] in ("smoke", "prepare", "train") and not st["kernel"]:
             if st["wait_until"] and now() < st["wait_until"]:
@@ -280,6 +283,41 @@ class Orchestrator:
         self.save(st)
         self.store.commit(f"orchestrator: {st['phase']} (session {st['session']})")
         return st
+
+    def safe_tick(self, update_code: bool = False) -> tuple[dict, str | None]:
+        """
+        tick() that survives transient Kaggle/GitHub errors (the next tick
+        retries). Returns (state, alert); the alert is set only on the tick
+        that stops the pipeline or on the TICK_ERRORS_BEFORE_ALERT-th
+        consecutive error, so a problem sends one email, not one per tick.
+        """
+        self.store.open()
+        was_stopped = self.load()["phase"] == "stopped"
+        try:
+            st = self.tick(update_code)
+        except Exception as e:
+            st = self.load()  # last saved state
+            alert = None
+            if re.search(r"quota", str(e), re.I) and not st["kernel"]:
+                st["wait_until"] = now() + QUOTA_WAIT_S
+                self.event(st, f"Kaggle refused the session (quota); waiting until {stamp(st['wait_until'])}")
+            else:
+                st["tick_errors"] += 1
+                self.event(st, f"Tick error {st['tick_errors']}: {type(e).__name__}: {str(e)[-300:]}")
+                if st["tick_errors"] == TICK_ERRORS_BEFORE_ALERT:
+                    alert = f"{st['tick_errors']} consecutive orchestrator errors, latest: {e}"
+            self.save(st)
+            self.store.commit("orchestrator: tick error")
+            return st, alert
+
+        if st["tick_errors"]:
+            st["tick_errors"] = 0
+            self.event(st, "Recovered from tick errors")
+            self.save(st)
+            self.store.commit("orchestrator: recovered")
+        if st["phase"] == "stopped" and not was_stopped:
+            return st, f"Orchestrator stopped: {st['stop_reason']}"
+        return st, None
 
     def resume(self, phase: str) -> dict:
         """Manually leave 'stopped' (after fixing the cause) and continue at `phase`."""
@@ -492,12 +530,9 @@ def main():
         print(json.dumps({k: v for k, v in st.items() if k != "events"}, indent=2))
         return
     else:
-        orch.store.open()
-        was_stopped = orch.load()["phase"] == "stopped"
-        st = orch.tick(update_code=args.update_code)
-        if st["phase"] == "stopped" and not was_stopped:
-            # Fail only the run that stopped the pipeline: one GitHub email, not one per tick
-            sys.exit(f"Orchestrator stopped: {st['stop_reason']}")
+        st, alert = orch.safe_tick(update_code=args.update_code)
+        if alert:
+            sys.exit(alert)  # failing run → one GitHub email
 
     if st["phase"] == "done":
         disable_workflow()

@@ -224,3 +224,45 @@ def test_session_restores_from_the_named_kernel_output(tmp_path, monkeypatch):
     assert session.find_input("results", "sn8-train-a") == tmp_path / "sn8-train-a" / "results"
     assert session.find_input("processed/manifest.json", "sn8-prepare").parent.name == "processed"
     assert session.find_input("results", "sn8-train-b") is None
+
+
+class FlakyKaggle(FakeKaggle):
+    def __init__(self):
+        super().__init__()
+        self.push_error = None
+
+    def push(self, slug, script, gpu, sources):
+        if self.push_error:
+            raise RuntimeError(self.push_error)
+        super().push(slug, script, gpu, sources)
+
+
+def test_transient_errors_alert_once_then_recover(tmp_path):
+    kaggle = FlakyKaggle()
+    orch = Orchestrator(kaggle, DirResultsStore(tmp_path / "results"), "repo", "a" * 40)
+    kaggle.push_error = "kaggle push failed: 503 Service Unavailable"
+    alerts = [orch.safe_tick()[1] for _ in range(orch_mod.TICK_ERRORS_BEFORE_ALERT + 2)]
+    assert [a is not None for a in alerts] == [False, False, True, False, False]  # one email only
+    kaggle.push_error = None
+    st, alert = orch.safe_tick()
+    assert alert is None and st["tick_errors"] == 0 and st["kernel"] == "sn8-smoke"
+
+
+def test_quota_refusal_on_push_waits_without_alert(tmp_path):
+    kaggle = FlakyKaggle()
+    orch = Orchestrator(kaggle, DirResultsStore(tmp_path / "results"), "repo", "a" * 40)
+    kaggle.push_error = "403: GPU quota exceeded for this week"
+    st, alert = orch.safe_tick()
+    assert alert is None and st["wait_until"] is not None and st["tick_errors"] == 0
+
+
+def test_stopping_alerts_only_on_the_stopping_tick(setup):
+    orch, kaggle, _ = setup
+    orch.tick()
+    alerts = []
+    for _ in range(orch_mod.MAX_PHASE_RETRIES + 1):
+        kaggle.statuses["sn8-smoke"] = "complete"
+        kaggle.outputs["sn8-smoke"] = _smoke_output(ok=False)
+        alerts.append(orch.safe_tick()[1])
+    alerts.append(orch.safe_tick()[1])  # already stopped: no second email
+    assert [a is not None for a in alerts] == [False, False, True, False]
