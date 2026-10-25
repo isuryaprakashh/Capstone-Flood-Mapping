@@ -492,12 +492,15 @@ def main():
         print(json.dumps({k: v for k, v in st.items() if k != "events"}, indent=2))
         return
     else:
+        orch.store.open()
+        was_stopped = orch.load()["phase"] == "stopped"
         st = orch.tick(update_code=args.update_code)
+        if st["phase"] == "stopped" and not was_stopped:
+            # Fail only the run that stopped the pipeline: one GitHub email, not one per tick
+            sys.exit(f"Orchestrator stopped: {st['stop_reason']}")
 
     if st["phase"] == "done":
         disable_workflow()
-    if st["phase"] == "stopped":
-        sys.exit(f"Orchestrator stopped: {st['stop_reason']}")  # failing run → GitHub email
 
 
 if __name__ == "__main__":
