@@ -1,10 +1,10 @@
 {
   "phase": "smoke",
-  "code_commit": "64eeb7d8656bb7cbd94fa95203d77195c6e9100b",
-  "session": 4,
-  "kernel": null,
+  "code_commit": "2dcf24d9452e9f80927e63e70f328d7017e164ab",
+  "session": 5,
+  "kernel": "sn8-smoke",
   "kernel_mode": "smoke",
-  "pushed_at": 1792918830.3430488,
+  "pushed_at": 1792921717.2489014,
   "wait_until": null,
   "last_good_train": null,
   "phase_retries": 0,
@@ -53,6 +53,10 @@
     {
       "at": "2026-10-25T09:48:33+00:00",
       "message": "Manually resumed at phase 'smoke'"
+    },
+    {
+      "at": "2026-10-25T09:48:37+00:00",
+      "message": "Started smoke session 5 on sn8-smoke (code 2dcf24d)"
     }
   ]
 }

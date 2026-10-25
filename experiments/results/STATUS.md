@@ -1,16 +1,17 @@
 # Orchestrator status
 
 - **Phase:** smoke
-- **Sessions started:** 4
-- **Running:** —
-- **Code commit:** 64eeb7d8656bb7cbd94fa95203d77195c6e9100b
+- **Sessions started:** 5
+- **Running:** sn8-smoke
+- **Code commit:** 2dcf24d9452e9f80927e63e70f328d7017e164ab
 - **Waiting for quota until:** —
-- **Updated:** 2026-10-25T09:48:33+00:00
+- **Updated:** 2026-10-25T09:48:37+00:00
 
 Per-run progress: [PROGRESS.md](PROGRESS.md)
 
 ## Recent events
 
+- 2026-10-25T09:48:37+00:00 — Started smoke session 5 on sn8-smoke (code 2dcf24d)
 - 2026-10-25T09:48:33+00:00 — Manually resumed at phase 'smoke'
 - 2026-10-25T09:00:30+00:00 — Started smoke session 4 on sn8-smoke (code 64eeb7d)
 - 2026-10-25T09:00:27+00:00 — Manually resumed at phase 'smoke'
