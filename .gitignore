@@ -53,5 +53,9 @@ frontend/.env.local
 
 # Dataset (large files)
 CP1-DATASET/
-processed/
+processed*/
 *.tar.gz
+
+# Training outputs (the results branch holds the automated runs)
+/results*/
+/.results_worktree/

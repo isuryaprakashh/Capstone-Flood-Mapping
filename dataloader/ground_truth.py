@@ -29,6 +29,7 @@ def load_ground_truth(
     geojson_path: Union[str, Path],
     pre_image_path: Union[str, Path],
     reference_csv_path: Optional[Union[str, Path]] = None,
+    include_mask: bool = True,
 ) -> dict:
     """
     Load a tile's reference buildings, roads and rasterized mask.
@@ -37,11 +38,13 @@ def load_ground_truth(
         geojson_path: Tile annotation GeoJSON (geographic coordinates).
         pre_image_path: Pre-event GeoTIFF defining the pixel grid.
         reference_csv_path: AOI reference CSV with pixel-space road WKT.
+        include_mask: Also rasterize the 5-channel mask (skip when only the
+            vectors are needed).
 
     Returns:
         Dictionary with 'buildings' and 'roads' (GeoJSON FeatureCollections
-        in pixel [x, y] coordinates, each feature with 'flooded') and 'mask'
-        (5, H, W) uint8 in the model's channel order.
+        in pixel [x, y] coordinates, each feature with 'flooded'), 'gsd_m'
+        and 'mask' ((5, H, W) uint8 in the model's channel order, or None).
     """
     pre_image_path = Path(pre_image_path)
     with rasterio.open(pre_image_path) as src:
@@ -82,11 +85,13 @@ def load_ground_truth(
                 },
             })
 
-    mask = generate_mask(
-        geojson_path=geojson_path,
-        reference_image_path=pre_image_path,
-        reference_csv_path=reference_csv_path,
-    )
+    mask = None
+    if include_mask:
+        mask = generate_mask(
+            geojson_path=geojson_path,
+            reference_image_path=pre_image_path,
+            reference_csv_path=reference_csv_path,
+        )
 
     return {
         "buildings": {"type": "FeatureCollection", "features": buildings},
