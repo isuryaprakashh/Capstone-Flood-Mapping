@@ -10,7 +10,7 @@ warmup_epochs: 1
 ema_decay: 0.999
 amp: true
 grad_clip: 1.0
-num_workers: 0
+num_workers: 2
 flood_oversample: 2.0
 deadline_margin_s: 0
 register_post: false
@@ -49,4 +49,4 @@ model: ra_fusion
 model_kwargs:
   backbone: dinov3_sat
 priority: 1
-config_hash: 8ff0d21bfb2b3baa
+config_hash: 295cc840e620c96c

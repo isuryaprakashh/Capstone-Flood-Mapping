@@ -1,0 +1,135 @@
+[{"stream_name":"stdout","time":0.871942988,"data":"[09:48:40 +0m] Job: {\"mode\": \"smoke\", \"repo\": \"https://github.com/isuryaprakashh/Capstone-Flood-Mapping.git\", \"commit\": \"2dcf24d9452e9f80927e63e70f328d7017e164ab\", \"hours\": 3.0, \"queue\": \"kaggle\", \"pip\": [\"rasterio\u003e=1.3.8\", \"timm==1.0.30\", \"filelock\u003e=3.12\", \"pyyaml\u003e=6.0\"], \"session\": 5, \"data_source\": \"sn8-prepare\", \"previous\": null, \"reset_failed\": false}\n"}
+,{"stream_name":"stdout","time":0.876885923,"data":"[09:48:40 +0m] CPUs: 4; shared memory (DataLoader workers): 15.0 GB\n"}
+,{"stream_name":"stdout","time":6.95828443,"data":"[09:48:46 +0m] GPUs: 2 ['Tesla T4', 'Tesla T4']\n"}
+,{"stream_name":"stdout","time":6.958322878,"data":"[09:48:46 +0m] $ /usr/bin/python3 -m pip install -q \"rasterio\u003e=1.3.8\" \"timm==1.0.30\" \"filelock\u003e=3.12\" \"pyyaml\u003e=6.0\"\n"}
+,{"stream_name":"stdout","time":11.994808073,"data":"[09:48:51 +0m] $ git clone --quiet https://github.com/isuryaprakashh/Capstone-Flood-Mapping.git /kaggle/tmp/code\n"}
+,{"stream_name":"stdout","time":12.679289813,"data":"[09:48:52 +0m] $ git checkout --quiet 2dcf24d9452e9f80927e63e70f328d7017e164ab\n"}
+,{"stream_name":"stdout","time":12.692417578,"data":"[09:48:52 +0m] Downloading Germany_Training_Public\n"}
+,{"stream_name":"stderr","time":36.343756347,"data":"/kaggle/src/script.py:77: DeprecationWarning: Python 3.14 will, by default, filter extracted tar archives and reject files or modify their metadata. Use the filter argument to control this behavior.\n"}
+,{"stream_name":"stderr","time":36.343813553,"data":"  tar.extractall(dest)\n"}
+,{"stream_name":"stdout","time":56.669902732,"data":"[09:49:36 +1m] Downloading Louisiana-East_Training_Public\n"}
+,{"stream_name":"stdout","time":146.979576898,"data":"[09:51:06 +2m] $ /usr/bin/python3 scripts/prepare_data.py --data-root /kaggle/tmp/raw --out-dir /kaggle/tmp/processed_smoke --workers 4 --limit 12\n"}
+,{"stream_name":"stderr","time":151.343402128,"data":"09:51:10 [INFO] Preparing 24 tiles (0 already done) with 4 workers\n"}
+,{"stream_name":"stderr","time":170.385197383,"data":"09:51:29 [INFO]   24/24 tiles\n"}
+,{"stream_name":"stderr","time":170.407241788,"data":"09:51:29 [INFO] P1: train 11 | val 1 | test 12\n"}
+,{"stream_name":"stderr","time":170.407274067,"data":"09:51:29 [INFO] P2: train 9 | val 3 | test 12\n"}
+,{"stream_name":"stderr","time":170.407278444,"data":"09:51:29 [INFO] P3: train 16 | val 4 | test 4\n"}
+,{"stream_name":"stdout","time":173.807786318,"data":"[09:51:33 +3m] $ /usr/bin/python3 scripts/run_queue.py --processed /kaggle/tmp/processed_smoke --results /kaggle/working/results/smoke --smoke\n"}
+,{"stream_name":"stderr","time":176.69527652,"data":"09:51:36 [INFO] [worker 0] starting smoke_ra_fusion\n"}
+,{"stream_name":"stderr","time":194.069561188,"data":"09:51:53 [INFO] Loading pretrained weights from Hugging Face hub (timm/vit_large_patch16_dinov3.sat493m)\n"}
+,{"stream_name":"stderr","time":194.224217355,"data":"09:51:53 [INFO] HTTP Request: GET https://huggingface.co/api/agent-harnesses \"HTTP/1.1 200 OK\"\n"}
+,{"stream_name":"stderr","time":194.288015307,"data":"09:51:53 [INFO] HTTP Request: HEAD https://huggingface.co/timm/vit_large_patch16_dinov3.sat493m/resolve/main/model.safetensors \"HTTP/1.1 302 Found\"\n"}
+,{"stream_name":"stderr","time":194.288857096,"data":"Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.\n"}
+,{"stream_name":"stderr","time":194.288977302,"data":"09:51:53 [WARNING] Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.\n"}
+,{"stream_name":"stderr","time":194.399746476,"data":"09:51:53 [INFO] HTTP Request: GET https://huggingface.co/api/models/timm/vit_large_patch16_dinov3.sat493m/xet-read-token/ce148bd5ed3de1eb75ebdccafcb2c280bb3e8f7c \"HTTP/1.1 200 OK\"\n"}
+,{"stream_name":"stderr","time":202.800243088,"data":"09:52:02 [INFO] [timm/vit_large_patch16_dinov3.sat493m] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.\n"}
+,{"stream_name":"stderr","time":203.361943818,"data":"09:52:02 [INFO] Loading pretrained weights from Hugging Face hub (timm/resnet18.a1_in1k)\n"}
+,{"stream_name":"stderr","time":203.495495022,"data":"09:52:02 [INFO] HTTP Request: HEAD https://huggingface.co/timm/resnet18.a1_in1k/resolve/main/model.safetensors \"HTTP/1.1 302 Found\"\n"}
+,{"stream_name":"stderr","time":203.553928421,"data":"09:52:03 [INFO] HTTP Request: GET https://huggingface.co/api/models/timm/resnet18.a1_in1k/xet-read-token/491b427b45c94c7fb0e78b5474cc919aff584bbf \"HTTP/1.1 200 OK\"\n"}
+,{"stream_name":"stderr","time":208.662546274,"data":"09:52:08 [INFO] [timm/resnet18.a1_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.\n"}
+,{"stream_name":"stderr","time":208.751524774,"data":"09:52:08 [INFO] Missing keys (fc.weight, fc.bias) discovered while loading pretrained weights. This is expected if model is being adapted.\n"}
+,{"stream_name":"stderr","time":281.174502917,"data":"/kaggle/tmp/code/training/engine.py:499: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.\n"}
+,{"stream_name":"stderr","time":281.17457751,"data":"Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:836.)\n"}
+,{"stream_name":"stderr","time":281.174586762,"data":"  sums[k] = sums.get(k, 0.0) + float(v)\n"}
+,{"stream_name":"stderr","time":301.303988049,"data":"09:53:40 [INFO] [smoke_ra_fusion] joint epoch 1/2 loss 6.3579 val_score 0.0000 * (92s)\n"}
+,{"stream_name":"stderr","time":301.751969747,"data":"09:53:41 [INFO] Pausing after 1 epoch(s) as requested\n"}
+,{"stream_name":"stderr","time":301.761225748,"data":"09:53:41 [INFO] Smoke pass 1: {'smoke_ra_fusion': 'paused'}\n"}
+,{"stream_name":"stderr","time":301.762657048,"data":"09:53:41 [INFO] [worker 0] starting smoke_ra_fusion\n"}
+,{"stream_name":"stderr","time":306.421216257,"data":"09:53:45 [INFO] Loading pretrained weights from Hugging Face hub (timm/vit_large_patch16_dinov3.sat493m)\n"}
+,{"stream_name":"stderr","time":306.52546853,"data":"09:53:45 [INFO] HTTP Request: HEAD https://huggingface.co/timm/vit_large_patch16_dinov3.sat493m/resolve/main/model.safetensors \"HTTP/1.1 302 Found\"\n"}
+,{"stream_name":"stderr","time":306.526895436,"data":"09:53:45 [INFO] [timm/vit_large_patch16_dinov3.sat493m] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.\n"}
+,{"stream_name":"stderr","time":306.876532561,"data":"09:53:46 [INFO] Loading pretrained weights from Hugging Face hub (timm/resnet18.a1_in1k)\n"}
+,{"stream_name":"stderr","time":306.935181434,"data":"09:53:46 [INFO] HTTP Request: HEAD https://huggingface.co/timm/resnet18.a1_in1k/resolve/main/model.safetensors \"HTTP/1.1 302 Found\"\n"}
+,{"stream_name":"stderr","time":306.936441561,"data":"09:53:46 [INFO] [timm/resnet18.a1_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.\n"}
+,{"stream_name":"stderr","time":306.948324495,"data":"09:53:46 [INFO] Missing keys (fc.weight, fc.bias) discovered while loading pretrained weights. This is expected if model is being adapted.\n"}
+,{"stream_name":"stderr","time":307.744692317,"data":"09:53:47 [INFO] Resuming smoke_ra_fusion at stage 0 epoch 1\n"}
+,{"stream_name":"stderr","time":310.344284563,"data":"09:53:49 [INFO] [smoke_ra_fusion] joint epoch 2/2 loss 6.9023 val_score 0.0000 (2s)\n"}
+,{"stream_name":"stderr","time":322.436572778,"data":"09:54:01 [INFO] [smoke_ra_fusion] thresholds {'building': 0.3, 'road': 0.3, 'flooded_building': 0.3, 'flooded_road': 0.3}\n"}
+,{"stream_name":"stderr","time":333.17062139,"data":"09:54:12 [INFO] Road graph: 0 nodes, 0 edges\n"}
+,{"stream_name":"stderr","time":343.972698633,"data":"09:54:23 [INFO] Road graph: 0 nodes, 0 edges\n"}
+,{"stream_name":"stderr","time":354.704209426,"data":"09:54:34 [INFO] Road graph: 0 nodes, 0 edges\n"}
+,{"stream_name":"stderr","time":365.508858767,"data":"09:54:44 [INFO] Road graph: 0 nodes, 0 edges\n"}
+,{"stream_name":"stderr","time":376.269689754,"data":"09:54:55 [INFO] Road graph: 0 nodes, 0 edges\n"}
+,{"stream_name":"stderr","time":387.070867643,"data":"09:55:06 [INFO] Road graph: 0 nodes, 0 edges\n"}
+,{"stream_name":"stderr","time":387.384285101,"data":"09:55:06 [WARNING] Statistic undefined in 2 of 1000 bootstrap replicates\n"}
+,{"stream_name":"stderr","time":387.56063692,"data":"09:55:07 [WARNING] Statistic undefined in 358 of 1000 bootstrap replicates\n"}
+,{"stream_name":"stderr","time":387.736283881,"data":"09:55:07 [WARNING] Statistic undefined in 2 of 1000 bootstrap replicates\n"}
+,{"stream_name":"stderr","time":387.795957446,"data":"09:55:07 [WARNING] Statistic undefined in 15 of 1000 bootstrap replicates\n"}
+,{"stream_name":"stderr","time":387.799529417,"data":"09:55:07 [INFO] [smoke_ra_fusion] test {'building_f1': 0.0, 'flooded_building_f1': 0.0, 'building_flood_iou': 0.0, 'apls': 0.0, 'apls_flooded_network': 0.0, 'flooded_road_f1': 0.0}\n"}
+,{"stream_name":"stderr","time":394.564194209,"data":"09:55:14 [INFO] Road graph: 0 nodes, 0 edges\n"}
+,{"stream_name":"stderr","time":401.382360445,"data":"09:55:20 [INFO] Road graph: 0 nodes, 0 edges\n"}
+,{"stream_name":"stderr","time":408.170227771,"data":"09:55:27 [INFO] Road graph: 0 nodes, 0 edges\n"}
+,{"stream_name":"stderr","time":415.014792372,"data":"09:55:34 [INFO] Road graph: 0 nodes, 0 edges\n"}
+,{"stream_name":"stderr","time":415.165022065,"data":"09:55:34 [WARNING] Statistic undefined in 217 of 1000 bootstrap replicates\n"}
+,{"stream_name":"stderr","time":415.253496422,"data":"09:55:34 [WARNING] Statistic undefined in 217 of 1000 bootstrap replicates\n"}
+,{"stream_name":"stderr","time":415.368035461,"data":"09:55:34 [WARNING] Statistic undefined in 217 of 1000 bootstrap replicates\n"}
+,{"stream_name":"stderr","time":415.457671105,"data":"09:55:34 [WARNING] Statistic undefined in 217 of 1000 bootstrap replicates\n"}
+,{"stream_name":"stderr","time":422.243086205,"data":"09:55:41 [INFO] Road graph: 0 nodes, 0 edges\n"}
+,{"stream_name":"stderr","time":422.42471018,"data":"09:55:41 [INFO] [worker 0] starting smoke_siamese_unet\n"}
+,{"stream_name":"stderr","time":422.847903939,"data":"09:55:42 [INFO] Loading pretrained weights from Hugging Face hub (timm/efficientnet_b5.sw_in12k_ft_in1k)\n"}
+,{"stream_name":"stderr","time":422.956470223,"data":"09:55:42 [INFO] HTTP Request: HEAD https://huggingface.co/timm/efficientnet_b5.sw_in12k_ft_in1k/resolve/main/model.safetensors \"HTTP/1.1 302 Found\"\n"}
+,{"stream_name":"stderr","time":423.018716348,"data":"09:55:42 [INFO] HTTP Request: GET https://huggingface.co/api/models/timm/efficientnet_b5.sw_in12k_ft_in1k/xet-read-token/13dc77aa3a148f79df28798eef496172f7611691 \"HTTP/1.1 200 OK\"\n"}
+,{"stream_name":"stderr","time":424.435487324,"data":"09:55:43 [INFO] [timm/efficientnet_b5.sw_in12k_ft_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.\n"}
+,{"stream_name":"stderr","time":424.517601902,"data":"09:55:43 [WARNING] Unexpected keys (bn2.num_batches_tracked, bn2.bias, bn2.running_mean, bn2.running_var, bn2.weight, classifier.bias, classifier.weight, conv_head.weight) found while loading pretrained weights. This may be expected if model is being adapted.\n"}
+,{"stream_name":"stderr","time":424.96405485,"data":"09:55:44 [INFO] Loading pretrained weights from Hugging Face hub (timm/efficientnet_b5.sw_in12k_ft_in1k)\n"}
+,{"stream_name":"stderr","time":425.028289439,"data":"09:55:44 [INFO] HTTP Request: HEAD https://huggingface.co/timm/efficientnet_b5.sw_in12k_ft_in1k/resolve/main/model.safetensors \"HTTP/1.1 302 Found\"\n"}
+,{"stream_name":"stderr","time":425.029577383,"data":"09:55:44 [INFO] [timm/efficientnet_b5.sw_in12k_ft_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.\n"}
+,{"stream_name":"stderr","time":425.084111659,"data":"09:55:44 [WARNING] Unexpected keys (bn2.num_batches_tracked, bn2.bias, bn2.running_mean, bn2.running_var, bn2.weight, classifier.bias, classifier.weight, conv_head.weight) found while loading pretrained weights. This may be expected if model is being adapted.\n"}
+,{"stream_name":"stderr","time":495.901417269,"data":"/kaggle/tmp/code/training/engine.py:493: UserWarning: Detected call of `lr_scheduler.step()` before `optimizer.step()`. In PyTorch 1.1.0 and later, you should call them in the opposite order: `optimizer.step()` before `lr_scheduler.step()`.  Failure to do this will result in PyTorch skipping the first value of the learning rate schedule. See more details at https://pytorch.org/docs/stable/optim.html#how-to-adjust-learning-rate\n"}
+,{"stream_name":"stderr","time":495.901470437,"data":"  scheduler.step()\n"}
+,{"stream_name":"stderr","time":506.390794225,"data":"09:57:05 [INFO] [smoke_siamese_unet] foundation epoch 1/2 loss 4.0373 val_score 0.0000 * (81s)\n"}
+,{"stream_name":"stderr","time":507.422342712,"data":"09:57:06 [INFO] Pausing after 1 epoch(s) as requested\n"}
+,{"stream_name":"stderr","time":507.443927603,"data":"09:57:06 [INFO] Smoke pass 2: {'smoke_ra_fusion': 'completed', 'smoke_siamese_unet': 'paused'}\n"}
+,{"stream_name":"stderr","time":507.445487586,"data":"09:57:06 [INFO] [worker 0] starting smoke_siamese_unet\n"}
+,{"stream_name":"stderr","time":507.874352453,"data":"09:57:07 [INFO] Loading pretrained weights from Hugging Face hub (timm/efficientnet_b5.sw_in12k_ft_in1k)\n"}
+,{"stream_name":"stderr","time":507.978515484,"data":"09:57:07 [INFO] HTTP Request: HEAD https://huggingface.co/timm/efficientnet_b5.sw_in12k_ft_in1k/resolve/main/model.safetensors \"HTTP/1.1 302 Found\"\n"}
+,{"stream_name":"stderr","time":507.980037146,"data":"09:57:07 [INFO] [timm/efficientnet_b5.sw_in12k_ft_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.\n"}
+,{"stream_name":"stderr","time":508.037051822,"data":"09:57:07 [WARNING] Unexpected keys (bn2.num_batches_tracked, bn2.bias, bn2.running_mean, bn2.running_var, bn2.weight, classifier.bias, classifier.weight, conv_head.weight) found while loading pretrained weights. This may be expected if model is being adapted.\n"}
+,{"stream_name":"stderr","time":508.556309949,"data":"09:57:08 [INFO] Loading pretrained weights from Hugging Face hub (timm/efficientnet_b5.sw_in12k_ft_in1k)\n"}
+,{"stream_name":"stderr","time":508.616476324,"data":"09:57:08 [INFO] HTTP Request: HEAD https://huggingface.co/timm/efficientnet_b5.sw_in12k_ft_in1k/resolve/main/model.safetensors \"HTTP/1.1 302 Found\"\n"}
+,{"stream_name":"stderr","time":508.61784455,"data":"09:57:08 [INFO] [timm/efficientnet_b5.sw_in12k_ft_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.\n"}
+,{"stream_name":"stderr","time":508.67090377,"data":"09:57:08 [WARNING] Unexpected keys (bn2.num_batches_tracked, bn2.bias, bn2.running_mean, bn2.running_var, bn2.weight, classifier.bias, classifier.weight, conv_head.weight) found while loading pretrained weights. This may be expected if model is being adapted.\n"}
+,{"stream_name":"stderr","time":509.689191052,"data":"09:57:09 [INFO] Resuming smoke_siamese_unet at stage 0 epoch 1\n"}
+,{"stream_name":"stderr","time":512.944599173,"data":"09:57:12 [INFO] [smoke_siamese_unet] foundation epoch 2/2 loss 3.9868 val_score 0.0000 (3s)\n"}
+,{"stream_name":"stderr","time":515.14390089,"data":"09:57:14 [INFO] Stage 'flood': ran init_flood_from_foundation()\n"}
+,{"stream_name":"stderr","time":518.944107068,"data":"/kaggle/tmp/code/training/engine.py:493: UserWarning: Detected call of `lr_scheduler.step()` before `optimizer.step()`. In PyTorch 1.1.0 and later, you should call them in the opposite order: `optimizer.step()` before `lr_scheduler.step()`.  Failure to do this will result in PyTorch skipping the first value of the learning rate schedule. See more details at https://pytorch.org/docs/stable/optim.html#how-to-adjust-learning-rate\n"}
+,{"stream_name":"stderr","time":518.944157883,"data":"  scheduler.step()\n"}
+,{"stream_name":"stderr","time":521.731792243,"data":"09:57:21 [INFO] [smoke_siamese_unet] flood epoch 1/2 loss 2.9429 val_score 0.0000 * (6s)\n"}
+,{"stream_name":"stderr","time":522.599184133,"data":"09:57:22 [INFO] Pausing after 2 epoch(s) as requested\n"}
+,{"stream_name":"stderr","time":522.621903248,"data":"09:57:22 [INFO] Smoke pass 3: {'smoke_siamese_unet': 'paused'}\n"}
+,{"stream_name":"stderr","time":522.623387051,"data":"09:57:22 [INFO] [worker 0] starting smoke_siamese_unet\n"}
+,{"stream_name":"stderr","time":523.070282656,"data":"09:57:22 [INFO] Loading pretrained weights from Hugging Face hub (timm/efficientnet_b5.sw_in12k_ft_in1k)\n"}
+,{"stream_name":"stderr","time":523.195619091,"data":"09:57:22 [INFO] HTTP Request: HEAD https://huggingface.co/timm/efficientnet_b5.sw_in12k_ft_in1k/resolve/main/model.safetensors \"HTTP/1.1 302 Found\"\n"}
+,{"stream_name":"stderr","time":523.197059611,"data":"09:57:22 [INFO] [timm/efficientnet_b5.sw_in12k_ft_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.\n"}
+,{"stream_name":"stderr","time":523.259750946,"data":"09:57:22 [WARNING] Unexpected keys (bn2.num_batches_tracked, bn2.bias, bn2.running_mean, bn2.running_var, bn2.weight, classifier.bias, classifier.weight, conv_head.weight) found while loading pretrained weights. This may be expected if model is being adapted.\n"}
+,{"stream_name":"stderr","time":523.746481068,"data":"09:57:23 [INFO] Loading pretrained weights from Hugging Face hub (timm/efficientnet_b5.sw_in12k_ft_in1k)\n"}
+,{"stream_name":"stderr","time":523.811544744,"data":"09:57:23 [INFO] HTTP Request: HEAD https://huggingface.co/timm/efficientnet_b5.sw_in12k_ft_in1k/resolve/main/model.safetensors \"HTTP/1.1 302 Found\"\n"}
+,{"stream_name":"stderr","time":523.812798909,"data":"09:57:23 [INFO] [timm/efficientnet_b5.sw_in12k_ft_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.\n"}
+,{"stream_name":"stderr","time":523.866681681,"data":"09:57:23 [WARNING] Unexpected keys (bn2.num_batches_tracked, bn2.bias, bn2.running_mean, bn2.running_var, bn2.weight, classifier.bias, classifier.weight, conv_head.weight) found while loading pretrained weights. This may be expected if model is being adapted.\n"}
+,{"stream_name":"stderr","time":524.553724993,"data":"09:57:24 [INFO] Resuming smoke_siamese_unet at stage 1 epoch 1\n"}
+,{"stream_name":"stderr","time":528.278705232,"data":"09:57:27 [INFO] [smoke_siamese_unet] flood epoch 2/2 loss 2.5619 val_score 0.0000 (4s)\n"}
+,{"stream_name":"stderr","time":543.098486649,"data":"09:57:42 [INFO] [smoke_siamese_unet] thresholds {'building': 0.3, 'road': 0.5, 'flooded_building': 0.3, 'flooded_road': 0.3}\n"}
+,{"stream_name":"stderr","time":546.87846222,"data":"09:57:46 [WARNING] CPLE_AppDefined in DeprecationWarning: 'Memory' driver is deprecated since GDAL 3.11. Use 'MEM' onwards. Further messages of this type will be suppressed.\n"}
+,{"stream_name":"stderr","time":580.77079682,"data":"09:58:20 [INFO] Road graph: 36290 nodes, 59827 edges\n"}
+,{"stream_name":"stderr","time":770.4237462,"data":"Killed\n"}
+,{"stream_name":"stderr","time":770.455066125,"data":"Traceback (most recent call last):\n"}
+,{"stream_name":"stderr","time":770.461002098,"data":"  File \"/kaggle/src/script.py\", line 145, in \u003cmodule\u003e\n"}
+,{"stream_name":"stderr","time":770.461056397,"data":"    main()\n"}
+,{"stream_name":"stderr","time":770.461064067,"data":"    ~~~~^^\n"}
+,{"stream_name":"stderr","time":770.461069165,"data":"  File \"/kaggle/src/script.py\", line 117, in main\n"}
+,{"stream_name":"stderr","time":770.461074309,"data":"    sh(f\"{py} scripts/run_queue.py --processed {processed} --results {results / 'smoke'} --smoke\", cwd=code)\n"}
+,{"stream_name":"stderr","time":770.461080004,"data":"    ~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n"}
+,{"stream_name":"stderr","time":770.461085201,"data":"  File \"/kaggle/src/script.py\", line 46, in sh\n"}
+,{"stream_name":"stderr","time":770.461090261,"data":"    subprocess.run(cmd, shell=True, check=True, cwd=cwd)\n"}
+,{"stream_name":"stderr","time":770.461095206,"data":"    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n"}
+,{"stream_name":"stderr","time":770.461100038,"data":"  File \"/usr/lib/python3.13/subprocess.py\", line 577, in run\n"}
+,{"stream_name":"stderr","time":770.461105104,"data":"    raise CalledProcessError(retcode, process.args,\n"}
+,{"stream_name":"stderr","time":770.461109976,"data":"                             output=stdout, stderr=stderr)\n"}
+,{"stream_name":"stderr","time":770.46111515,"data":"subprocess.CalledProcessError: Command '/usr/bin/python3 scripts/run_queue.py --processed /kaggle/tmp/processed_smoke --results /kaggle/working/results/smoke --smoke' returned non-zero exit status 137.\n"}
+,{"stream_name":"stderr","time":776.215167177,"data":"/usr/local/lib/python3.13/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\\|'\n"}
+,{"stream_name":"stderr","time":776.215216457,"data":"  cells[i][c] = re.sub('\\\\\\\\\\|', '|', cell)\n"}
+,{"stream_name":"stderr","time":776.530267576,"data":"/usr/local/lib/python3.13/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\\_'\n"}
+,{"stream_name":"stderr","time":776.530307792,"data":"  text = re.sub(r'_', '\\_', text) # Escape underscores in display text\n"}
+,{"stream_name":"stderr","time":777.97991158,"data":"[NbConvertApp] Converting notebook __script__.ipynb to html\n"}
+,{"stream_name":"stderr","time":779.029978938,"data":"[NbConvertApp] Writing 302891 bytes to __results__.html\n"}
+]

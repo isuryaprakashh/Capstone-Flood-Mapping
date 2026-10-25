@@ -1,37 +1,43 @@
-2026-10-25 08:39:18 [INFO] Loading pretrained weights from Hugging Face hub (timm/vit_large_patch16_dinov3.sat493m)
-2026-10-25 08:39:18 [INFO] HTTP Request: GET https://huggingface.co/api/agent-harnesses "HTTP/1.1 200 OK"
-2026-10-25 08:39:18 [INFO] HTTP Request: HEAD https://huggingface.co/timm/vit_large_patch16_dinov3.sat493m/resolve/main/model.safetensors "HTTP/1.1 302 Found"
-2026-10-25 08:39:18 [WARNING] Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
-2026-10-25 08:39:19 [INFO] HTTP Request: GET https://huggingface.co/api/models/timm/vit_large_patch16_dinov3.sat493m/xet-read-token/ce148bd5ed3de1eb75ebdccafcb2c280bb3e8f7c "HTTP/1.1 200 OK"
-2026-10-25 08:39:29 [INFO] [timm/vit_large_patch16_dinov3.sat493m] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
-2026-10-25 08:39:29 [INFO] Loading pretrained weights from Hugging Face hub (timm/resnet18.a1_in1k)
-2026-10-25 08:39:30 [INFO] HTTP Request: HEAD https://huggingface.co/timm/resnet18.a1_in1k/resolve/main/model.safetensors "HTTP/1.1 302 Found"
-2026-10-25 08:39:30 [INFO] HTTP Request: GET https://huggingface.co/api/models/timm/resnet18.a1_in1k/xet-read-token/491b427b45c94c7fb0e78b5474cc919aff584bbf "HTTP/1.1 200 OK"
-2026-10-25 08:39:34 [INFO] [timm/resnet18.a1_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
-2026-10-25 08:39:34 [INFO] Missing keys (fc.weight, fc.bias) discovered while loading pretrained weights. This is expected if model is being adapted.
-2026-10-25 08:39:50 [INFO] [smoke_ra_fusion] joint epoch 1/2 loss 6.5934 val_score 0.0000 * (16s)
-2026-10-25 08:39:50 [INFO] Pausing after 1 epoch(s) as requested
-2026-10-25 08:39:54 [INFO] Loading pretrained weights from Hugging Face hub (timm/vit_large_patch16_dinov3.sat493m)
-2026-10-25 08:39:55 [INFO] HTTP Request: HEAD https://huggingface.co/timm/vit_large_patch16_dinov3.sat493m/resolve/main/model.safetensors "HTTP/1.1 302 Found"
-2026-10-25 08:39:55 [INFO] [timm/vit_large_patch16_dinov3.sat493m] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
-2026-10-25 08:39:55 [INFO] Loading pretrained weights from Hugging Face hub (timm/resnet18.a1_in1k)
-2026-10-25 08:39:55 [INFO] HTTP Request: HEAD https://huggingface.co/timm/resnet18.a1_in1k/resolve/main/model.safetensors "HTTP/1.1 302 Found"
-2026-10-25 08:39:55 [INFO] [timm/resnet18.a1_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
-2026-10-25 08:39:55 [INFO] Missing keys (fc.weight, fc.bias) discovered while loading pretrained weights. This is expected if model is being adapted.
-2026-10-25 08:39:56 [INFO] Resuming smoke_ra_fusion at stage 0 epoch 1
-2026-10-25 08:40:49 [INFO] Loading pretrained weights from Hugging Face hub (timm/vit_large_patch16_dinov3.sat493m)
-2026-10-25 08:40:49 [INFO] HTTP Request: HEAD https://huggingface.co/timm/vit_large_patch16_dinov3.sat493m/resolve/main/model.safetensors "HTTP/1.1 302 Found"
-2026-10-25 08:40:49 [INFO] [timm/vit_large_patch16_dinov3.sat493m] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
-2026-10-25 08:40:50 [INFO] Loading pretrained weights from Hugging Face hub (timm/resnet18.a1_in1k)
-2026-10-25 08:40:50 [INFO] HTTP Request: HEAD https://huggingface.co/timm/resnet18.a1_in1k/resolve/main/model.safetensors "HTTP/1.1 302 Found"
-2026-10-25 08:40:50 [INFO] [timm/resnet18.a1_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
-2026-10-25 08:40:50 [INFO] Missing keys (fc.weight, fc.bias) discovered while loading pretrained weights. This is expected if model is being adapted.
-2026-10-25 08:40:50 [INFO] Resuming smoke_ra_fusion at stage 0 epoch 1
-2026-10-25 08:40:55 [INFO] Loading pretrained weights from Hugging Face hub (timm/vit_large_patch16_dinov3.sat493m)
-2026-10-25 08:40:55 [INFO] HTTP Request: HEAD https://huggingface.co/timm/vit_large_patch16_dinov3.sat493m/resolve/main/model.safetensors "HTTP/1.1 302 Found"
-2026-10-25 08:40:55 [INFO] [timm/vit_large_patch16_dinov3.sat493m] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
-2026-10-25 08:40:55 [INFO] Loading pretrained weights from Hugging Face hub (timm/resnet18.a1_in1k)
-2026-10-25 08:40:55 [INFO] HTTP Request: HEAD https://huggingface.co/timm/resnet18.a1_in1k/resolve/main/model.safetensors "HTTP/1.1 302 Found"
-2026-10-25 08:40:55 [INFO] [timm/resnet18.a1_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
-2026-10-25 08:40:55 [INFO] Missing keys (fc.weight, fc.bias) discovered while loading pretrained weights. This is expected if model is being adapted.
-2026-10-25 08:40:56 [INFO] Resuming smoke_ra_fusion at stage 0 epoch 1
+2026-10-25 09:51:53 [INFO] Loading pretrained weights from Hugging Face hub (timm/vit_large_patch16_dinov3.sat493m)
+2026-10-25 09:51:53 [INFO] HTTP Request: GET https://huggingface.co/api/agent-harnesses "HTTP/1.1 200 OK"
+2026-10-25 09:51:53 [INFO] HTTP Request: HEAD https://huggingface.co/timm/vit_large_patch16_dinov3.sat493m/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-10-25 09:51:53 [WARNING] Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-10-25 09:51:53 [INFO] HTTP Request: GET https://huggingface.co/api/models/timm/vit_large_patch16_dinov3.sat493m/xet-read-token/ce148bd5ed3de1eb75ebdccafcb2c280bb3e8f7c "HTTP/1.1 200 OK"
+2026-10-25 09:52:02 [INFO] [timm/vit_large_patch16_dinov3.sat493m] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
+2026-10-25 09:52:02 [INFO] Loading pretrained weights from Hugging Face hub (timm/resnet18.a1_in1k)
+2026-10-25 09:52:02 [INFO] HTTP Request: HEAD https://huggingface.co/timm/resnet18.a1_in1k/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-10-25 09:52:03 [INFO] HTTP Request: GET https://huggingface.co/api/models/timm/resnet18.a1_in1k/xet-read-token/491b427b45c94c7fb0e78b5474cc919aff584bbf "HTTP/1.1 200 OK"
+2026-10-25 09:52:08 [INFO] [timm/resnet18.a1_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
+2026-10-25 09:52:08 [INFO] Missing keys (fc.weight, fc.bias) discovered while loading pretrained weights. This is expected if model is being adapted.
+2026-10-25 09:53:40 [INFO] [smoke_ra_fusion] joint epoch 1/2 loss 6.3579 val_score 0.0000 * (92s)
+2026-10-25 09:53:41 [INFO] Pausing after 1 epoch(s) as requested
+2026-10-25 09:53:45 [INFO] Loading pretrained weights from Hugging Face hub (timm/vit_large_patch16_dinov3.sat493m)
+2026-10-25 09:53:45 [INFO] HTTP Request: HEAD https://huggingface.co/timm/vit_large_patch16_dinov3.sat493m/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-10-25 09:53:45 [INFO] [timm/vit_large_patch16_dinov3.sat493m] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
+2026-10-25 09:53:46 [INFO] Loading pretrained weights from Hugging Face hub (timm/resnet18.a1_in1k)
+2026-10-25 09:53:46 [INFO] HTTP Request: HEAD https://huggingface.co/timm/resnet18.a1_in1k/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-10-25 09:53:46 [INFO] [timm/resnet18.a1_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
+2026-10-25 09:53:46 [INFO] Missing keys (fc.weight, fc.bias) discovered while loading pretrained weights. This is expected if model is being adapted.
+2026-10-25 09:53:47 [INFO] Resuming smoke_ra_fusion at stage 0 epoch 1
+2026-10-25 09:53:49 [INFO] [smoke_ra_fusion] joint epoch 2/2 loss 6.9023 val_score 0.0000 (2s)
+2026-10-25 09:54:01 [INFO] [smoke_ra_fusion] thresholds {'building': 0.3, 'road': 0.3, 'flooded_building': 0.3, 'flooded_road': 0.3}
+2026-10-25 09:54:12 [INFO] Road graph: 0 nodes, 0 edges
+2026-10-25 09:54:23 [INFO] Road graph: 0 nodes, 0 edges
+2026-10-25 09:54:34 [INFO] Road graph: 0 nodes, 0 edges
+2026-10-25 09:54:44 [INFO] Road graph: 0 nodes, 0 edges
+2026-10-25 09:54:55 [INFO] Road graph: 0 nodes, 0 edges
+2026-10-25 09:55:06 [INFO] Road graph: 0 nodes, 0 edges
+2026-10-25 09:55:06 [WARNING] Statistic undefined in 2 of 1000 bootstrap replicates
+2026-10-25 09:55:07 [WARNING] Statistic undefined in 358 of 1000 bootstrap replicates
+2026-10-25 09:55:07 [WARNING] Statistic undefined in 2 of 1000 bootstrap replicates
+2026-10-25 09:55:07 [WARNING] Statistic undefined in 15 of 1000 bootstrap replicates
+2026-10-25 09:55:07 [INFO] [smoke_ra_fusion] test {'building_f1': 0.0, 'flooded_building_f1': 0.0, 'building_flood_iou': 0.0, 'apls': 0.0, 'apls_flooded_network': 0.0, 'flooded_road_f1': 0.0}
+2026-10-25 09:55:14 [INFO] Road graph: 0 nodes, 0 edges
+2026-10-25 09:55:20 [INFO] Road graph: 0 nodes, 0 edges
+2026-10-25 09:55:27 [INFO] Road graph: 0 nodes, 0 edges
+2026-10-25 09:55:34 [INFO] Road graph: 0 nodes, 0 edges
+2026-10-25 09:55:34 [WARNING] Statistic undefined in 217 of 1000 bootstrap replicates
+2026-10-25 09:55:34 [WARNING] Statistic undefined in 217 of 1000 bootstrap replicates
+2026-10-25 09:55:34 [WARNING] Statistic undefined in 217 of 1000 bootstrap replicates
+2026-10-25 09:55:34 [WARNING] Statistic undefined in 217 of 1000 bootstrap replicates
+2026-10-25 09:55:41 [INFO] Road graph: 0 nodes, 0 edges

@@ -1,0 +1,160 @@
+{
+  "summary": {
+    "building_f1": 0.0,
+    "flooded_building_f1": 0.0,
+    "building_flood_iou": 0.0,
+    "apls": 0.0,
+    "apls_flooded_network": 0.0,
+    "flooded_road_f1": 0.0
+  },
+  "metrics": {
+    "building": {
+      "all": {
+        "precision": null,
+        "recall": 0.0,
+        "f1": 0.0,
+        "iou": 0.0
+      },
+      "flooded": {
+        "precision": null,
+        "recall": 0.0,
+        "f1": 0.0,
+        "iou": 0.0
+      },
+      "non_flooded": {
+        "precision": null,
+        "recall": 0.0,
+        "f1": 0.0,
+        "iou": 0.0
+      },
+      "state_accuracy": null,
+      "pixel_iou_flooded": 0.0,
+      "pixel_iou_non_flooded": 0.0,
+      "flood_iou": 0.0
+    },
+    "road_length": {
+      "gt_m": 3382.245435832371,
+      "pred_m": 0.0,
+      "gt_matched_m": 0.0,
+      "pred_matched_m": 0.0,
+      "precision": null,
+      "recall": 0.0,
+      "f1": 0.0,
+      "n_tiles": 6
+    },
+    "flooded_road_length": {
+      "gt_m": 111.3892129988144,
+      "pred_m": 0.0,
+      "gt_matched_m": 0.0,
+      "pred_matched_m": 0.0,
+      "precision": null,
+      "recall": 0.0,
+      "f1": 0.0,
+      "n_tiles": 6
+    },
+    "apls": 0.0,
+    "apls_traversable": 0.0,
+    "apls_flooded_network": 0.0,
+    "pixel": {
+      "building": {
+        "precision": 0.2,
+        "recall": 2.531821835697422e-05,
+        "f1": 5.0630027403502334e-05,
+        "iou": 2.5315654567893422e-05
+      },
+      "road": {
+        "precision": 0.011315723096230109,
+        "recall": 1.0,
+        "f1": 0.022378220446501212,
+        "iou": 0.011315723096230109
+      },
+      "flooded_building": {
+        "precision": 0.0002568706233226097,
+        "recall": 1.0,
+        "f1": 0.0005136093155002025,
+        "iou": 0.0002568706233226097
+      },
+      "flooded_road": {
+        "precision": 0.0003394361808191628,
+        "recall": 1.0,
+        "f1": 0.0006786420059876697,
+        "iou": 0.0003394361808191628
+      }
+    },
+    "n_tiles": 6,
+    "n_tiles_with_roads": 6,
+    "n_tiles_with_flooded_roads": 3,
+    "sn8_road_score": 0.0
+  },
+  "ci": {
+    "building_f1": {
+      "estimate": 0.0,
+      "low": 0.0,
+      "high": 0.0,
+      "std": 0.0,
+      "n_boot": 998,
+      "n_tiles": 6,
+      "alpha": 0.05
+    },
+    "flooded_building_f1": {
+      "estimate": 0.0,
+      "low": 0.0,
+      "high": 0.0,
+      "std": 0.0,
+      "n_boot": 642,
+      "n_tiles": 6,
+      "alpha": 0.05
+    },
+    "building_flood_iou": {
+      "estimate": 0.0,
+      "low": 0.0,
+      "high": 0.0,
+      "std": 0.0,
+      "n_boot": 998,
+      "n_tiles": 6,
+      "alpha": 0.05
+    },
+    "apls": {
+      "estimate": 0.0,
+      "low": 0.0,
+      "high": 0.0,
+      "std": 0.0,
+      "n_boot": 1000,
+      "n_tiles": 6,
+      "alpha": 0.05
+    },
+    "apls_flooded_network": {
+      "estimate": 0.0,
+      "low": 0.0,
+      "high": 0.0,
+      "std": 0.0,
+      "n_boot": 1000,
+      "n_tiles": 3,
+      "alpha": 0.05
+    },
+    "road_f1": {
+      "estimate": 0.0,
+      "low": 0.0,
+      "high": 0.0,
+      "std": 0.0,
+      "n_boot": 1000,
+      "n_tiles": 6,
+      "alpha": 0.05
+    },
+    "flooded_road_f1": {
+      "estimate": 0.0,
+      "low": 0.0,
+      "high": 0.0,
+      "std": 0.0,
+      "n_boot": 985,
+      "n_tiles": 6,
+      "alpha": 0.05
+    }
+  },
+  "thresholds": {
+    "building": 0.3,
+    "road": 0.3,
+    "flooded_building": 0.3,
+    "flooded_road": 0.3
+  }
+}

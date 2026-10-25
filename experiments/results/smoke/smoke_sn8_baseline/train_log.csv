@@ -1,2 +1,0 @@
-stage,epoch,lr,loss_building,loss_building_border,loss_road,loss_junction,loss,val_f1_building,val_f1_road,val_score,best,seconds
-foundation,0,0.0003,5.271609,0.213756,1.247282,0.114019,6.846665,0.0,0.0,0.0,True,1.7

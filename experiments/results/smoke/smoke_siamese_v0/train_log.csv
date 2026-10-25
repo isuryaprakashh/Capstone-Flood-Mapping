@@ -1,2 +1,0 @@
-stage,epoch,lr,loss_building,loss_building_border,loss_road,loss_junction,loss_flooded_building,loss_flooded_road,loss_flood_image,loss,val_f1_building,val_f1_road,val_f1_flooded_building,val_f1_flooded_road,val_score,best,seconds
-joint,0,0.0003,1.676517,0.427833,1.805172,0.329958,0.966763,1.278733,0.197286,6.682262,0.0,0.0,0.0,0.0,0.0,True,7.3

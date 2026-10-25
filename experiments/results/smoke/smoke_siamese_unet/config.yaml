@@ -10,7 +10,7 @@ warmup_epochs: 1
 ema_decay: 0.999
 amp: true
 grad_clip: 1.0
-num_workers: 0
+num_workers: 2
 flood_oversample: 2.0
 deadline_margin_s: 0
 register_post: false
@@ -46,6 +46,7 @@ eval:
 queue: kaggle
 id: smoke_siamese_unet
 model: siamese_unet
+grad_accum: 2
 stages:
 - name: foundation
   epochs: 2
@@ -67,4 +68,4 @@ stages:
   - flood.
   init: init_flood_from_foundation
 priority: 1
-config_hash: 5c8fe7ea0430cb6a
+config_hash: a4769ee1a87bb9a1
