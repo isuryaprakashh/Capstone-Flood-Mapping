@@ -53,8 +53,8 @@ def smoke_runs(runs: dict) -> list[dict]:
             c["deadline_margin_s"] = 0
             if c.get("stages"):
                 c["stages"] = [{**s, "epochs": 2} for s in c["stages"]]  # a mid-stage resume in each
-            c["eval"] = {**c["eval"], "window": 256, "overlap": 32, "stress_tiles": 2, "timing_tiles": 1,
-                         "threshold_grid": [0.3, 0.5], "stress_shifts_px": [0, 10], "max_tiles": 6}
+            c["eval"] = {**c["eval"], "window": 256, "overlap": 32, "stress_tiles": 1, "timing_tiles": 1,
+                         "threshold_grid": [0.3, 0.5], "stress_shifts_px": [0, 10], "max_tiles": 3}
             picked[cfg["model"]] = c
     return list(picked.values())
 
