@@ -138,6 +138,22 @@ class KaggleCLI:
                 args += ["--accelerator", "NvidiaTeslaT4"]
             self._run(*args)
 
+    def quota(self) -> tuple[float, float] | None:
+        """(GPU hours left this week, next reset time) from `kaggle quota`; None if unavailable."""
+        result = self._run("quota", "--format", "json", check=False)
+        try:
+            gpu = next(r for r in json.loads(result.stdout) if r.get("resource") == "GPU")
+            left = float(str(gpu["remaining"]).rstrip("h"))
+            if float(str(gpu["total"]).rstrip("h")) <= 0:
+                return None  # no allowance reported: don't block on it
+        except Exception:
+            return None
+        try:
+            reset = datetime.fromisoformat(gpu.get("refreshAt") or gpu.get("refresh_at")).timestamp()
+        except Exception:
+            reset = quota_week_start(now()) + 7 * 86400
+        return left, reset
+
     def status(self, slug: str) -> str:
         result = self._run("kernels", "status", f"{self.username}/{slug}", check=False)
         return normalize_status(result.stdout + result.stderr)
@@ -285,9 +301,9 @@ class Orchestrator:
         if st["phase"] in ("smoke", "prepare", "train") and not st["kernel"]:
             if st["wait_until"] and now() < st["wait_until"]:
                 logger.info(f"Waiting for GPU quota until {stamp(st['wait_until'])}")
-            elif st["phase"] != "prepare" and self.gpu_hours_this_week(st) >= WEEKLY_GPU_HOURS:
+            elif st["phase"] != "prepare" and self.gpu_quota(st)[0] <= 0:
                 # Kaggle refuses new GPU sessions once the quota is spent (a running one may finish)
-                self.quota_wait(st, f"Weekly GPU quota used ({self.gpu_hours_this_week(st):.1f} h)")
+                self.quota_wait(st, "Weekly GPU quota used up")
             else:
                 st["wait_until"] = None
                 self.launch(st)
@@ -410,7 +426,7 @@ class Orchestrator:
             if produced_results:
                 # Resume from the newest output with results, even if the session ended in an error
                 st["last_good_train"] = slug
-            quota_low = self.gpu_hours_this_week(st) >= WEEKLY_GPU_HOURS - QUOTA_NEAR_H
+            quota_low = self.gpu_quota(st)[0] < QUOTA_NEAR_H
             if status != "complete" and minutes < 15 and (quota_low or re.search(r"quota|limit", log_text, re.I)):
                 self.quota_wait(st, f"Session {slug} refused or cut short, GPU quota appears exhausted")
             elif status != "complete" and minutes < 15:
@@ -419,17 +435,20 @@ class Orchestrator:
                 st["phase"] = "done"
                 self.event(st, "All runs finished")
 
-    def gpu_hours_this_week(self, st: dict) -> float:
+    def gpu_quota(self, st: dict) -> tuple[float, float]:
+        """(GPU hours left this week, next reset): Kaggle's figures, else our own session tally."""
+        reported = self.kaggle.quota() if hasattr(self.kaggle, "quota") else None
+        if reported is not None:
+            return reported
         start = quota_week_start(now())
-        return sum(s["hours"] for s in st["gpu_sessions"] if s["start"] and s["start"] >= start)
+        used = sum(s["hours"] for s in st["gpu_sessions"] if s["start"] and s["start"] >= start)
+        return WEEKLY_GPU_HOURS - used, start + 7 * 86400
 
     def quota_wait(self, st: dict, reason: str):
-        """Wait for the Saturday reset when this week's quota is (nearly) spent, else retry in 6 h."""
-        if self.gpu_hours_this_week(st) >= WEEKLY_GPU_HOURS - QUOTA_NEAR_H:
-            st["wait_until"] = quota_week_start(now()) + 7 * 86400 + 600
-        else:
-            st["wait_until"] = now() + QUOTA_WAIT_S
-        self.event(st, f"{reason}; waiting until {stamp(st['wait_until'])}")
+        """Wait for the weekly reset when the quota is (nearly) spent, else retry in 6 h."""
+        left, reset = self.gpu_quota(st)
+        st["wait_until"] = reset + 600 if left < QUOTA_NEAR_H else now() + QUOTA_WAIT_S
+        self.event(st, f"{reason} ({max(left, 0):.1f} GPU h left); waiting until {stamp(st['wait_until'])}")
 
     def retry_or_stop(self, st: dict, reason: str):
         st["phase_retries"] += 1

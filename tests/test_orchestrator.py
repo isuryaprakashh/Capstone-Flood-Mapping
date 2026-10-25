@@ -317,3 +317,15 @@ def test_smoke_is_judged_only_on_its_own_output(setup):
     st = orch.tick()
     assert not (store.root / "smoke").exists()
     assert "no smoke results" in st["events"][-2]["message"]
+
+
+def test_kaggle_reported_quota_is_preferred(setup):
+    orch, kaggle, _ = setup
+    _to_training(orch, kaggle)
+    reset = orch_mod.now() + 3 * 86400
+    kaggle.quota = lambda: (0.0, reset)  # Kaggle says nothing left
+    kaggle.statuses["sn8-train-a"] = "complete"
+    kaggle.outputs["sn8-train-a"] = {"results/run_a/status.json": _status("paused")}
+    pushes = len(kaggle.pushes)
+    st = orch.tick()
+    assert len(kaggle.pushes) == pushes and st["wait_until"] == reset + 600
