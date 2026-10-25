@@ -288,7 +288,9 @@ class Orchestrator:
         if update_code:
             st["code_commit"] = self.current_commit
             self.event(st, f"Code re-pinned to {self.current_commit[:7]}")
-        self.apply_command(st)
+        if self.apply_command(st):
+            self.save(st)
+            self.store.commit("orchestrator: maintainer command")
 
         if st["phase"] in ("done", "stopped"):
             logger.info(f"Phase {st['phase']}: nothing to do ({st.get('stop_reason') or 'finished'})")
@@ -322,18 +324,19 @@ class Orchestrator:
         self.store.commit(f"orchestrator: {st['phase']} (session {st['session']})")
         return st
 
-    def apply_command(self, st: dict):
+    def apply_command(self, st: dict) -> bool:
         """
         Run orchestration/COMMAND once per distinct content: 'update-code' (re-pin the
         training code to current main) or 'resume <phase>' (leave 'stopped'; waits for a
         running session to end). Lets the maintainer act by pushing a file, without a click.
+        Returns True if a command was applied.
         """
         if not COMMAND_FILE.exists():
-            return
+            return False
         text = COMMAND_FILE.read_text()
         token = hashlib.sha256(text.encode()).hexdigest()[:16]
         if token == st["last_command"]:
-            return
+            return False
         lines = [l.split() for l in text.splitlines() if l.strip() and not l.lstrip().startswith("#")]
         cmd = lines[0] if lines else []
         if cmd == ["update-code"]:
@@ -341,13 +344,14 @@ class Orchestrator:
             self.event(st, f"Command: training code re-pinned to {self.current_commit[:7]}")
         elif len(cmd) == 2 and cmd[0] == "resume" and cmd[1] in ("smoke", "prepare", "train"):
             if st["kernel"]:
-                return  # applied once the running session has been recorded
+                return False  # applied once the running session has been recorded
             st.update({"phase": cmd[1], "stop_reason": None, "phase_retries": 0, "wait_until": None,
                        "reset_failed": True, "tick_errors": 0})
             self.event(st, f"Command: resumed at phase '{cmd[1]}'")
         else:
             self.event(st, f"Command ignored (expected 'update-code' or 'resume <phase>'): {' '.join(cmd)[:80]}")
         st["last_command"] = token
+        return True
 
     def safe_tick(self, update_code: bool = False, ignore_hold: bool = False) -> tuple[dict, str | None]:
         """
