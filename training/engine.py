@@ -149,7 +149,9 @@ class EMA:
         return self.shadow
 
     def load_state_dict(self, state: dict):
-        self.shadow = {k: v.clone() for k, v in state.items()}
+        # Copy into the existing shadow so it stays on the model's device (checkpoints load on CPU)
+        for k, v in state.items():
+            self.shadow[k].copy_(v)
 
     def apply_to(self, model: torch.nn.Module) -> dict:
         """Load EMA weights into the model; returns the replaced weights."""
@@ -333,7 +335,8 @@ def _train(cfg, chash, processed_dir, run_dir, ckpt_dir, deadline, device, max_s
     )
     weights = tile_weights(tiles, split["train"], cfg.get("flood_oversample", 2.0))
     samples_per_epoch = int(cfg.get("samples_per_tile", 2) * len(split["train"]))
-    steps_per_epoch = samples_per_epoch // cfg["batch_size"]
+    grad_accum = cfg.get("grad_accum", 1)  # micro-batches per optimizer step (effective batch = batch_size × grad_accum)
+    steps_per_epoch = samples_per_epoch // (cfg["batch_size"] * grad_accum)
     if max_steps_per_epoch:
         steps_per_epoch = min(steps_per_epoch, max_steps_per_epoch)
 
@@ -390,7 +393,7 @@ def _train(cfg, chash, processed_dir, run_dir, ckpt_dir, deadline, device, max_s
             )
             train_metrics = _train_epoch(
                 model, loader, criterion, optimizer, scheduler, scaler, ema, device, use_amp,
-                cfg.get("grad_clip", 1.0), steps_per_epoch, has_alignment and ssl_cfg is not None,
+                cfg.get("grad_clip", 1.0), steps_per_epoch, has_alignment and ssl_cfg is not None, grad_accum,
             )
 
             replaced = ema.apply_to(model)
@@ -433,14 +436,15 @@ def _train(cfg, chash, processed_dir, run_dir, ckpt_dir, deadline, device, max_s
 
 
 def _train_epoch(model, loader, criterion, optimizer, scheduler, scaler, ema, device, use_amp,
-                 grad_clip, max_steps, use_ssl) -> dict:
+                 grad_clip, max_steps, use_ssl, grad_accum=1) -> dict:
+    """max_steps counts optimizer steps; each takes grad_accum micro-batches."""
     train_mode(model)
-    sums, n = {}, 0
-    for step, batch in enumerate(loader):
-        if step >= max_steps:
+    sums, n, steps = {}, 0, 0
+    optimizer.zero_grad(set_to_none=True)
+    for micro, batch in enumerate(loader):
+        if steps >= max_steps:
             break
         batch = {k: v.to(device, non_blocking=True) for k, v in batch.items()}
-        optimizer.zero_grad(set_to_none=True)
         with torch.autocast(device.type, dtype=torch.float16, enabled=use_amp):
             outputs = model(batch["pre"], batch["post"])
             ssl_flows = None
@@ -449,14 +453,17 @@ def _train_epoch(model, loader, criterion, optimizer, scheduler, scaler, ema, de
                 ssl_flows = model.estimate_flow(batch["ssl_a"][idx], batch["ssl_b"][idx])
             losses = criterion(outputs, batch, ssl_flows)
         if not torch.isfinite(losses["total"]):
-            raise FloatingPointError(f"Non-finite loss at step {step}: { {k: float(v) for k, v in losses.items()} }")
-        scaler.scale(losses["total"]).backward()
-        scaler.unscale_(optimizer)
-        torch.nn.utils.clip_grad_norm_([p for p in model.parameters() if p.requires_grad], grad_clip)
-        scaler.step(optimizer)
-        scaler.update()
-        scheduler.step()
-        ema.update(model)
+            raise FloatingPointError(f"Non-finite loss at step {steps}: { {k: float(v) for k, v in losses.items()} }")
+        scaler.scale(losses["total"] / grad_accum).backward()
+        if (micro + 1) % grad_accum == 0:
+            scaler.unscale_(optimizer)
+            torch.nn.utils.clip_grad_norm_([p for p in model.parameters() if p.requires_grad], grad_clip)
+            scaler.step(optimizer)
+            scaler.update()
+            scheduler.step()
+            ema.update(model)
+            optimizer.zero_grad(set_to_none=True)
+            steps += 1
 
         for k, v in losses.items():
             sums[k] = sums.get(k, 0.0) + float(v)
