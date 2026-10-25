@@ -2,12 +2,12 @@
   "phase": "smoke",
   "code_commit": "60e6bfd09b2319ee06560ebbaaafc513db16301d",
   "session": 3,
-  "kernel": "sn8-smoke",
+  "kernel": null,
   "kernel_mode": "smoke",
   "pushed_at": 1792918071.4966223,
   "wait_until": null,
   "last_good_train": null,
-  "phase_retries": 2,
+  "phase_retries": 0,
   "stop_reason": null,
   "events": [
     {
@@ -37,6 +37,10 @@
     {
       "at": "2026-10-25T08:47:51+00:00",
       "message": "Started smoke session 3 on sn8-smoke (code 60e6bfd)"
+    },
+    {
+      "at": "2026-10-25T09:00:27+00:00",
+      "message": "Manually resumed at phase 'smoke'"
     }
   ]
 }
