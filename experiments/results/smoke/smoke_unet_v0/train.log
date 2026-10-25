@@ -1,15 +1,15 @@
-2026-10-25 11:15:40 [INFO] [smoke_unet_v0] joint epoch 1/2 loss 6.5213 val_score 0.0000 * (4s)
-2026-10-25 11:15:40 [INFO] Pausing after 1 epoch(s) as requested
-2026-10-25 11:15:41 [INFO] Resuming smoke_unet_v0 at stage 0 epoch 1
-2026-10-25 11:15:43 [INFO] [smoke_unet_v0] joint epoch 2/2 loss 7.4254 val_score 0.0000 (1s)
-2026-10-25 11:15:46 [INFO] [smoke_unet_v0] thresholds {'building': 0.3, 'road': 0.5, 'flooded_building': 0.3, 'flooded_road': 0.3}
-2026-10-25 11:15:51 [INFO] Road graph: 70 nodes, 108 edges
-2026-10-25 11:15:56 [INFO] Road graph: 0 nodes, 0 edges
-2026-10-25 11:16:02 [INFO] Road graph: 4 nodes, 4 edges
-2026-10-25 11:16:02 [WARNING] Statistic undefined in 305 of 1000 bootstrap replicates
-2026-10-25 11:16:02 [INFO] [smoke_unet_v0] test {'building_f1': 0.0, 'flooded_building_f1': 0.0, 'building_flood_iou': 0.0, 'apls': 0.0003109620837516849, 'apls_flooded_network': 0.0, 'flooded_road_f1': 0.0}
-2026-10-25 11:16:05 [INFO] Road graph: 2131 nodes, 3312 edges
-2026-10-25 11:16:11 [INFO] Road graph: 1996 nodes, 3111 edges
-2026-10-25 11:16:14 [WARNING] Statistic undefined in 1000 of 1000 bootstrap replicates
-2026-10-25 11:16:14 [WARNING] Statistic undefined in 1000 of 1000 bootstrap replicates
-2026-10-25 11:16:17 [INFO] Road graph: 2131 nodes, 3312 edges
+2026-10-25 11:47:01 [INFO] [smoke_unet_v0] joint epoch 1/2 loss 6.5210 val_score 0.0000 * (5s)
+2026-10-25 11:47:02 [INFO] Pausing after 1 epoch(s) as requested
+2026-10-25 11:47:03 [INFO] Resuming smoke_unet_v0 at stage 0 epoch 1
+2026-10-25 11:47:05 [INFO] [smoke_unet_v0] joint epoch 2/2 loss 7.4298 val_score 0.0000 (2s)
+2026-10-25 11:47:09 [INFO] [smoke_unet_v0] thresholds {'building': 0.3, 'road': 0.5, 'flooded_building': 0.3, 'flooded_road': 0.3}
+2026-10-25 11:47:13 [INFO] Road graph: 71 nodes, 109 edges
+2026-10-25 11:47:19 [INFO] Road graph: 0 nodes, 0 edges
+2026-10-25 11:47:24 [INFO] Road graph: 4 nodes, 5 edges
+2026-10-25 11:47:25 [WARNING] Statistic undefined in 305 of 1000 bootstrap replicates
+2026-10-25 11:47:25 [INFO] [smoke_unet_v0] test {'building_f1': 0.0, 'flooded_building_f1': 0.0, 'building_flood_iou': 0.0, 'apls': 0.00032306051355498463, 'apls_flooded_network': 0.0, 'flooded_road_f1': 0.0}
+2026-10-25 11:47:29 [INFO] Road graph: 2213 nodes, 3436 edges
+2026-10-25 11:47:35 [INFO] Road graph: 2061 nodes, 3214 edges
+2026-10-25 11:47:39 [WARNING] Statistic undefined in 1000 of 1000 bootstrap replicates
+2026-10-25 11:47:39 [WARNING] Statistic undefined in 1000 of 1000 bootstrap replicates
+2026-10-25 11:47:42 [INFO] Road graph: 2213 nodes, 3436 edges

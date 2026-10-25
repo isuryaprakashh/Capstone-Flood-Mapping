@@ -3,14 +3,14 @@
     "0": {
       "building_f1": 0.0,
       "flooded_building_f1": 0.0,
-      "building_flood_iou": 0.00043714878850086854,
+      "building_flood_iou": 0.0004368442525152222,
       "apls": 0.0,
       "n_tiles": 1
     },
     "10": {
       "building_f1": 0.0,
       "flooded_building_f1": 0.0,
-      "building_flood_iou": 0.0004367181878696233,
+      "building_flood_iou": 0.0004364226416835532,
       "apls": 0.0,
       "n_tiles": 1
     }

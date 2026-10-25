@@ -1,36 +1,36 @@
-2026-10-25 10:59:18 [INFO] Loading pretrained weights from Hugging Face hub (timm/vit_large_patch16_dinov3.sat493m)
-2026-10-25 10:59:18 [INFO] HTTP Request: GET https://huggingface.co/api/agent-harnesses "HTTP/1.1 200 OK"
-2026-10-25 10:59:19 [INFO] HTTP Request: HEAD https://huggingface.co/timm/vit_large_patch16_dinov3.sat493m/resolve/main/model.safetensors "HTTP/1.1 302 Found"
-2026-10-25 10:59:19 [WARNING] Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
-2026-10-25 10:59:19 [INFO] HTTP Request: GET https://huggingface.co/api/models/timm/vit_large_patch16_dinov3.sat493m/xet-read-token/ce148bd5ed3de1eb75ebdccafcb2c280bb3e8f7c "HTTP/1.1 200 OK"
-2026-10-25 10:59:27 [INFO] [timm/vit_large_patch16_dinov3.sat493m] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
-2026-10-25 10:59:28 [INFO] Loading pretrained weights from Hugging Face hub (timm/resnet18.a1_in1k)
-2026-10-25 10:59:28 [INFO] HTTP Request: HEAD https://huggingface.co/timm/resnet18.a1_in1k/resolve/main/model.safetensors "HTTP/1.1 302 Found"
-2026-10-25 10:59:28 [INFO] HTTP Request: GET https://huggingface.co/api/models/timm/resnet18.a1_in1k/xet-read-token/491b427b45c94c7fb0e78b5474cc919aff584bbf "HTTP/1.1 200 OK"
-2026-10-25 10:59:33 [INFO] [timm/resnet18.a1_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
-2026-10-25 10:59:33 [INFO] Missing keys (fc.weight, fc.bias) discovered while loading pretrained weights. This is expected if model is being adapted.
-2026-10-25 11:00:52 [INFO] [smoke_ra_fusion] joint epoch 1/2 loss 6.3577 val_score 0.0000 * (78s)
-2026-10-25 11:00:52 [INFO] Pausing after 1 epoch(s) as requested
-2026-10-25 11:00:56 [INFO] Loading pretrained weights from Hugging Face hub (timm/vit_large_patch16_dinov3.sat493m)
-2026-10-25 11:00:56 [INFO] HTTP Request: HEAD https://huggingface.co/timm/vit_large_patch16_dinov3.sat493m/resolve/main/model.safetensors "HTTP/1.1 302 Found"
-2026-10-25 11:00:56 [INFO] [timm/vit_large_patch16_dinov3.sat493m] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
-2026-10-25 11:00:57 [INFO] Loading pretrained weights from Hugging Face hub (timm/resnet18.a1_in1k)
-2026-10-25 11:00:57 [INFO] HTTP Request: HEAD https://huggingface.co/timm/resnet18.a1_in1k/resolve/main/model.safetensors "HTTP/1.1 302 Found"
-2026-10-25 11:00:57 [INFO] [timm/resnet18.a1_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
-2026-10-25 11:00:57 [INFO] Missing keys (fc.weight, fc.bias) discovered while loading pretrained weights. This is expected if model is being adapted.
-2026-10-25 11:00:57 [INFO] Resuming smoke_ra_fusion at stage 0 epoch 1
-2026-10-25 11:01:00 [INFO] [smoke_ra_fusion] joint epoch 2/2 loss 6.9026 val_score 0.0000 (2s)
-2026-10-25 11:01:11 [INFO] [smoke_ra_fusion] thresholds {'building': 0.3, 'road': 0.3, 'flooded_building': 0.3, 'flooded_road': 0.3}
-2026-10-25 11:01:21 [INFO] Road graph: 0 nodes, 0 edges
-2026-10-25 11:01:31 [INFO] Road graph: 0 nodes, 0 edges
-2026-10-25 11:01:41 [INFO] Road graph: 0 nodes, 0 edges
-2026-10-25 11:01:41 [WARNING] Statistic undefined in 305 of 1000 bootstrap replicates
-2026-10-25 11:01:41 [WARNING] Statistic undefined in 305 of 1000 bootstrap replicates
-2026-10-25 11:01:41 [INFO] [smoke_ra_fusion] test {'building_f1': 0.0, 'flooded_building_f1': 0.0, 'building_flood_iou': 0.0, 'apls': 0.0, 'apls_flooded_network': 0.0, 'flooded_road_f1': 0.0}
-2026-10-25 11:01:47 [INFO] Road graph: 0 nodes, 0 edges
-2026-10-25 11:01:53 [INFO] Road graph: 0 nodes, 0 edges
-2026-10-25 11:01:53 [WARNING] Statistic undefined in 1000 of 1000 bootstrap replicates
-2026-10-25 11:01:53 [WARNING] Statistic undefined in 1000 of 1000 bootstrap replicates
-2026-10-25 11:01:53 [WARNING] Statistic undefined in 1000 of 1000 bootstrap replicates
-2026-10-25 11:01:53 [WARNING] Statistic undefined in 1000 of 1000 bootstrap replicates
-2026-10-25 11:01:59 [INFO] Road graph: 0 nodes, 0 edges
+2026-10-25 11:30:23 [INFO] Loading pretrained weights from Hugging Face hub (timm/vit_large_patch16_dinov3.sat493m)
+2026-10-25 11:30:23 [INFO] HTTP Request: GET https://huggingface.co/api/agent-harnesses "HTTP/1.1 200 OK"
+2026-10-25 11:30:23 [INFO] HTTP Request: HEAD https://huggingface.co/timm/vit_large_patch16_dinov3.sat493m/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-10-25 11:30:23 [WARNING] Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-10-25 11:30:23 [INFO] HTTP Request: GET https://huggingface.co/api/models/timm/vit_large_patch16_dinov3.sat493m/xet-read-token/ce148bd5ed3de1eb75ebdccafcb2c280bb3e8f7c "HTTP/1.1 200 OK"
+2026-10-25 11:30:32 [INFO] [timm/vit_large_patch16_dinov3.sat493m] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
+2026-10-25 11:30:37 [INFO] Loading pretrained weights from Hugging Face hub (timm/resnet18.a1_in1k)
+2026-10-25 11:30:37 [INFO] HTTP Request: HEAD https://huggingface.co/timm/resnet18.a1_in1k/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-10-25 11:30:38 [INFO] HTTP Request: GET https://huggingface.co/api/models/timm/resnet18.a1_in1k/xet-read-token/491b427b45c94c7fb0e78b5474cc919aff584bbf "HTTP/1.1 200 OK"
+2026-10-25 11:30:41 [INFO] [timm/resnet18.a1_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
+2026-10-25 11:30:41 [INFO] Missing keys (fc.weight, fc.bias) discovered while loading pretrained weights. This is expected if model is being adapted.
+2026-10-25 11:32:08 [INFO] [smoke_ra_fusion] joint epoch 1/2 loss 6.3577 val_score 0.0000 * (86s)
+2026-10-25 11:32:08 [INFO] Pausing after 1 epoch(s) as requested
+2026-10-25 11:32:12 [INFO] Loading pretrained weights from Hugging Face hub (timm/vit_large_patch16_dinov3.sat493m)
+2026-10-25 11:32:13 [INFO] HTTP Request: HEAD https://huggingface.co/timm/vit_large_patch16_dinov3.sat493m/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-10-25 11:32:13 [INFO] [timm/vit_large_patch16_dinov3.sat493m] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
+2026-10-25 11:32:13 [INFO] Loading pretrained weights from Hugging Face hub (timm/resnet18.a1_in1k)
+2026-10-25 11:32:13 [INFO] HTTP Request: HEAD https://huggingface.co/timm/resnet18.a1_in1k/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-10-25 11:32:13 [INFO] [timm/resnet18.a1_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
+2026-10-25 11:32:13 [INFO] Missing keys (fc.weight, fc.bias) discovered while loading pretrained weights. This is expected if model is being adapted.
+2026-10-25 11:32:14 [INFO] Resuming smoke_ra_fusion at stage 0 epoch 1
+2026-10-25 11:32:16 [INFO] [smoke_ra_fusion] joint epoch 2/2 loss 6.8997 val_score 0.0000 (2s)
+2026-10-25 11:32:27 [INFO] [smoke_ra_fusion] thresholds {'building': 0.3, 'road': 0.3, 'flooded_building': 0.3, 'flooded_road': 0.3}
+2026-10-25 11:32:37 [INFO] Road graph: 0 nodes, 0 edges
+2026-10-25 11:32:47 [INFO] Road graph: 0 nodes, 0 edges
+2026-10-25 11:32:57 [INFO] Road graph: 0 nodes, 0 edges
+2026-10-25 11:32:57 [WARNING] Statistic undefined in 305 of 1000 bootstrap replicates
+2026-10-25 11:32:57 [WARNING] Statistic undefined in 305 of 1000 bootstrap replicates
+2026-10-25 11:32:57 [INFO] [smoke_ra_fusion] test {'building_f1': 0.0, 'flooded_building_f1': 0.0, 'building_flood_iou': 0.0, 'apls': 0.0, 'apls_flooded_network': 0.0, 'flooded_road_f1': 0.0}
+2026-10-25 11:33:03 [INFO] Road graph: 0 nodes, 0 edges
+2026-10-25 11:33:09 [INFO] Road graph: 0 nodes, 0 edges
+2026-10-25 11:33:09 [WARNING] Statistic undefined in 1000 of 1000 bootstrap replicates
+2026-10-25 11:33:09 [WARNING] Statistic undefined in 1000 of 1000 bootstrap replicates
+2026-10-25 11:33:09 [WARNING] Statistic undefined in 1000 of 1000 bootstrap replicates
+2026-10-25 11:33:09 [WARNING] Statistic undefined in 1000 of 1000 bootstrap replicates
+2026-10-25 11:33:15 [INFO] Road graph: 0 nodes, 0 edges

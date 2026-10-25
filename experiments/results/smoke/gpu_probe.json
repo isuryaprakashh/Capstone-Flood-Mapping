@@ -4,25 +4,25 @@
     "ra_fusion {'backbone': 'dinov3_sat'}": {
       "batch_size": 8,
       "peak_memory_gb": 9.41,
-      "sec_per_step": 3.204,
-      "epoch_minutes": 6.4,
-      "run_hours_train_only": 4.24,
+      "sec_per_step": 3.004,
+      "epoch_minutes": 6.0,
+      "run_hours_train_only": 3.97,
       "fits_configured_batch": true
     },
     "sn8_baseline": {
       "batch_size": 8,
       "peak_memory_gb": 6.86,
-      "sec_per_step": 0.801,
+      "sec_per_step": 0.792,
       "epoch_minutes": 1.6,
-      "run_hours_train_only": 1.06,
+      "run_hours_train_only": 1.05,
       "fits_configured_batch": true
     },
     "siamese_unet": {
       "batch_size": 4,
-      "peak_memory_gb": 12.41,
-      "sec_per_step": 0.768,
-      "epoch_minutes": 3.1,
-      "run_hours_train_only": 2.04,
+      "peak_memory_gb": 12.42,
+      "sec_per_step": 0.765,
+      "epoch_minutes": 3.0,
+      "run_hours_train_only": 2.03,
       "fits_configured_batch": true
     },
     "snunet": {
@@ -36,7 +36,7 @@
     "unet_v0": {
       "batch_size": 8,
       "peak_memory_gb": 2.24,
-      "sec_per_step": 0.221,
+      "sec_per_step": 0.216,
       "epoch_minutes": 0.4,
       "run_hours_train_only": 0.29,
       "fits_configured_batch": true
@@ -44,25 +44,25 @@
     "siamese_v0": {
       "batch_size": 8,
       "peak_memory_gb": 5.36,
-      "sec_per_step": 0.557,
+      "sec_per_step": 0.549,
       "epoch_minutes": 1.1,
-      "run_hours_train_only": 0.74,
+      "run_hours_train_only": 0.73,
       "fits_configured_batch": true
     },
     "ra_fusion {'backbone': 'dinov3_sat', 'align': False}": {
       "batch_size": 8,
       "peak_memory_gb": 7.42,
-      "sec_per_step": 1.727,
-      "epoch_minutes": 3.4,
-      "run_hours_train_only": 2.28,
+      "sec_per_step": 1.645,
+      "epoch_minutes": 3.3,
+      "run_hours_train_only": 2.17,
       "fits_configured_batch": true
     },
     "ra_fusion {'backbone': 'convnext_tiny.dinov3_lvd1689m'}": {
       "batch_size": 4,
       "peak_memory_gb": 8.91,
-      "sec_per_step": 0.763,
+      "sec_per_step": 0.752,
       "epoch_minutes": 3.0,
-      "run_hours_train_only": 2.03,
+      "run_hours_train_only": 2.0,
       "fits_configured_batch": false
     }
   }

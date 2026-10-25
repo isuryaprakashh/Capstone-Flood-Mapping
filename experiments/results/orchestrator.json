@@ -1,13 +1,13 @@
 {
-  "phase": "smoke",
+  "phase": "prepare",
   "code_commit": "26379792d3b4427f54d893008452a7d723fa4814",
-  "session": 8,
-  "kernel": "sn8-smoke",
-  "kernel_mode": "smoke",
-  "pushed_at": 1792927605.3397243,
+  "session": 9,
+  "kernel": "sn8-prepare",
+  "kernel_mode": "prepare",
+  "pushed_at": 1792929602.1172345,
   "wait_until": null,
   "last_good_train": null,
-  "phase_retries": 2,
+  "phase_retries": 0,
   "stop_reason": null,
   "gpu_sessions": [
     {
@@ -21,6 +21,10 @@
     {
       "start": 1792925762.490885,
       "hours": 0.3766666666666667
+    },
+    {
+      "start": 1792927605.3397243,
+      "hours": 0.38833333333333336
     }
   ],
   "prepared": false,
@@ -115,6 +119,18 @@
     {
       "at": "2026-10-25T11:39:25+00:00",
       "message": "Command: training code re-pinned to 2637979"
+    },
+    {
+      "at": "2026-10-25T11:59:46+00:00",
+      "message": "sn8-smoke (smoke) ended: complete after 33 min"
+    },
+    {
+      "at": "2026-10-25T12:00:00+00:00",
+      "message": "Smoke test passed; preparing the full dataset"
+    },
+    {
+      "at": "2026-10-25T12:00:02+00:00",
+      "message": "Started prepare session 9 on sn8-prepare (code 2637979)"
     }
   ]
 }

@@ -4,7 +4,7 @@
       "building_f1": 0.0,
       "flooded_building_f1": 0.0,
       "building_flood_iou": 0.0,
-      "apls": 0.0006492389693641618,
+      "apls": 0.0008037913930788828,
       "flooded_road_f1": 0.0,
       "n_tiles": 1
     },
@@ -12,7 +12,7 @@
       "building_f1": 0.0,
       "flooded_building_f1": 0.0,
       "building_flood_iou": 0.0,
-      "apls": 0.0006492389693641618,
+      "apls": 0.0008037913930788828,
       "flooded_road_f1": 0.0,
       "n_tiles": 1
     }

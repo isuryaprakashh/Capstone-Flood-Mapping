@@ -2,12 +2,12 @@
   "id": "smoke_siamese_unet",
   "state": "completed",
   "attempts": 0,
-  "session": "24a3ecc7-4",
+  "session": "652e203f-4",
   "worker": "0",
-  "pid": 81,
-  "started_at": "2026-10-25T11:01:59+00:00",
-  "updated_at": "2026-10-25T11:12:00+00:00",
+  "pid": 83,
+  "started_at": "2026-10-25T11:33:16+00:00",
+  "updated_at": "2026-10-25T11:43:22+00:00",
   "error": null,
-  "seconds_total": 600.2,
-  "completed_at": "2026-10-25T11:12:00+00:00"
+  "seconds_total": 606.1,
+  "completed_at": "2026-10-25T11:43:22+00:00"
 }

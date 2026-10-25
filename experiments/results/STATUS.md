@@ -1,16 +1,19 @@
 # Orchestrator status
 
-- **Phase:** smoke
-- **Sessions started:** 8
-- **Running:** sn8-smoke
+- **Phase:** prepare
+- **Sessions started:** 9
+- **Running:** sn8-prepare
 - **Code commit:** 26379792d3b4427f54d893008452a7d723fa4814
 - **Waiting for quota until:** —
-- **Updated:** 2026-10-25T11:39:25+00:00
+- **Updated:** 2026-10-25T12:00:02+00:00
 
 Per-run progress: [PROGRESS.md](PROGRESS.md)
 
 ## Recent events
 
+- 2026-10-25T12:00:02+00:00 — Started prepare session 9 on sn8-prepare (code 2637979)
+- 2026-10-25T12:00:00+00:00 — Smoke test passed; preparing the full dataset
+- 2026-10-25T11:59:46+00:00 — sn8-smoke (smoke) ended: complete after 33 min
 - 2026-10-25T11:39:25+00:00 — Command: training code re-pinned to 2637979
 - 2026-10-25T11:26:45+00:00 — Started smoke session 8 on sn8-smoke (code b4a70bb)
 - 2026-10-25T11:26:43+00:00 — Smoke test failed: models do not fit their batch size: ["ra_fusion {'backbone': 'convnext_tiny.dinov3_lvd1689m'}"] (see smoke/gpu_probe.json) — retry 2/2

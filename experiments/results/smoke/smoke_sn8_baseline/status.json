@@ -2,12 +2,12 @@
   "id": "smoke_sn8_baseline",
   "state": "completed",
   "attempts": 0,
-  "session": "24a3ecc7-6",
+  "session": "652e203f-6",
   "worker": "0",
-  "pid": 81,
-  "started_at": "2026-10-25T11:12:00+00:00",
-  "updated_at": "2026-10-25T11:12:52+00:00",
+  "pid": 83,
+  "started_at": "2026-10-25T11:43:22+00:00",
+  "updated_at": "2026-10-25T11:44:13+00:00",
   "error": null,
-  "seconds_total": 52.0,
-  "completed_at": "2026-10-25T11:12:52+00:00"
+  "seconds_total": 51.4,
+  "completed_at": "2026-10-25T11:44:13+00:00"
 }

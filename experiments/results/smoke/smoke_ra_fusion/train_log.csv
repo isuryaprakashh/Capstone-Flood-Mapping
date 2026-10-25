@@ -1,3 +1,3 @@
 stage,epoch,lr,loss_building,loss_building_border,loss_road,loss_junction,loss_flooded_building,loss_flooded_road,loss_flood_image,loss_alignment,loss,val_f1_building,val_f1_road,val_f1_flooded_building,val_f1_flooded_road,val_score,best,seconds
-joint,0,0.0003,1.645539,0.398507,1.885626,0.420604,0.915305,0.921021,0.142237,0.028907,6.357746,0.0,0.0,0.0,0.0,0.0,True,77.8
-joint,1,0.0,1.640836,0.395164,1.824941,0.417196,1.536441,0.904053,0.143669,0.040312,6.902612,0.0,0.0,0.0,0.0,0.0,False,2.2
+joint,0,0.0003,1.645536,0.398505,1.885628,0.420603,0.915304,0.921095,0.142116,0.028907,6.357693,0.0,0.0,0.0,0.0,0.0,True,86.1
+joint,1,0.0,1.640772,0.395178,1.825027,0.41717,1.53767,0.903716,0.139829,0.040308,6.89967,0.0,0.0,0.0,0.0,0.0,False,2.2

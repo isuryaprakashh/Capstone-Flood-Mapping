@@ -1,7 +1,7 @@
 {
-  "seconds_per_tile_mean": 5.004,
+  "seconds_per_tile_mean": 4.837,
   "seconds_per_tile_all": [
-    5.004
+    4.837
   ],
   "tile_size_px": 1300,
   "device": "Tesla T4",
