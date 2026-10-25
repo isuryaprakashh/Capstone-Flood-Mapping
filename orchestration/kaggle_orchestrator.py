@@ -49,7 +49,7 @@ logger = logging.getLogger(__name__)
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SESSION_TEMPLATE = REPO_ROOT / "orchestration" / "kaggle_session.py"
-HOLD_FILE = REPO_ROOT / "orchestration" / "HOLD"  # while present on main, no new GPU sessions start
+HOLD_FILE = REPO_ROOT / "orchestration" / "HOLD"  # while on main, scheduled ticks start no session (resume does)
 JOB_PLACEHOLDER = "JOB = {}  # __JOB__ (replaced by the orchestrator)"
 
 SLUGS = {"smoke": "sn8-smoke", "prepare": "sn8-prepare", "train": ("sn8-train-a", "sn8-train-b")}
@@ -62,7 +62,7 @@ MAX_RUN_ATTEMPTS = 3
 TICK_ERRORS_BEFORE_ALERT = 3  # consecutive failing ticks (1.5 h) before one alert email
 WEEKLY_GPU_HOURS = 30.0  # Kaggle's weekly GPU quota, reset Saturday 00:00 UTC
 QUOTA_NEAR_H = 5.0  # an early failure with less than this left is treated as quota, not a bug
-PIP_PACKAGES = ["rasterio>=1.3.8", "timm>=1.0.20", "filelock>=3.12", "pyyaml>=6.0"]
+PIP_PACKAGES = ["rasterio>=1.3.8", "timm==1.0.30", "filelock>=3.12", "pyyaml>=6.0"]  # timm pinned: same encoders every session
 DOWNLOAD_PATTERN = r"^(?!processed/)(?!.*checkpoints/).*$"
 
 
@@ -244,6 +244,7 @@ DEFAULT_STATE = {
     "stop_reason": None,
     "gpu_sessions": [],  # {"start", "hours"} per GPU session, for the weekly quota
     "prepared": False,  # sn8-prepare output exists: a re-run smoke test goes straight to training
+    "reset_failed": False,  # set by resume: the next training session resets failed runs
     "tick_errors": 0,
     "events": [],
 }
@@ -277,7 +278,7 @@ class Orchestrator:
         st["events"].append({"at": stamp(), "message": message})
 
     # main entry
-    def tick(self, update_code: bool = False) -> dict:
+    def tick(self, update_code: bool = False, ignore_hold: bool = False) -> dict:
         self.store.open()
         st = self.load()
         if update_code:
@@ -303,8 +304,8 @@ class Orchestrator:
         if st["phase"] in ("smoke", "prepare", "train") and not st["kernel"]:
             if st["wait_until"] and now() < st["wait_until"]:
                 logger.info(f"Waiting for GPU quota until {stamp(st['wait_until'])}")
-            elif st["phase"] != "prepare" and HOLD_FILE.exists():
-                logger.info(f"{HOLD_FILE.name} present on main: not starting GPU sessions")
+            elif HOLD_FILE.exists() and not ignore_hold:
+                logger.info(f"{HOLD_FILE.name} present on main: not starting new sessions")
             elif st["phase"] != "prepare" and self.gpu_quota(st)[0] <= 0:
                 # Kaggle refuses new GPU sessions once the quota is spent (a running one may finish)
                 self.quota_wait(st, "Weekly GPU quota used up")
@@ -316,7 +317,7 @@ class Orchestrator:
         self.store.commit(f"orchestrator: {st['phase']} (session {st['session']})")
         return st
 
-    def safe_tick(self, update_code: bool = False) -> tuple[dict, str | None]:
+    def safe_tick(self, update_code: bool = False, ignore_hold: bool = False) -> tuple[dict, str | None]:
         """
         tick() that survives transient Kaggle/GitHub errors (the next tick
         retries). Returns (state, alert); the alert is set only on the tick
@@ -326,7 +327,7 @@ class Orchestrator:
         self.store.open()
         was_stopped = self.load()["phase"] == "stopped"
         try:
-            st = self.tick(update_code)
+            st = self.tick(update_code, ignore_hold)
         except Exception as e:
             st = self.load()  # last saved state
             alert = None
@@ -354,7 +355,9 @@ class Orchestrator:
         """Manually leave 'stopped' (after fixing the cause) and continue at `phase`."""
         self.store.open()
         st = self.load()
-        st.update({"phase": phase, "stop_reason": None, "phase_retries": 0, "kernel": None, "wait_until": None})
+        # The next training session also gives permanently failed runs a fresh set of attempts
+        st.update({"phase": phase, "stop_reason": None, "phase_retries": 0, "kernel": None, "wait_until": None,
+                   "reset_failed": True, "tick_errors": 0})
         self.event(st, f"Manually resumed at phase '{phase}'")
         self.save(st)
         self.store.commit(f"orchestrator: resume {phase}")
@@ -375,7 +378,10 @@ class Orchestrator:
             "session": st["session"] + 1,
             "data_source": SLUGS["prepare"],
             "previous": st["last_good_train"] if mode == "train" else None,
+            "reset_failed": mode == "train" and st["reset_failed"],
         }
+        if mode == "train":
+            st["reset_failed"] = False
         sources = []
         if mode == "train":
             sources.append(f"{self.kaggle.username}/{SLUGS['prepare']}")
@@ -439,7 +445,14 @@ class Orchestrator:
                 self.quota_wait(st, f"Session {slug} refused or cut short, GPU quota appears exhausted")
             elif status != "complete" and minutes < 15:
                 self.retry_or_stop(st, f"Training session failed early with status {status}")
-            if self.all_runs_finished():
+            if status == "complete":
+                st["phase_retries"] = 0  # only consecutive failed sessions count towards a stop
+            finished, failed = self.runs_outcome()
+            if finished and failed:
+                # Never report 'done' over permanently failed runs: stop (one email) for a fix + resume
+                st.update({"phase": "stopped", "stop_reason": f"runs failed permanently: {failed}"})
+                self.event(st, f"Stopped: all runs ended but {len(failed)} failed permanently: {failed}")
+            elif finished:
                 st["phase"] = "done"
                 self.event(st, "All runs finished")
 
@@ -507,19 +520,21 @@ class Orchestrator:
             return False, f"models do not fit their batch size: {too_big} (see smoke/gpu_probe.json)"
         return True, ""
 
-    def all_runs_finished(self) -> bool:
+    def runs_outcome(self) -> tuple[bool, list[str]]:
+        """(every run completed or out of attempts, ids of runs that failed permanently)."""
         sys.path.insert(0, str(REPO_ROOT))
         from training.config import load_runs
 
         runs = [r for r in load_runs(self.runs_file).values() if r.get("queue") == "kaggle"]
+        finished, failed = True, []
         for cfg in runs:
             path = self.store.root / cfg["id"] / "status.json"
-            if not path.exists():
-                return False
-            s = json.loads(path.read_text())
-            if s["state"] != "completed" and not (s["state"] == "failed" and s.get("attempts", 0) >= MAX_RUN_ATTEMPTS):
-                return False
-        return True
+            s = json.loads(path.read_text()) if path.exists() else {"state": "pending"}
+            if s["state"] == "failed" and s.get("attempts", 0) >= MAX_RUN_ATTEMPTS:
+                failed.append(cfg["id"])
+            elif s["state"] != "completed":
+                finished = False
+        return finished, failed
 
     def write_status(self, st: dict):
         lines = [
@@ -567,6 +582,7 @@ def main():
     parser.add_argument("command", choices=["tick", "resume", "status"])
     parser.add_argument("--phase", choices=["smoke", "prepare", "train"], help="For 'resume'")
     parser.add_argument("--update-code", action="store_true", help="Re-pin the code commit to current main")
+    parser.add_argument("--ignore-hold", action="store_true", help="Launch even if orchestration/HOLD exists")
     args = parser.parse_args()
 
     username = os.environ.get("KAGGLE_USERNAME")
@@ -587,7 +603,7 @@ def main():
         print(json.dumps({k: v for k, v in st.items() if k != "events"}, indent=2))
         return
     else:
-        st, alert = orch.safe_tick(update_code=args.update_code)
+        st, alert = orch.safe_tick(update_code=args.update_code, ignore_hold=args.ignore_hold)
         if alert:
             sys.exit(alert)  # failing run → one GitHub email
 

@@ -180,7 +180,19 @@ def test_quota_exhaustion_waits(setup, monkeypatch):
     assert len(kaggle.pushes) == pushes  # still waiting
 
 
-def test_all_runs_finished_marks_done(setup):
+def test_all_runs_completed_marks_done(setup):
+    orch, kaggle, _ = setup
+    _to_training(orch, kaggle)
+    kaggle.statuses["sn8-train-a"] = "complete"
+    kaggle.outputs["sn8-train-a"] = {f"results/{r}/status.json": _status("completed") for r in ("run_a", "run_b")}
+    st = orch.tick()
+    assert st["phase"] == "done"
+    pushes = len(kaggle.pushes)
+    orch.tick()
+    assert len(kaggle.pushes) == pushes
+
+
+def test_permanent_failures_stop_with_alert_and_resume_resets_them(setup):
     orch, kaggle, _ = setup
     _to_training(orch, kaggle)
     kaggle.statuses["sn8-train-a"] = "complete"
@@ -188,11 +200,15 @@ def test_all_runs_finished_marks_done(setup):
         "results/run_a/status.json": _status("completed"),
         "results/run_b/status.json": _status("failed", orch_mod.MAX_RUN_ATTEMPTS),
     }
-    st = orch.tick()
-    assert st["phase"] == "done"
-    pushes = len(kaggle.pushes)
-    orch.tick()
-    assert len(kaggle.pushes) == pushes
+    st, alert = orch.safe_tick()
+    assert st["phase"] == "stopped" and "run_b" in st["stop_reason"] and alert
+    orch.resume("train")
+    st, _ = orch.safe_tick()
+    assert st["kernel"] == "sn8-train-b" and _job(kaggle.pushes[-1])["reset_failed"] is True
+    kaggle.statuses["sn8-train-b"] = "complete"
+    kaggle.outputs["sn8-train-b"] = {"results/run_b/status.json": _status("paused")}
+    orch.safe_tick()
+    assert _job(kaggle.pushes[-1])["reset_failed"] is False  # only the first session after resume
 
 
 def test_failed_session_without_output_keeps_last_good(setup):
@@ -337,19 +353,22 @@ def test_kaggle_reported_quota_is_preferred(setup):
     assert len(kaggle.pushes) == pushes and st["wait_until"] == reset + 600
 
 
-def test_hold_file_blocks_gpu_sessions_but_not_prepare(setup, monkeypatch, tmp_path):
+def test_hold_file_blocks_scheduled_launches_but_not_a_manual_resume(setup, monkeypatch, tmp_path):
     orch, kaggle, _ = setup
     hold = tmp_path / "HOLD"
     hold.write_text("hold")
     monkeypatch.setattr(orch_mod, "HOLD_FILE", hold)
     assert orch.tick()["kernel"] is None and not kaggle.pushes  # no smoke launch
     hold.unlink()
-    _to_training(orch, kaggle)  # smoke passes -> prepare launches
+    orch.tick()
+    kaggle.statuses["sn8-smoke"] = "complete"
+    kaggle.outputs["sn8-smoke"] = _smoke_output()
     hold.write_text("hold")
-    kaggle.statuses["sn8-prepare"] = "complete"
-    pushes = len(kaggle.pushes)
-    st = orch.tick()  # prepare finished; training held
-    assert st["phase"] == "train" and st["prepared"] and len(kaggle.pushes) == pushes
+    st = orch.tick()  # finished session still recorded; next session (prepare) held
+    assert st["phase"] == "prepare" and st["kernel"] is None and len(kaggle.pushes) == 1
+    orch.resume("smoke")
+    st, _ = orch.safe_tick(ignore_hold=True)  # what the workflow's resume action runs
+    assert st["kernel"] == "sn8-smoke" and len(kaggle.pushes) == 2
 
 
 def test_rerun_smoke_skips_prepare_once_prepared(setup):

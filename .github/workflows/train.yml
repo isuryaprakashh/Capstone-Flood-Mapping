@@ -57,6 +57,6 @@ jobs:
           case "${{ github.event.inputs.action || 'tick' }}" in
             update-code) python orchestration/kaggle_orchestrator.py tick --update-code ;;
             resume)      python orchestration/kaggle_orchestrator.py resume --phase "${{ github.event.inputs.phase }}" &&
-                         python orchestration/kaggle_orchestrator.py tick ;;
+                         python orchestration/kaggle_orchestrator.py tick --ignore-hold ;;
             *)           python orchestration/kaggle_orchestrator.py tick ;;
           esac
