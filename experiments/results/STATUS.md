@@ -2,15 +2,17 @@
 
 - **Phase:** smoke
 - **Sessions started:** 6
-- **Running:** sn8-smoke
+- **Running:** —
 - **Code commit:** 6e97ab0756d7f708c7e3d98f624d9c46b9a07603
 - **Waiting for quota until:** —
-- **Updated:** 2026-10-25T10:24:48+00:00
+- **Updated:** 2026-10-25T10:37:38+00:00
 
 Per-run progress: [PROGRESS.md](PROGRESS.md)
 
 ## Recent events
 
+- 2026-10-25T10:37:38+00:00 — Smoke test failed: runs not completed: ['smoke_siamese_unet'] — retry 1/2
+- 2026-10-25T10:37:33+00:00 — sn8-smoke (smoke) ended: error after 13 min
 - 2026-10-25T10:24:48+00:00 — Started smoke session 6 on sn8-smoke (code 6e97ab0)
 - 2026-10-25T10:24:44+00:00 — Manually resumed at phase 'smoke'
 - 2026-10-25T10:07:42+00:00 — Smoke test failed: runs not completed: ['smoke_siamese_unet'] — retry 1/2

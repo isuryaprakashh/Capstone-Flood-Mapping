@@ -40,9 +40,9 @@ eval:
   stress_shifts_px:
   - 0
   - 10
-  stress_tiles: 2
+  stress_tiles: 1
   timing_tiles: 1
-  max_tiles: 6
+  max_tiles: 3
 queue: kaggle
 id: smoke_siamese_unet
 model: siamese_unet

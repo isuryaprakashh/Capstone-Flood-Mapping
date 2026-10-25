@@ -7,7 +7,7 @@
   },
   "val_pixel_f1_at_threshold": {
     "building": 0.0,
-    "road": 0.0066,
+    "road": 0.0065,
     "flooded_building": 0.0,
     "flooded_road": 1.0
   },

@@ -1,6 +1,6 @@
 # Training progress
 
-1/6 runs completed · updated 2026-10-25T09:57:22+00:00
+1/6 runs completed · updated 2026-10-25T10:32:06+00:00
 
 | Run | Model | Protocol | Seed | State | Failed attempts | Test metrics | Last error |
 |---|---|---|---|---|---|---|---|

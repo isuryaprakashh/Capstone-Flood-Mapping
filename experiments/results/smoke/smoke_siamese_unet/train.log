@@ -1,37 +1,37 @@
-2026-10-25 09:55:42 [INFO] Loading pretrained weights from Hugging Face hub (timm/efficientnet_b5.sw_in12k_ft_in1k)
-2026-10-25 09:55:42 [INFO] HTTP Request: HEAD https://huggingface.co/timm/efficientnet_b5.sw_in12k_ft_in1k/resolve/main/model.safetensors "HTTP/1.1 302 Found"
-2026-10-25 09:55:42 [INFO] HTTP Request: GET https://huggingface.co/api/models/timm/efficientnet_b5.sw_in12k_ft_in1k/xet-read-token/13dc77aa3a148f79df28798eef496172f7611691 "HTTP/1.1 200 OK"
-2026-10-25 09:55:43 [INFO] [timm/efficientnet_b5.sw_in12k_ft_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
-2026-10-25 09:55:43 [WARNING] Unexpected keys (bn2.num_batches_tracked, bn2.bias, bn2.running_mean, bn2.running_var, bn2.weight, classifier.bias, classifier.weight, conv_head.weight) found while loading pretrained weights. This may be expected if model is being adapted.
-2026-10-25 09:55:44 [INFO] Loading pretrained weights from Hugging Face hub (timm/efficientnet_b5.sw_in12k_ft_in1k)
-2026-10-25 09:55:44 [INFO] HTTP Request: HEAD https://huggingface.co/timm/efficientnet_b5.sw_in12k_ft_in1k/resolve/main/model.safetensors "HTTP/1.1 302 Found"
-2026-10-25 09:55:44 [INFO] [timm/efficientnet_b5.sw_in12k_ft_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
-2026-10-25 09:55:44 [WARNING] Unexpected keys (bn2.num_batches_tracked, bn2.bias, bn2.running_mean, bn2.running_var, bn2.weight, classifier.bias, classifier.weight, conv_head.weight) found while loading pretrained weights. This may be expected if model is being adapted.
-2026-10-25 09:57:05 [INFO] [smoke_siamese_unet] foundation epoch 1/2 loss 4.0373 val_score 0.0000 * (81s)
-2026-10-25 09:57:06 [INFO] Pausing after 1 epoch(s) as requested
-2026-10-25 09:57:07 [INFO] Loading pretrained weights from Hugging Face hub (timm/efficientnet_b5.sw_in12k_ft_in1k)
-2026-10-25 09:57:07 [INFO] HTTP Request: HEAD https://huggingface.co/timm/efficientnet_b5.sw_in12k_ft_in1k/resolve/main/model.safetensors "HTTP/1.1 302 Found"
-2026-10-25 09:57:07 [INFO] [timm/efficientnet_b5.sw_in12k_ft_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
-2026-10-25 09:57:07 [WARNING] Unexpected keys (bn2.num_batches_tracked, bn2.bias, bn2.running_mean, bn2.running_var, bn2.weight, classifier.bias, classifier.weight, conv_head.weight) found while loading pretrained weights. This may be expected if model is being adapted.
-2026-10-25 09:57:08 [INFO] Loading pretrained weights from Hugging Face hub (timm/efficientnet_b5.sw_in12k_ft_in1k)
-2026-10-25 09:57:08 [INFO] HTTP Request: HEAD https://huggingface.co/timm/efficientnet_b5.sw_in12k_ft_in1k/resolve/main/model.safetensors "HTTP/1.1 302 Found"
-2026-10-25 09:57:08 [INFO] [timm/efficientnet_b5.sw_in12k_ft_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
-2026-10-25 09:57:08 [WARNING] Unexpected keys (bn2.num_batches_tracked, bn2.bias, bn2.running_mean, bn2.running_var, bn2.weight, classifier.bias, classifier.weight, conv_head.weight) found while loading pretrained weights. This may be expected if model is being adapted.
-2026-10-25 09:57:09 [INFO] Resuming smoke_siamese_unet at stage 0 epoch 1
-2026-10-25 09:57:12 [INFO] [smoke_siamese_unet] foundation epoch 2/2 loss 3.9868 val_score 0.0000 (3s)
-2026-10-25 09:57:14 [INFO] Stage 'flood': ran init_flood_from_foundation()
-2026-10-25 09:57:21 [INFO] [smoke_siamese_unet] flood epoch 1/2 loss 2.9429 val_score 0.0000 * (6s)
-2026-10-25 09:57:22 [INFO] Pausing after 2 epoch(s) as requested
-2026-10-25 09:57:22 [INFO] Loading pretrained weights from Hugging Face hub (timm/efficientnet_b5.sw_in12k_ft_in1k)
-2026-10-25 09:57:22 [INFO] HTTP Request: HEAD https://huggingface.co/timm/efficientnet_b5.sw_in12k_ft_in1k/resolve/main/model.safetensors "HTTP/1.1 302 Found"
-2026-10-25 09:57:22 [INFO] [timm/efficientnet_b5.sw_in12k_ft_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
-2026-10-25 09:57:22 [WARNING] Unexpected keys (bn2.num_batches_tracked, bn2.bias, bn2.running_mean, bn2.running_var, bn2.weight, classifier.bias, classifier.weight, conv_head.weight) found while loading pretrained weights. This may be expected if model is being adapted.
-2026-10-25 09:57:23 [INFO] Loading pretrained weights from Hugging Face hub (timm/efficientnet_b5.sw_in12k_ft_in1k)
-2026-10-25 09:57:23 [INFO] HTTP Request: HEAD https://huggingface.co/timm/efficientnet_b5.sw_in12k_ft_in1k/resolve/main/model.safetensors "HTTP/1.1 302 Found"
-2026-10-25 09:57:23 [INFO] [timm/efficientnet_b5.sw_in12k_ft_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
-2026-10-25 09:57:23 [WARNING] Unexpected keys (bn2.num_batches_tracked, bn2.bias, bn2.running_mean, bn2.running_var, bn2.weight, classifier.bias, classifier.weight, conv_head.weight) found while loading pretrained weights. This may be expected if model is being adapted.
-2026-10-25 09:57:24 [INFO] Resuming smoke_siamese_unet at stage 1 epoch 1
-2026-10-25 09:57:27 [INFO] [smoke_siamese_unet] flood epoch 2/2 loss 2.5619 val_score 0.0000 (4s)
-2026-10-25 09:57:42 [INFO] [smoke_siamese_unet] thresholds {'building': 0.3, 'road': 0.5, 'flooded_building': 0.3, 'flooded_road': 0.3}
-2026-10-25 09:57:46 [WARNING] CPLE_AppDefined in DeprecationWarning: 'Memory' driver is deprecated since GDAL 3.11. Use 'MEM' onwards. Further messages of this type will be suppressed.
-2026-10-25 09:58:20 [INFO] Road graph: 36290 nodes, 59827 edges
+2026-10-25 10:30:40 [INFO] Loading pretrained weights from Hugging Face hub (timm/efficientnet_b5.sw_in12k_ft_in1k)
+2026-10-25 10:30:40 [INFO] HTTP Request: HEAD https://huggingface.co/timm/efficientnet_b5.sw_in12k_ft_in1k/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-10-25 10:30:40 [INFO] HTTP Request: GET https://huggingface.co/api/models/timm/efficientnet_b5.sw_in12k_ft_in1k/xet-read-token/13dc77aa3a148f79df28798eef496172f7611691 "HTTP/1.1 200 OK"
+2026-10-25 10:30:41 [INFO] [timm/efficientnet_b5.sw_in12k_ft_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
+2026-10-25 10:30:41 [WARNING] Unexpected keys (bn2.num_batches_tracked, bn2.bias, bn2.running_mean, bn2.running_var, bn2.weight, classifier.bias, classifier.weight, conv_head.weight) found while loading pretrained weights. This may be expected if model is being adapted.
+2026-10-25 10:30:42 [INFO] Loading pretrained weights from Hugging Face hub (timm/efficientnet_b5.sw_in12k_ft_in1k)
+2026-10-25 10:30:42 [INFO] HTTP Request: HEAD https://huggingface.co/timm/efficientnet_b5.sw_in12k_ft_in1k/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-10-25 10:30:42 [INFO] [timm/efficientnet_b5.sw_in12k_ft_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
+2026-10-25 10:30:42 [WARNING] Unexpected keys (bn2.num_batches_tracked, bn2.bias, bn2.running_mean, bn2.running_var, bn2.weight, classifier.bias, classifier.weight, conv_head.weight) found while loading pretrained weights. This may be expected if model is being adapted.
+2026-10-25 10:31:51 [INFO] [smoke_siamese_unet] foundation epoch 1/2 loss 4.0373 val_score 0.0000 * (69s)
+2026-10-25 10:31:52 [INFO] Pausing after 1 epoch(s) as requested
+2026-10-25 10:31:53 [INFO] Loading pretrained weights from Hugging Face hub (timm/efficientnet_b5.sw_in12k_ft_in1k)
+2026-10-25 10:31:53 [INFO] HTTP Request: HEAD https://huggingface.co/timm/efficientnet_b5.sw_in12k_ft_in1k/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-10-25 10:31:53 [INFO] [timm/efficientnet_b5.sw_in12k_ft_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
+2026-10-25 10:31:53 [WARNING] Unexpected keys (bn2.num_batches_tracked, bn2.bias, bn2.running_mean, bn2.running_var, bn2.weight, classifier.bias, classifier.weight, conv_head.weight) found while loading pretrained weights. This may be expected if model is being adapted.
+2026-10-25 10:31:53 [INFO] Loading pretrained weights from Hugging Face hub (timm/efficientnet_b5.sw_in12k_ft_in1k)
+2026-10-25 10:31:53 [INFO] HTTP Request: HEAD https://huggingface.co/timm/efficientnet_b5.sw_in12k_ft_in1k/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-10-25 10:31:53 [INFO] [timm/efficientnet_b5.sw_in12k_ft_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
+2026-10-25 10:31:53 [WARNING] Unexpected keys (bn2.num_batches_tracked, bn2.bias, bn2.running_mean, bn2.running_var, bn2.weight, classifier.bias, classifier.weight, conv_head.weight) found while loading pretrained weights. This may be expected if model is being adapted.
+2026-10-25 10:31:54 [INFO] Resuming smoke_siamese_unet at stage 0 epoch 1
+2026-10-25 10:31:58 [INFO] [smoke_siamese_unet] foundation epoch 2/2 loss 3.9863 val_score 0.0000 (3s)
+2026-10-25 10:32:00 [INFO] Stage 'flood': ran init_flood_from_foundation()
+2026-10-25 10:32:06 [INFO] [smoke_siamese_unet] flood epoch 1/2 loss 2.9425 val_score 0.0000 * (6s)
+2026-10-25 10:32:06 [INFO] Pausing after 2 epoch(s) as requested
+2026-10-25 10:32:07 [INFO] Loading pretrained weights from Hugging Face hub (timm/efficientnet_b5.sw_in12k_ft_in1k)
+2026-10-25 10:32:07 [INFO] HTTP Request: HEAD https://huggingface.co/timm/efficientnet_b5.sw_in12k_ft_in1k/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-10-25 10:32:07 [INFO] [timm/efficientnet_b5.sw_in12k_ft_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
+2026-10-25 10:32:07 [WARNING] Unexpected keys (bn2.num_batches_tracked, bn2.bias, bn2.running_mean, bn2.running_var, bn2.weight, classifier.bias, classifier.weight, conv_head.weight) found while loading pretrained weights. This may be expected if model is being adapted.
+2026-10-25 10:32:07 [INFO] Loading pretrained weights from Hugging Face hub (timm/efficientnet_b5.sw_in12k_ft_in1k)
+2026-10-25 10:32:07 [INFO] HTTP Request: HEAD https://huggingface.co/timm/efficientnet_b5.sw_in12k_ft_in1k/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-10-25 10:32:07 [INFO] [timm/efficientnet_b5.sw_in12k_ft_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
+2026-10-25 10:32:07 [WARNING] Unexpected keys (bn2.num_batches_tracked, bn2.bias, bn2.running_mean, bn2.running_var, bn2.weight, classifier.bias, classifier.weight, conv_head.weight) found while loading pretrained weights. This may be expected if model is being adapted.
+2026-10-25 10:32:08 [INFO] Resuming smoke_siamese_unet at stage 1 epoch 1
+2026-10-25 10:32:12 [INFO] [smoke_siamese_unet] flood epoch 2/2 loss 2.6011 val_score 0.0000 (3s)
+2026-10-25 10:32:25 [INFO] [smoke_siamese_unet] thresholds {'building': 0.3, 'road': 0.5, 'flooded_building': 0.3, 'flooded_road': 0.3}
+2026-10-25 10:32:28 [WARNING] CPLE_AppDefined in DeprecationWarning: 'Memory' driver is deprecated since GDAL 3.11. Use 'MEM' onwards. Further messages of this type will be suppressed.
+2026-10-25 10:32:58 [INFO] Road graph: 35940 nodes, 59787 edges
