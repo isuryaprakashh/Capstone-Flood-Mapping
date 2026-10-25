@@ -92,8 +92,13 @@ def road_length_f1(
 
     gt_matched = pred_matched = 0.0
     if not pred.is_empty and not gt.is_empty:
-        gt_matched = gt.intersection(pred.buffer(buffer_px)).length
         pred_matched = pred.intersection(gt.buffer(buffer_px)).length
+        # Only predicted lines within buffer_px of the reference can match it, so buffering just
+        # those gives the same result as buffering the whole prediction, which explodes in memory
+        # and time on the dense road meshes an untrained model produces
+        near = pred.intersection(gt.buffer(buffer_px * 1.01))
+        if not near.is_empty:
+            gt_matched = gt.intersection(near.buffer(buffer_px)).length
 
     lengths = {
         "gt_m": gt.length * gsd_m,

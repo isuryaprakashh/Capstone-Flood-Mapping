@@ -35,6 +35,8 @@ ABORT_EXIT_CODE = 3  # a worker gave up after repeated failures: the session fai
 WORKER_GRACE_S = 900  # terminate workers still running this long after the deadline
 MAX_WORKER_RESTARTS = 2
 RESTART_MIN_SECONDS = 2700
+WORKER_RAM_FRACTION = 0.4  # memory guard (training/memguard.py)
+SINGLE_RAM_FRACTION = 0.75
 
 SMOKE_MODELS = ("ra_fusion", "sn8_baseline", "siamese_unet", "snunet", "unet_v0", "siamese_v0")
 
@@ -75,7 +77,15 @@ def main():
     parser.add_argument("--session", type=str, default=None, help=argparse.SUPPRESS)
     args = parser.parse_args()
 
+    from training import memguard
     from training.queue import QueueAborted, reset_failed, run_worker, write_progress
+
+    # One GPU worker of several may use 40% of RAM; a lone process (smoke, single GPU) 75%.
+    # The supervisor (multi-GPU parent) only waits, so it needs no guard.
+    if args.worker is not None:
+        memguard.start(WORKER_RAM_FRACTION)
+    elif args.smoke or args.gpus <= 1:
+        memguard.start(SINGLE_RAM_FRACTION)
 
     runs = load_runs(args.runs_file)
     if args.smoke:

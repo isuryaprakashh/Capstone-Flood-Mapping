@@ -1,3 +1,0 @@
-Pipeline hold: while this file exists on main, the orchestrator still records finished
-Kaggle sessions but starts no new session. A manual 'resume' run ignores it.
-Delete this file to let the pipeline continue on its own.

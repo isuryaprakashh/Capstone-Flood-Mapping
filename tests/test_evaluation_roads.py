@@ -92,3 +92,21 @@ def test_aggregate_sums_lengths():
 def test_invalid_gsd_raises():
     with pytest.raises(ValueError):
         road_length_f1(_fc(ROAD), _fc(ROAD), 0.0)
+
+
+def test_dense_noisy_prediction_does_not_blow_up():
+    # An untrained model's road "mesh": buffering all of it used to exhaust memory
+    import time
+    step = 10
+    mesh = [[(x, y), (x + step, y)] for x in range(0, 600, step) for y in range(0, 600, step)] + \
+           [[(x, y), (x, y + step)] for x in range(0, 600, step) for y in range(0, 600, step)]
+    pred = {"type": "FeatureCollection", "features": [
+        {"type": "Feature", "geometry": {"type": "LineString", "coordinates": [list(map(float, p)) for p in l]},
+         "properties": {"flooded": False}} for l in mesh]}
+    gt = {"type": "FeatureCollection", "features": [
+        {"type": "Feature", "geometry": {"type": "LineString", "coordinates": [[0.0, 305.0], [600.0, 305.0]]},
+         "properties": {"flooded": False}}]}
+    t0 = time.time()
+    r = road_length_f1(pred, gt, 0.5)
+    assert r["recall"] == pytest.approx(1.0) and r["precision"] < 0.05
+    assert time.time() - t0 < 60
