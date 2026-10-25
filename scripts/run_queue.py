@@ -35,7 +35,7 @@ SMOKE_MODELS = ("ra_fusion", "sn8_baseline", "siamese_unet", "snunet", "unet_v0"
 
 
 def smoke_runs(runs: dict) -> list[dict]:
-    """One short configuration per model: 2 epochs (or 1 per stage), small crops."""
+    """One short configuration per model: 2 epochs per stage, small crops."""
     picked = {}
     for cfg in runs.values():
         if cfg["model"] in SMOKE_MODELS and cfg["model"] not in picked and cfg["protocol"] == "P1":
@@ -47,7 +47,7 @@ def smoke_runs(runs: dict) -> list[dict]:
             c["num_workers"] = 0
             c["deadline_margin_s"] = 0
             if c.get("stages"):
-                c["stages"] = [{**s, "epochs": 1} for s in c["stages"]]
+                c["stages"] = [{**s, "epochs": 2} for s in c["stages"]]  # a mid-stage resume in each
             c["eval"] = {**c["eval"], "window": 256, "overlap": 32, "stress_tiles": 2, "timing_tiles": 1,
                          "threshold_grid": [0.3, 0.5], "stress_shifts_px": [0, 10], "max_tiles": 6}
             picked[cfg["model"]] = c

@@ -119,7 +119,7 @@ def run_worker(
             st["attempts"] = st.get("attempts", 0) + 1
             st.update({"state": "failed", "error": f"{type(e).__name__}: {e}"})
             (results_dir / run_id / "error.log").write_text(
-                f"[{_now()}] attempt {st['attempts']}\n{traceback.format_exc()}\n"
+                f"[{_now()}] attempt {st['attempts']}\n{traceback.format_exc()}\n", encoding="utf-8"
             )
             logger.error(f"[worker {worker}] {run_id} failed (attempt {st['attempts']}): {e}")
             if torch.cuda.is_available():
@@ -160,5 +160,5 @@ def write_progress(runs: list[dict], results_dir: Union[str, Path]):
         "",
     ]
     tmp = results_dir / "PROGRESS.md.tmp"
-    tmp.write_text("\n".join(text))
+    tmp.write_text("\n".join(text), encoding="utf-8")
     os.replace(tmp, results_dir / "PROGRESS.md")
