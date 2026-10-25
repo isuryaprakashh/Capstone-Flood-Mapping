@@ -1,0 +1,13 @@
+{
+  "id": "smoke_unet_v0",
+  "state": "completed",
+  "attempts": 0,
+  "session": "24a3ecc7-9",
+  "worker": "0",
+  "pid": 81,
+  "started_at": "2026-10-25T11:15:35+00:00",
+  "updated_at": "2026-10-25T11:16:17+00:00",
+  "error": null,
+  "seconds_total": 42.5,
+  "completed_at": "2026-10-25T11:16:17+00:00"
+}

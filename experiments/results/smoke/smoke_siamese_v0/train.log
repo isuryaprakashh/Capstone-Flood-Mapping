@@ -1,0 +1,15 @@
+2026-10-25 11:14:53 [INFO] [smoke_siamese_v0] joint epoch 1/2 loss 6.0731 val_score 0.0000 * (25s)
+2026-10-25 11:14:53 [INFO] Pausing after 1 epoch(s) as requested
+2026-10-25 11:14:54 [INFO] Resuming smoke_siamese_v0 at stage 0 epoch 1
+2026-10-25 11:14:56 [INFO] [smoke_siamese_v0] joint epoch 2/2 loss 7.2061 val_score 0.0000 (2s)
+2026-10-25 11:15:01 [INFO] [smoke_siamese_v0] thresholds {'building': 0.3, 'road': 0.3, 'flooded_building': 0.3, 'flooded_road': 0.3}
+2026-10-25 11:15:07 [INFO] Road graph: 0 nodes, 0 edges
+2026-10-25 11:15:13 [INFO] Road graph: 0 nodes, 0 edges
+2026-10-25 11:15:19 [INFO] Road graph: 0 nodes, 0 edges
+2026-10-25 11:15:19 [WARNING] Statistic undefined in 305 of 1000 bootstrap replicates
+2026-10-25 11:15:19 [INFO] [smoke_siamese_v0] test {'building_f1': 0.0, 'flooded_building_f1': 0.0, 'building_flood_iou': 0.0002568047843796419, 'apls': 0.0, 'apls_flooded_network': 0.0, 'flooded_road_f1': 0.0}
+2026-10-25 11:15:24 [INFO] Road graph: 0 nodes, 0 edges
+2026-10-25 11:15:29 [INFO] Road graph: 0 nodes, 0 edges
+2026-10-25 11:15:29 [WARNING] Statistic undefined in 1000 of 1000 bootstrap replicates
+2026-10-25 11:15:29 [WARNING] Statistic undefined in 1000 of 1000 bootstrap replicates
+2026-10-25 11:15:35 [INFO] Road graph: 0 nodes, 0 edges

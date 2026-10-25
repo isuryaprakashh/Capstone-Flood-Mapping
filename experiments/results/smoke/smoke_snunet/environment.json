@@ -1,0 +1,11 @@
+{
+  "python": "3.13.15",
+  "platform": "Linux-6.18.55+-x86_64-with-glibc2.39",
+  "torch": "2.11.0+cu128",
+  "cuda": "12.8",
+  "gpu": "Tesla T4",
+  "gpu_count": 2,
+  "cuda_visible_devices": null,
+  "git_commit": "b4a70bbf473ece101d97b2a5892dc7c8ff07711a",
+  "kaggle_kernel_run": "Batch"
+}

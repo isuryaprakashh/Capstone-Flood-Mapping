@@ -1,0 +1,160 @@
+{
+  "summary": {
+    "building_f1": 0.0,
+    "flooded_building_f1": 0.0,
+    "building_flood_iou": 0.00026807400471651514,
+    "apls": 0.00021487515633248312,
+    "apls_flooded_network": 1.4487829765400257e-06,
+    "flooded_road_f1": 0.0009778373999030552
+  },
+  "metrics": {
+    "building": {
+      "all": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "iou": 0.0
+      },
+      "flooded": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "iou": 0.0
+      },
+      "non_flooded": {
+        "precision": null,
+        "recall": 0.0,
+        "f1": 0.0,
+        "iou": 0.0
+      },
+      "state_accuracy": null,
+      "pixel_iou_flooded": 0.0005361480094330303,
+      "pixel_iou_non_flooded": 0.0,
+      "flood_iou": 0.00026807400471651514
+    },
+    "road_length": {
+      "gt_m": 786.5489935153704,
+      "pred_m": 600943.8018447584,
+      "gt_matched_m": 786.5489935153704,
+      "pred_matched_m": 7072.713978357995,
+      "precision": 0.011769343417215385,
+      "recall": 1.0,
+      "f1": 0.023264874536452824,
+      "n_tiles": 3
+    },
+    "flooded_road_length": {
+      "gt_m": 33.276705794849214,
+      "pred_m": 600943.8018447584,
+      "gt_matched_m": 33.276705794849214,
+      "pred_matched_m": 293.9563831145425,
+      "precision": 0.0004891578583757157,
+      "recall": 1.0,
+      "f1": 0.0009778373999030552,
+      "n_tiles": 3
+    },
+    "apls": 0.00021487515633248312,
+    "apls_traversable": 0.0,
+    "apls_flooded_network": 1.4487829765400257e-06,
+    "pixel": {
+      "building": {
+        "precision": 0.0017903906289711937,
+        "recall": 0.9803000801740923,
+        "f1": 0.0035742533489572068,
+        "iou": 0.0017903262142120399
+      },
+      "road": {
+        "precision": 0.005852432130934641,
+        "recall": 0.6523756495916853,
+        "f1": 0.01160079406857835,
+        "iou": 0.005834237930679626
+      },
+      "flooded_building": {
+        "precision": 0.0005136095687592838,
+        "recall": 1.0,
+        "f1": 0.0010266918187762772,
+        "iou": 0.0005136095687592838
+      },
+      "flooded_road": {
+        "precision": 0.00022643834133914968,
+        "recall": 0.601237842617153,
+        "f1": 0.00045270618436592507,
+        "iou": 0.0002264043395052932
+      }
+    },
+    "n_tiles": 3,
+    "n_tiles_with_roads": 3,
+    "n_tiles_with_flooded_roads": 1,
+    "sn8_road_score": 7.243914882700129e-07
+  },
+  "ci": {
+    "building_f1": {
+      "estimate": 0.0,
+      "low": 0.0,
+      "high": 0.0,
+      "std": 0.0,
+      "n_boot": 1000,
+      "n_tiles": 3,
+      "alpha": 0.05
+    },
+    "flooded_building_f1": {
+      "estimate": 0.0,
+      "low": 0.0,
+      "high": 0.0,
+      "std": 0.0,
+      "n_boot": 1000,
+      "n_tiles": 3,
+      "alpha": 0.05
+    },
+    "building_flood_iou": {
+      "estimate": 0.00026807400471651514,
+      "low": 0.0,
+      "high": 0.0015557981207995118,
+      "std": 0.0003337070932260969,
+      "n_boot": 1000,
+      "n_tiles": 3,
+      "alpha": 0.05
+    },
+    "apls": {
+      "estimate": 0.00021487515633248312,
+      "low": 2.4521260741849557e-06,
+      "high": 0.0006378153767038509,
+      "std": 0.00017222829426755592,
+      "n_boot": 1000,
+      "n_tiles": 3,
+      "alpha": 0.05
+    },
+    "apls_flooded_network": {
+      "estimate": 1.4487829765400257e-06,
+      "low": 1.4487829765400257e-06,
+      "high": 1.4487829765400257e-06,
+      "std": 0.0,
+      "n_boot": 1000,
+      "n_tiles": 1,
+      "alpha": 0.05
+    },
+    "road_f1": {
+      "estimate": 0.023264874536452824,
+      "low": 0.0025423384451206286,
+      "high": 0.05817577926067598,
+      "std": 0.015598910620511719,
+      "n_boot": 1000,
+      "n_tiles": 3,
+      "alpha": 0.05
+    },
+    "flooded_road_f1": {
+      "estimate": 0.0009778373999030552,
+      "low": 0.0,
+      "high": 0.0030995586307895565,
+      "std": 0.0008503285191578223,
+      "n_boot": 1000,
+      "n_tiles": 3,
+      "alpha": 0.05
+    }
+  },
+  "thresholds": {
+    "building": 0.3,
+    "road": 0.5,
+    "flooded_building": 0.3,
+    "flooded_road": 0.3
+  }
+}

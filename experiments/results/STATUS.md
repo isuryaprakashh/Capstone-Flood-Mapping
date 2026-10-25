@@ -1,16 +1,19 @@
 # Orchestrator status
 
 - **Phase:** smoke
-- **Sessions started:** 7
+- **Sessions started:** 8
 - **Running:** sn8-smoke
 - **Code commit:** b4a70bbf473ece101d97b2a5892dc7c8ff07711a
 - **Waiting for quota until:** —
-- **Updated:** 2026-10-25T10:56:02+00:00
+- **Updated:** 2026-10-25T11:26:45+00:00
 
 Per-run progress: [PROGRESS.md](PROGRESS.md)
 
 ## Recent events
 
+- 2026-10-25T11:26:45+00:00 — Started smoke session 8 on sn8-smoke (code b4a70bb)
+- 2026-10-25T11:26:43+00:00 — Smoke test failed: models do not fit their batch size: ["ra_fusion {'backbone': 'convnext_tiny.dinov3_lvd1689m'}"] (see smoke/gpu_probe.json) — retry 2/2
+- 2026-10-25T11:26:29+00:00 — sn8-smoke (smoke) ended: complete after 30 min
 - 2026-10-25T10:56:02+00:00 — Started smoke session 7 on sn8-smoke (code b4a70bb)
 - 2026-10-25T10:37:38+00:00 — Smoke test failed: runs not completed: ['smoke_siamese_unet'] — retry 1/2
 - 2026-10-25T10:37:33+00:00 — sn8-smoke (smoke) ended: error after 13 min

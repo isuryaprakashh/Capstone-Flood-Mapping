@@ -6,6 +6,6 @@
   "gpu": "Tesla T4",
   "gpu_count": 2,
   "cuda_visible_devices": null,
-  "git_commit": "6e97ab0756d7f708c7e3d98f624d9c46b9a07603",
+  "git_commit": "b4a70bbf473ece101d97b2a5892dc7c8ff07711a",
   "kaggle_kernel_run": "Batch"
 }

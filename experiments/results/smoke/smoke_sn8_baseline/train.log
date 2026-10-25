@@ -1,0 +1,42 @@
+2026-10-25 11:12:00 [INFO] Loading pretrained weights from Hugging Face hub (timm/resnet34.tv_in1k)
+2026-10-25 11:12:00 [INFO] HTTP Request: HEAD https://huggingface.co/timm/resnet34.tv_in1k/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-10-25 11:12:00 [INFO] HTTP Request: GET https://huggingface.co/api/models/timm/resnet34.tv_in1k/xet-read-token/1b7b21cca82ff974d341713f777bf740c2db38c4 "HTTP/1.1 200 OK"
+2026-10-25 11:12:01 [INFO] [timm/resnet34.tv_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
+2026-10-25 11:12:01 [INFO] Missing keys (fc.weight, fc.bias) discovered while loading pretrained weights. This is expected if model is being adapted.
+2026-10-25 11:12:01 [INFO] Loading pretrained weights from Hugging Face hub (timm/resnet34.tv_in1k)
+2026-10-25 11:12:01 [INFO] HTTP Request: HEAD https://huggingface.co/timm/resnet34.tv_in1k/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-10-25 11:12:01 [INFO] [timm/resnet34.tv_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
+2026-10-25 11:12:01 [INFO] Missing keys (fc.weight, fc.bias) discovered while loading pretrained weights. This is expected if model is being adapted.
+2026-10-25 11:12:14 [INFO] [smoke_sn8_baseline] foundation epoch 1/2 loss 7.5495 val_score 0.0000 * (12s)
+2026-10-25 11:12:14 [INFO] Pausing after 1 epoch(s) as requested
+2026-10-25 11:12:14 [INFO] Loading pretrained weights from Hugging Face hub (timm/resnet34.tv_in1k)
+2026-10-25 11:12:14 [INFO] HTTP Request: HEAD https://huggingface.co/timm/resnet34.tv_in1k/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-10-25 11:12:14 [INFO] [timm/resnet34.tv_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
+2026-10-25 11:12:14 [INFO] Missing keys (fc.weight, fc.bias) discovered while loading pretrained weights. This is expected if model is being adapted.
+2026-10-25 11:12:15 [INFO] Loading pretrained weights from Hugging Face hub (timm/resnet34.tv_in1k)
+2026-10-25 11:12:15 [INFO] HTTP Request: HEAD https://huggingface.co/timm/resnet34.tv_in1k/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-10-25 11:12:15 [INFO] [timm/resnet34.tv_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
+2026-10-25 11:12:15 [INFO] Missing keys (fc.weight, fc.bias) discovered while loading pretrained weights. This is expected if model is being adapted.
+2026-10-25 11:12:15 [INFO] Resuming smoke_sn8_baseline at stage 0 epoch 1
+2026-10-25 11:12:17 [INFO] [smoke_sn8_baseline] foundation epoch 2/2 loss 5.7602 val_score 0.0000 (2s)
+2026-10-25 11:12:20 [INFO] [smoke_sn8_baseline] flood epoch 1/2 loss 5.0578 val_score 0.0000 * (2s)
+2026-10-25 11:12:20 [INFO] Pausing after 2 epoch(s) as requested
+2026-10-25 11:12:21 [INFO] Loading pretrained weights from Hugging Face hub (timm/resnet34.tv_in1k)
+2026-10-25 11:12:21 [INFO] HTTP Request: HEAD https://huggingface.co/timm/resnet34.tv_in1k/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-10-25 11:12:21 [INFO] [timm/resnet34.tv_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
+2026-10-25 11:12:21 [INFO] Missing keys (fc.weight, fc.bias) discovered while loading pretrained weights. This is expected if model is being adapted.
+2026-10-25 11:12:22 [INFO] Loading pretrained weights from Hugging Face hub (timm/resnet34.tv_in1k)
+2026-10-25 11:12:22 [INFO] HTTP Request: HEAD https://huggingface.co/timm/resnet34.tv_in1k/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-10-25 11:12:22 [INFO] [timm/resnet34.tv_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
+2026-10-25 11:12:22 [INFO] Missing keys (fc.weight, fc.bias) discovered while loading pretrained weights. This is expected if model is being adapted.
+2026-10-25 11:12:22 [INFO] Resuming smoke_sn8_baseline at stage 1 epoch 1
+2026-10-25 11:12:24 [INFO] [smoke_sn8_baseline] flood epoch 2/2 loss 5.0092 val_score 0.0000 (2s)
+2026-10-25 11:12:27 [INFO] [smoke_sn8_baseline] thresholds {'building': 0.3, 'road': 0.3, 'flooded_building': 0.3, 'flooded_road': 0.3}
+2026-10-25 11:12:30 [INFO] Road graph: 211 nodes, 263 edges
+2026-10-25 11:12:35 [INFO] Road graph: 128 nodes, 129 edges
+2026-10-25 11:12:39 [INFO] Road graph: 236 nodes, 306 edges
+2026-10-25 11:12:40 [WARNING] Statistic undefined in 305 of 1000 bootstrap replicates
+2026-10-25 11:12:40 [INFO] [smoke_sn8_baseline] test {'building_f1': 0.0, 'flooded_building_f1': 0.0, 'building_flood_iou': 0.0006967607748559444, 'apls': 0.0, 'apls_flooded_network': 0.0, 'flooded_road_f1': 0.005098533717357553}
+2026-10-25 11:12:43 [INFO] Road graph: 923 nodes, 930 edges
+2026-10-25 11:12:47 [INFO] Road graph: 917 nodes, 924 edges
+2026-10-25 11:12:51 [INFO] Road graph: 155 nodes, 154 edges

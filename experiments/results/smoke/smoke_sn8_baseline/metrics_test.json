@@ -1,0 +1,160 @@
+{
+  "summary": {
+    "building_f1": 0.0,
+    "flooded_building_f1": 0.0,
+    "building_flood_iou": 0.0006967607748559444,
+    "apls": 0.0,
+    "apls_flooded_network": 0.0,
+    "flooded_road_f1": 0.005098533717357553
+  },
+  "metrics": {
+    "building": {
+      "all": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "iou": 0.0
+      },
+      "flooded": {
+        "precision": null,
+        "recall": 0.0,
+        "f1": 0.0,
+        "iou": 0.0
+      },
+      "non_flooded": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "iou": 0.0
+      },
+      "state_accuracy": null,
+      "pixel_iou_flooded": 0.0,
+      "pixel_iou_non_flooded": 0.0013935215497118889,
+      "flood_iou": 0.0006967607748559444
+    },
+    "road_length": {
+      "gt_m": 786.5489935153704,
+      "pred_m": 5411.287508335017,
+      "gt_matched_m": 56.60489579704202,
+      "pred_matched_m": 81.75519204024262,
+      "precision": 0.015108269873725048,
+      "recall": 0.07196614103344584,
+      "f1": 0.024973671809574452,
+      "n_tiles": 3
+    },
+    "flooded_road_length": {
+      "gt_m": 33.276705794849214,
+      "pred_m": 5411.287508335017,
+      "gt_matched_m": 10.009771999464984,
+      "pred_matched_m": 13.912723999736391,
+      "precision": 0.0025710561448281195,
+      "recall": 0.3008041739821002,
+      "f1": 0.005098533717357553,
+      "n_tiles": 3
+    },
+    "apls": 0.0,
+    "apls_traversable": 0.0,
+    "apls_flooded_network": 0.0,
+    "pixel": {
+      "building": {
+        "precision": 0.0019350746533261616,
+        "recall": 0.9563623868972626,
+        "f1": 0.0038623343763948925,
+        "iou": 0.00193490381094947
+      },
+      "road": {
+        "precision": 0.0058989697573944835,
+        "recall": 0.007906458797327395,
+        "f1": 0.006756756756756757,
+        "iou": 0.003389830508474576
+      },
+      "flooded_building": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "iou": 0.0
+      },
+      "flooded_road": {
+        "precision": 0.001385540499348796,
+        "recall": 0.04420866489832007,
+        "f1": 0.002686871943683164,
+        "iou": 0.0013452432199741713
+      }
+    },
+    "n_tiles": 3,
+    "n_tiles_with_roads": 3,
+    "n_tiles_with_flooded_roads": 1,
+    "sn8_road_score": 0.0
+  },
+  "ci": {
+    "building_f1": {
+      "estimate": 0.0,
+      "low": 0.0,
+      "high": 0.0,
+      "std": 0.0,
+      "n_boot": 1000,
+      "n_tiles": 3,
+      "alpha": 0.05
+    },
+    "flooded_building_f1": {
+      "estimate": 0.0,
+      "low": 0.0,
+      "high": 0.0,
+      "std": 0.0,
+      "n_boot": 695,
+      "n_tiles": 3,
+      "alpha": 0.05
+    },
+    "building_flood_iou": {
+      "estimate": 0.0006967607748559444,
+      "low": 0.0,
+      "high": 0.0036673708576488388,
+      "std": 0.0009134739823379495,
+      "n_boot": 1000,
+      "n_tiles": 3,
+      "alpha": 0.05
+    },
+    "apls": {
+      "estimate": 0.0,
+      "low": 0.0,
+      "high": 0.0,
+      "std": 0.0,
+      "n_boot": 1000,
+      "n_tiles": 3,
+      "alpha": 0.05
+    },
+    "apls_flooded_network": {
+      "estimate": 0.0,
+      "low": 0.0,
+      "high": 0.0,
+      "std": 0.0,
+      "n_boot": 1000,
+      "n_tiles": 1,
+      "alpha": 0.05
+    },
+    "road_f1": {
+      "estimate": 0.024973671809574452,
+      "low": 0.015255683583814832,
+      "high": 0.03219059823937914,
+      "std": 0.0048374010902868855,
+      "n_boot": 1000,
+      "n_tiles": 3,
+      "alpha": 0.05
+    },
+    "flooded_road_f1": {
+      "estimate": 0.005098533717357553,
+      "low": 0.0,
+      "high": 0.015255683583814832,
+      "std": 0.004250300257976455,
+      "n_boot": 1000,
+      "n_tiles": 3,
+      "alpha": 0.05
+    }
+  },
+  "thresholds": {
+    "building": 0.3,
+    "road": 0.3,
+    "flooded_building": 0.3,
+    "flooded_road": 0.3
+  }
+}

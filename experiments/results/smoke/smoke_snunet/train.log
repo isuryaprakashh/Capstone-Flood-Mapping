@@ -1,0 +1,16 @@
+2026-10-25 11:13:36 [INFO] [smoke_snunet] joint epoch 1/2 loss 24.1686 val_score 0.0000 * (44s)
+2026-10-25 11:13:36 [INFO] Pausing after 1 epoch(s) as requested
+2026-10-25 11:13:36 [INFO] Resuming smoke_snunet at stage 0 epoch 1
+2026-10-25 11:13:38 [INFO] [smoke_snunet] joint epoch 2/2 loss 29.1592 val_score 0.0000 (2s)
+2026-10-25 11:13:43 [INFO] [smoke_snunet] thresholds {'building': 0.3, 'road': 0.3, 'flooded_building': 0.3, 'flooded_road': 0.3}
+2026-10-25 11:13:50 [INFO] Road graph: 0 nodes, 0 edges
+2026-10-25 11:13:58 [INFO] Road graph: 0 nodes, 0 edges
+2026-10-25 11:14:05 [INFO] Road graph: 0 nodes, 0 edges
+2026-10-25 11:14:06 [WARNING] Statistic undefined in 38 of 1000 bootstrap replicates
+2026-10-25 11:14:06 [WARNING] Statistic undefined in 305 of 1000 bootstrap replicates
+2026-10-25 11:14:06 [INFO] [smoke_snunet] test {'building_f1': 0.002758620689655172, 'flooded_building_f1': 0.0, 'building_flood_iou': 0.0020808808155105105, 'apls': 0.0, 'apls_flooded_network': 0.0, 'flooded_road_f1': 0.0}
+2026-10-25 11:14:11 [INFO] Road graph: 0 nodes, 0 edges
+2026-10-25 11:14:17 [INFO] Road graph: 0 nodes, 0 edges
+2026-10-25 11:14:17 [WARNING] Statistic undefined in 1000 of 1000 bootstrap replicates
+2026-10-25 11:14:17 [WARNING] Statistic undefined in 1000 of 1000 bootstrap replicates
+2026-10-25 11:14:25 [INFO] Road graph: 11531 nodes, 17959 edges

@@ -1,0 +1,13 @@
+{
+  "id": "smoke_sn8_baseline",
+  "state": "completed",
+  "attempts": 0,
+  "session": "24a3ecc7-6",
+  "worker": "0",
+  "pid": 81,
+  "started_at": "2026-10-25T11:12:00+00:00",
+  "updated_at": "2026-10-25T11:12:52+00:00",
+  "error": null,
+  "seconds_total": 52.0,
+  "completed_at": "2026-10-25T11:12:52+00:00"
+}

@@ -1,0 +1,23 @@
+{
+  "shift_px": {
+    "0": {
+      "building_f1": 0.0,
+      "flooded_building_f1": 0.0,
+      "building_flood_iou": 0.0004474174287893014,
+      "apls": 0.00045584207617547156,
+      "flooded_road_f1": 0.0,
+      "n_tiles": 1
+    },
+    "10": {
+      "building_f1": 0.0,
+      "flooded_building_f1": 0.0,
+      "building_flood_iou": 0.0004474174287893014,
+      "apls": 0.00045584207617547156,
+      "flooded_road_f1": 0.0,
+      "n_tiles": 1
+    }
+  },
+  "tiles": [
+    "Germany_Training_Public/0_20_68"
+  ]
+}
