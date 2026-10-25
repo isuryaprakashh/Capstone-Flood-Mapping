@@ -207,8 +207,9 @@ class GitResultsStore:
 
     def commit(self, message: str):
         self._git("add", "-A", cwd=self.worktree)
-        if not self._git("status", "--porcelain", cwd=self.worktree).stdout.strip():
-            return
+        changed = self._git("diff", "--cached", "--name-only", cwd=self.worktree).stdout.split()
+        if not changed or changed == ["experiments/results/STATUS.md"]:
+            return  # nothing, or only STATUS.md's timestamp: no commit every tick while waiting
         self._git("-c", f"user.name={self.name}", "-c", f"user.email={self.email}",
                   "commit", "-q", "-m", message, cwd=self.worktree)
         self._git("push", "-q", "origin", f"HEAD:{self.branch}", cwd=self.worktree)

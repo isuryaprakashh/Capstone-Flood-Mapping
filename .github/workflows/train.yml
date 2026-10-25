@@ -2,11 +2,19 @@ name: Train on Kaggle
 
 # Drives the Kaggle training pipeline (orchestration/kaggle_orchestrator.py):
 # smoke test → dataset preparation → training sessions → done.
+#
+# Each run stays alive ~5.7 h, checking Kaggle every 10 minutes, and then
+# starts its successor (orchestration/loop.sh), so the pipeline does not rely
+# on GitHub's schedule. A push of orchestrator changes restarts the chain with
+# the new code; the schedule below only restarts it if it ever breaks.
 # Status: experiments/results/STATUS.md and PROGRESS.md on the `results` branch.
 
 on:
+  push:
+    branches: [main]
+    paths: [".github/workflows/train.yml", "orchestration/**"]
   schedule:
-    - cron: "*/30 * * * *"
+    - cron: "17 */3 * * *"
   workflow_dispatch:
     inputs:
       action:
@@ -33,13 +41,15 @@ jobs:
     # Skipped (not failed) until the KAGGLE_USERNAME repository variable is set
     if: ${{ vars.KAGGLE_USERNAME != '' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 355
     env:
       KAGGLE_API_TOKEN: ${{ secrets.KAGGLE_API_TOKEN }}
       KAGGLE_USERNAME: ${{ vars.KAGGLE_USERNAME }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       RESULTS_GIT_NAME: isuryaprakashh
       RESULTS_GIT_EMAIL: isurya2005@gmail.com
+      LOOP_SECONDS: "20400"
+      TICK_EVERY: "600"
     steps:
       - uses: actions/checkout@v4
         with:
@@ -52,11 +62,5 @@ jobs:
       - name: Install orchestrator dependencies
         run: pip install --quiet "kaggle>=1.8.0" "pyyaml>=6.0"
 
-      - name: Run orchestrator
-        run: |
-          case "${{ github.event.inputs.action || 'tick' }}" in
-            update-code) python orchestration/kaggle_orchestrator.py tick --update-code ;;
-            resume)      python orchestration/kaggle_orchestrator.py resume --phase "${{ github.event.inputs.phase }}" &&
-                         python orchestration/kaggle_orchestrator.py tick --ignore-hold ;;
-            *)           python orchestration/kaggle_orchestrator.py tick ;;
-          esac
+      - name: Orchestrate
+        run: bash orchestration/loop.sh "${{ github.event.inputs.action || 'tick' }}" "${{ github.event.inputs.phase || 'train' }}"
