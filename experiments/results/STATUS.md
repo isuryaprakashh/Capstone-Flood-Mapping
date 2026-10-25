@@ -2,15 +2,16 @@
 
 - **Phase:** smoke
 - **Sessions started:** 4
-- **Running:** sn8-smoke
+- **Running:** —
 - **Code commit:** 64eeb7d8656bb7cbd94fa95203d77195c6e9100b
 - **Waiting for quota until:** —
-- **Updated:** 2026-10-25T09:00:30+00:00
+- **Updated:** 2026-10-25T09:48:33+00:00
 
 Per-run progress: [PROGRESS.md](PROGRESS.md)
 
 ## Recent events
 
+- 2026-10-25T09:48:33+00:00 — Manually resumed at phase 'smoke'
 - 2026-10-25T09:00:30+00:00 — Started smoke session 4 on sn8-smoke (code 64eeb7d)
 - 2026-10-25T09:00:27+00:00 — Manually resumed at phase 'smoke'
 - 2026-10-25T08:47:51+00:00 — Started smoke session 3 on sn8-smoke (code 60e6bfd)

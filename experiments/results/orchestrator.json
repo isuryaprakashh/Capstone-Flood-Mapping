@@ -2,13 +2,17 @@
   "phase": "smoke",
   "code_commit": "64eeb7d8656bb7cbd94fa95203d77195c6e9100b",
   "session": 4,
-  "kernel": "sn8-smoke",
+  "kernel": null,
   "kernel_mode": "smoke",
   "pushed_at": 1792918830.3430488,
   "wait_until": null,
   "last_good_train": null,
   "phase_retries": 0,
   "stop_reason": null,
+  "gpu_sessions": [],
+  "prepared": false,
+  "reset_failed": true,
+  "tick_errors": 0,
   "events": [
     {
       "at": "2026-10-25T08:29:31+00:00",
@@ -45,6 +49,10 @@
     {
       "at": "2026-10-25T09:00:30+00:00",
       "message": "Started smoke session 4 on sn8-smoke (code 64eeb7d)"
+    },
+    {
+      "at": "2026-10-25T09:48:33+00:00",
+      "message": "Manually resumed at phase 'smoke'"
     }
   ]
 }
