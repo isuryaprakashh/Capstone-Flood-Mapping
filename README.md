@@ -25,6 +25,10 @@ predictions against the ground truth.
   from the mapping CSV) or upload a GeoTIFF pair; compare before/after and overlay ground truth
   with per-tile IoU/F1.
 - **Testing & deployment (O5)**: pytest suite, CUDA Docker image that also builds the frontend.
+- **Research pipeline**: RA-Fusion (frozen DINOv3 satellite ViT-L/16 + learned coarse-to-fine
+  pre/post alignment + change-gated fusion) against the SpaceNet 8 baseline, a Siamese U-Net
+  (5th-place style) and SNUNet-CD, under three geographic protocols with APLS, instance F1 and
+  bootstrap confidence intervals; trained automatically on Kaggle from GitHub Actions.
 
 ### Dataset finding: residual pre/post misalignment
 
@@ -58,20 +62,38 @@ CAPSTONE-PROJECT/
 │   ├── mask_generator.py      5-channel masks from GeoJSON + reference CSV
 │   ├── dataset.py             PyTorch Dataset, splits, augmentations
 │   ├── crs.py, tiling.py      CRS reprojection and tiling utilities
-├── models/                    unet_baseline.py (O2), siamese_fusion.py (O3), registry
-├── losses/                    combined_loss.py — Dice + Focal + BCE, class-weighted
+│   └── prepare.py             Full-tile training data: best-aligned post, targets, folds/splits
+├── models/
+│   ├── unet_baseline.py       O2 baseline (served by the web interface)
+│   ├── siamese_fusion.py      O3 Siamese cross-attention fusion (served by the web interface)
+│   ├── ra_fusion.py           RA-Fusion research model
+│   ├── backbones.py           Frozen DINOv3 satellite ViT-L/16, timm CNN backbones
+│   ├── alignment.py           Correlation-based coarse-to-fine flow alignment
+│   ├── baselines/             SN8 baseline, Siamese U-Net, SNUNet-CD
+│   └── legacy.py              Adapter running the v0 models in the research pipeline
+├── training/
+│   ├── engine.py              Training loop: AMP, EMA, stages, per-epoch resumable checkpoints
+│   ├── dataset.py             Random crops, synthetic misalignment, self-supervised pairs
+│   ├── losses.py              Multi-task loss (object-masked flood, alignment)
+│   ├── inference.py           Sliding-window prediction with flip TTA
+│   ├── evaluate_run.py        Threshold tuning, test metrics, misalignment stress test, timing
+│   └── queue.py, config.py    Experiment queue over experiments/runs.yaml
+├── evaluation/                APLS, building instance F1, flooded-road length F1, bootstrap CIs
+├── experiments/runs.yaml      Every run of the study (models × protocols × seeds, ablations)
+├── orchestration/             Kaggle session script and the GitHub Actions orchestrator
 ├── inference/
 │   ├── predict.py             FloodPredictor: aligned loading, sliding window, thresholds
 │   ├── postprocess.py         Building polygons, road graph, flood attribution, summary
 │   └── eval.py                Per-tile pixel metrics, RGBA overlay
-├── scripts/                   analyze_alignment.py, eval.py, tile_images.py, Colab helpers
-├── notebooks/                 SpaceNet8_Colab_Training.ipynb
-├── tests/                     pytest suite (API, pairs, alignment, post-processing, models)
+├── scripts/                   prepare_data.py, run_queue.py, gpu_probe.py, aggregate_results.py,
+│                              analyze_alignment.py
+├── legacy/                    v0 training pipeline (Colab), kept to reproduce the earlier weights
+├── tests/                     pytest suite
 ├── docs/
 │   ├── analysis/              Dataset analyses (alignment_stats.csv)
 │   └── training-logs/         Colab training logs
 ├── weights/                   Model checkpoints (*.pth, not in git) + metrics
-├── train.py                   Training loop (AMP, OneCycleLR, best-mIoU checkpointing)
+├── .github/workflows/         train.yml — Kaggle training automation
 ├── Dockerfile, docker-compose.yml, .dockerignore
 └── requirements.txt
 ```
@@ -150,17 +172,51 @@ docker compose up --build   # http://localhost:8000 — mounts ./weights and ./C
 
 ## Training & Evaluation
 
+### Protocols
+
+| Protocol | Train | Validation | Test |
+|---|---|---|---|
+| P1 | Louisiana-East (479) | Louisiana-East (120) | Germany (202) |
+| P2 | Germany (181) | Germany (21) | Louisiana-East (599) |
+| P3 | pooled, spatially blocked folds (494) | 166 | 141 |
+
+Louisiana-West has no public labels, so it is not used for evaluation.
+
+### Local
+
 ```bash
-python scripts/tile_images.py --data-root ./CP1-DATASET --output-dir ./processed
+# Full 1300 px tiles with the best-aligned post image, targets and splits (~3.5 GB)
+python scripts/prepare_data.py --data-root ./CP1-DATASET --out-dir ./processed
 
-python train.py --model fusion --data-root ./CP1-DATASET --mask-dir ./processed/masks --epochs 50 --amp
-python train.py --model unet   --data-root ./CP1-DATASET --mask-dir ./processed/masks --epochs 35 --amp
+# Every run in experiments/runs.yaml; resumes paused or failed runs
+python scripts/run_queue.py --processed ./processed --results ./results
 
-python scripts/eval.py --data-root ./CP1-DATASET --mask-dir ./processed/masks \
-  --unet-ckpt weights/unet_net_best.pth --fusion-ckpt weights/fusion_net_best.pth --split test
+# One short run per model, including a stop/resume check
+python scripts/run_queue.py --processed ./processed --results ./results_smoke --smoke
 ```
 
-Colab: [`notebooks/SpaceNet8_Colab_Training.ipynb`](notebooks/SpaceNet8_Colab_Training.ipynb).
+Each run writes `results/<run>/`: `train_log.csv`, `metrics_val.json` (tuned thresholds),
+`metrics_test.json` (metrics with 95 % bootstrap CIs), `stress_test.json` (metrics under added
+pre/post offsets), `timing.json` and `checkpoints/best.pt`. `results/PROGRESS.md` summarises all
+runs. `python scripts/aggregate_results.py --results ./results` builds the tables
+(`RESULTS.md`, `RESULTS.csv`: mean ± std over seeds, misalignment stress curves).
+
+### Automated (Kaggle + GitHub Actions)
+
+[`.github/workflows/train.yml`](.github/workflows/train.yml) runs every 30 minutes and drives
+Kaggle T4×2 sessions: a smoke test of every model, a CPU dataset-preparation kernel, then training
+sessions that each resume from the previous session's checkpoints. Progress (`STATUS.md`,
+`PROGRESS.md`, per-run logs and metrics) is committed to `experiments/results/` on the `results`
+branch, which merges into `main` without conflicts; checkpoints stay in the Kaggle kernel outputs.
+
+Setup: repository secret `KAGGLE_API_TOKEN` and repository variable `KAGGLE_USERNAME`. Manual
+actions (*Actions → Train on Kaggle → Run workflow*): `tick`, `update-code` (re-pin training to
+the current `main`), `resume` (after a stop).
+
+### Legacy pipeline
+
+The v0 U-Net and Siamese models in `weights/` were trained with the Colab pipeline in
+[`legacy/`](legacy/README.md).
 
 Re-run the misalignment analysis:
 
@@ -194,5 +250,9 @@ python -m pytest tests/ -v
 
 SpaceNet 8 dataset: R. Hänsch et al., *SpaceNet 8 — The Detection of Flooded Roads and
 Buildings*, CVPR Workshops 2022. Imagery © Maxar Technologies (CC BY-NC 4.0).
+
+RA-Fusion uses DINOv3 (O. Siméoni et al., *DINOv3*, 2025; satellite ViT-L/16 weights via
+[timm](https://github.com/huggingface/pytorch-image-models)), distributed under the DINOv3
+License.
 
 KL University Capstone Project KLCAP-2026-00010 — Department of Computer Science & Engineering.

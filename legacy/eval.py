@@ -22,6 +22,8 @@ import numpy as np
 import torch
 import torch.nn as nn
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # repo root
+
 from dataloader.dataset import create_dataloaders, NUM_CLASSES
 from models import build_model
 

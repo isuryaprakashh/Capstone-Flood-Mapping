@@ -50,14 +50,14 @@ download_and_extract "Louisiana-West_Test_Public" "https://spacenet-dataset.s3.a
 # 5. Generate Masks if not already generated
 if [ ! -d "processed/masks/Germany_Training_Public" ] || [ ! -d "processed/masks/Louisiana-East_Training_Public" ]; then
     echo "🗺️ Generating 5-channel segmentation masks..."
-    python3 scripts/tile_images.py --data-root ./CP1-DATASET --output-dir ./processed --val-region Germany_Training_Public --road-buffer 4.0
+    python3 legacy/tile_images.py --data-root ./CP1-DATASET --output-dir ./processed --val-region Germany_Training_Public --road-buffer 4.0
 else
     echo "✅ Masks already present in ./processed/masks. Skipping generation."
 fi
 
 # 6. Train Siamese Cross-Attention Network (O3)
 echo "🧠 Training Siamese Cross-Attention Network (50 epochs with OneCycleLR & AMP)..."
-python3 train.py \
+python3 legacy/train.py \
     --model fusion \
     --data-root ./CP1-DATASET \
     --mask-dir ./processed/masks \
@@ -76,7 +76,7 @@ python3 train.py \
 
 # 7. Train Baseline U-Net (O2)
 echo "🔬 Training Baseline U-Net (35 epochs)..."
-python3 train.py \
+python3 legacy/train.py \
     --model unet \
     --data-root ./CP1-DATASET \
     --mask-dir ./processed/masks \
@@ -95,7 +95,7 @@ python3 train.py \
 
 # 8. Evaluate with Test-Time Augmentation (TTA) & Overlap Attribution
 echo "📊 Evaluating models with TTA & SpaceNet 8 Overlap Heuristics..."
-python3 scripts/eval.py \
+python3 legacy/eval.py \
     --data-root ./CP1-DATASET \
     --mask-dir ./processed/masks \
     --unet-ckpt ./weights/unet_net_best.pth \

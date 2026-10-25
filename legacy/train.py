@@ -13,13 +13,13 @@ Supports:
 
 Usage:
     # Train baseline U-Net
-    python train.py --model unet --data-root ./CP1-DATASET --epochs 50
+    python legacy/train.py --model unet --data-root ./CP1-DATASET --epochs 50
 
     # Train Siamese Fusion model
-    python train.py --model fusion --data-root ./CP1-DATASET --epochs 100
+    python legacy/train.py --model fusion --data-root ./CP1-DATASET --epochs 100
 
     # Resume training from checkpoint
-    python train.py --model fusion --resume checkpoints/fusion_net_best.pth
+    python legacy/train.py --model fusion --resume checkpoints/fusion_net_best.pth
 """
 
 import argparse
@@ -58,8 +58,10 @@ except (ImportError, TypeError):
     def get_autocast_context(device_type: str = "cuda", enabled: bool = True):
         return amp_autocast(enabled=enabled)
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # repo root
+
 from dataloader.dataset import create_dataloaders, NUM_CLASSES
-from losses.combined_loss import CombinedLoss
+from legacy.losses.combined_loss import CombinedLoss
 from models import build_model, count_parameters
 
 logging.basicConfig(

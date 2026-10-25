@@ -7,7 +7,7 @@ import torch
 from models import build_model, count_parameters
 from models.unet_baseline import UNetBaseline
 from models.siamese_fusion import SiameseFusionNet
-from losses.combined_loss import CombinedLoss, DiceLoss, FocalLoss
+from legacy.losses.combined_loss import CombinedLoss, DiceLoss, FocalLoss
 
 
 def test_unet_baseline_forward(sample_batch):

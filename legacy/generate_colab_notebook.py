@@ -18,7 +18,7 @@ def create_colab_notebook():
             "# 🛰️ SpaceNet 8: Multi-Temporal Satellite Flood Mapping & Damage Assessment\n",
             "### **KL University Capstone Project `KLCAP-2026-00010`**\n",
             "\n",
-            "[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/isuryaprakashh/Capstone-Flood-Mapping/blob/main/notebooks/SpaceNet8_Colab_Training.ipynb)\n",
+            "[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/isuryaprakashh/Capstone-Flood-Mapping/blob/main/legacy/SpaceNet8_Colab_Training.ipynb)\n",
             "![PyTorch](https://img.shields.io/badge/PyTorch-2.x-EE4C2C?logo=pytorch)\n",
             "![GPU](https://img.shields.io/badge/Target%20GPU-NVIDIA%20Tesla%20T4%20(16GB)-76B900?logo=nvidia)\n",
             "![License](https://img.shields.io/badge/License-MIT-blue)\n",
@@ -277,7 +277,7 @@ def create_colab_notebook():
         "metadata": {},
         "outputs": [],
         "source": [
-            "!python scripts/tile_images.py \\\n",
+            "!python legacy/tile_images.py \\\n",
             "    --data-root ./CP1-DATASET \\\n",
             "    --output-dir ./processed \\\n",
             "    --val-region Germany_Training_Public \\\n",
@@ -312,7 +312,7 @@ def create_colab_notebook():
             "unet_lr = 0.001 #@param {type:\"number\"}\n",
             "use_amp = True #@param {type:\"boolean\"}\n",
             "\n",
-            "!python train.py \\\n",
+            "!python legacy/train.py \\\n",
             "    --model unet \\\n",
             "    --data-root ./CP1-DATASET \\\n",
             "    --mask-dir ./processed/masks \\\n",
@@ -355,7 +355,7 @@ def create_colab_notebook():
             "fusion_lr = 0.001 #@param {type:\"number\"}\n",
             "fusion_patience = 12 #@param {type:\"integer\"}\n",
             "\n",
-            "!python train.py \\\n",
+            "!python legacy/train.py \\\n",
             "    --model fusion \\\n",
             "    --data-root ./CP1-DATASET \\\n",
             "    --mask-dir ./processed/masks \\\n",
@@ -393,7 +393,7 @@ def create_colab_notebook():
         "metadata": {},
         "outputs": [],
         "source": [
-            "!python scripts/eval.py \\\n",
+            "!python legacy/eval.py \\\n",
             "    --data-root ./CP1-DATASET \\\n",
             "    --mask-dir ./processed/masks \\\n",
             "    --unet-ckpt ./weights/unet_net_best.pth \\\n",
@@ -576,12 +576,7 @@ def create_colab_notebook():
 if __name__ == "__main__":
     nb = create_colab_notebook()
     
-    # Save to notebooks/ and root
-    Path("notebooks").mkdir(exist_ok=True)
-    with open("notebooks/SpaceNet8_Colab_Training.ipynb", "w", encoding="utf-8") as f:
-        json.dump(nb, f, indent=2)
-        
-    with open("SpaceNet8_Colab_Training.ipynb", "w", encoding="utf-8") as f:
+    with open(Path(__file__).with_name("SpaceNet8_Colab_Training.ipynb"), "w", encoding="utf-8") as f:
         json.dump(nb, f, indent=2)
         
     print("Successfully generated Google Colab training notebooks!")

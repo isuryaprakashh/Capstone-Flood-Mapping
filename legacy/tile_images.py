@@ -9,8 +9,8 @@ Runs the full data preprocessing pipeline:
   4. Create train/val/test split manifest
 
 Usage:
-    python scripts/tile_images.py --data-root ./CP1-DATASET --output-dir ./processed
-    python scripts/tile_images.py --data-root ./CP1-DATASET --masks-only
+    python legacy/tile_images.py --data-root ./CP1-DATASET --output-dir ./processed
+    python legacy/tile_images.py --data-root ./CP1-DATASET --masks-only
 """
 
 import argparse
@@ -169,7 +169,7 @@ def main():
     logger.info(f"  Test samples:  {len(test_samples)}")
     logger.info("")
     logger.info("Next step: Run training with:")
-    logger.info(f"  python train.py --data-root {data_root} --mask-dir {mask_dir}")
+    logger.info(f"  python legacy/train.py --data-root {data_root} --mask-dir {mask_dir}")
 
 
 if __name__ == "__main__":
