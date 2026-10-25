@@ -39,7 +39,11 @@ class FakeKaggle:
 
 
 def _job(push):
-    return json.loads(push["script"].split("JOB = ", 1)[1].split("\n", 1)[0])
+    """Execute the pushed script's JOB line exactly as Python on Kaggle would."""
+    line = next(l for l in push["script"].splitlines() if l.startswith("JOB = "))
+    namespace = {}
+    exec(line, namespace)
+    return namespace["JOB"]
 
 
 def _status(state, attempts=0):

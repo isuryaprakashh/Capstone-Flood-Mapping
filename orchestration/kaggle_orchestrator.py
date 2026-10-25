@@ -320,7 +320,7 @@ class Orchestrator:
         script = SESSION_TEMPLATE.read_text()
         if JOB_PLACEHOLDER not in script:
             raise RuntimeError("Session template is missing the JOB placeholder")
-        script = script.replace(JOB_PLACEHOLDER, "JOB = " + json.dumps(job))
+        script = script.replace(JOB_PLACEHOLDER, "JOB = " + repr(job))  # a Python literal (None, not null)
         self.kaggle.push(slug, script, gpu=mode != "prepare", sources=sources)
         st.update({"kernel": slug, "kernel_mode": mode, "pushed_at": now(), "session": st["session"] + 1})
         self.event(st, f"Started {mode} session {st['session']} on {slug} (code {st['code_commit'][:7]})")
