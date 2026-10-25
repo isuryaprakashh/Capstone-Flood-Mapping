@@ -1,3 +1,12 @@
+# ── Stage 1: build the React frontend ──
+FROM node:20.18-alpine AS frontend
+WORKDIR /frontend
+COPY frontend/package.json frontend/package-lock.json ./
+RUN npm ci
+COPY frontend/ ./
+RUN npm run build
+
+# ── Stage 2: API + model runtime ──
 FROM nvidia/cuda:12.1.1-runtime-ubuntu22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -24,8 +33,9 @@ COPY requirements.txt .
 RUN pip3 install --no-cache-dir -U pip setuptools wheel
 RUN pip3 install --no-cache-dir -r requirements.txt
 
-# Copy codebase
+# Copy codebase and the built frontend (served by FastAPI at /)
 COPY . .
+COPY --from=frontend /frontend/dist ./frontend/dist
 
 EXPOSE 8000
 

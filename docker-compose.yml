@@ -14,7 +14,9 @@ services:
       - API_PORT=8000
       - API_DEBUG=false
       - USE_STUB=false
+      - MODEL_TYPE=fusion
       - O3_FUSION_WEIGHTS=/app/weights/fusion_net_best.pth
+      - SPACENET8_DATA_DIR=/app/CP1-DATASET
     volumes:
       - ./weights:/app/weights
       - ./CP1-DATASET:/app/CP1-DATASET

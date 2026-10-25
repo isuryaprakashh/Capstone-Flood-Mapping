@@ -1,0 +1,18 @@
+# Large data and weights are mounted as volumes (see docker-compose.yml)
+CP1-DATASET/
+processed/
+checkpoints/
+weights/*.pth
+weights/*.pt
+weights/*.zip
+
+# Version control, local config and build artefacts
+.git/
+.env
+**/__pycache__/
+*.py[cod]
+.pytest_cache/
+logs/
+wandb/
+frontend/node_modules/
+frontend/dist/

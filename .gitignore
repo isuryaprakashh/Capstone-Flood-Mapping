@@ -30,6 +30,9 @@ env/
 ENV/
 .venv
 
+# Editor
+*.code-workspace
+
 # Pytest / Coverage
 .pytest_cache/
 .coverage
@@ -37,8 +40,10 @@ htmlcov/
 
 # Logs & Model Weights
 logs/
+checkpoints/
 weights/*.pth
 weights/*.pt
+weights/*.zip
 wandb/
 
 # Node / Frontend
