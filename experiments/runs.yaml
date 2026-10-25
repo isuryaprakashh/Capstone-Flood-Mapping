@@ -1,0 +1,103 @@
+# SpaceNet 8 experiment registry.
+#
+# Every run inherits `defaults` and overrides what it needs. Training is
+# resumable per epoch; a run's config hash guards its checkpoints, so do not
+# edit a run's settings once it has started (add a new run instead).
+#
+# priority: lower runs first (the headline comparison is scheduled first).
+
+defaults:
+  protocol: P1
+  seed: 0
+  epochs: 40
+  batch_size: 8
+  crop_size: 512
+  samples_per_tile: 2
+  lr: 3.0e-4
+  weight_decay: 1.0e-4
+  warmup_epochs: 1
+  ema_decay: 0.999
+  amp: true
+  grad_clip: 1.0
+  num_workers: 2
+  flood_oversample: 2.0
+  deadline_margin_s: 600
+  register_post: false
+  aug:
+    flip: true
+    rot90: true
+    photometric: true
+    clouds: 0.15
+    shift_prob: 0.5
+    shift_max_px: 32
+    object_crop_prob: 0.5
+    flood_crop_prob: 0.5
+  ssl:
+    enabled: true
+    prob: 0.5
+    max_px: 32
+  loss:
+    object_masked_flood: true
+  eval:
+    window: 512
+    overlap: 64
+    window_batch: 4
+    tta: true
+    threshold_grid: [0.2, 0.3, 0.4, 0.5, 0.6, 0.7]
+    stress_shifts_px: [0, 5, 10, 20, 30, 40]
+    stress_tiles: 50
+    timing_tiles: 10
+  queue: kaggle
+
+# Two-stage schedules for the published two-network baselines
+x-sn8-stages: &sn8_stages
+  - {name: foundation, epochs: 20, heads: [building, building_border, road, junction], param_prefixes: [foundation.], init: null}
+  - {name: flood, epochs: 20, heads: [flooded_building, flooded_road, flood_image], param_prefixes: [flood.], init: null}
+
+x-siamese-stages: &siamese_stages
+  - {name: foundation, epochs: 20, heads: [building, building_border, road, junction], param_prefixes: [foundation.], init: null}
+  - {name: flood, epochs: 20, heads: [flooded_building, flooded_road, flood_image], param_prefixes: [flood.], init: init_flood_from_foundation}
+
+runs:
+  # ── Main comparison: train Louisiana-East → test Germany, 3 seeds ──
+  - {id: p1_ra_fusion_s0, model: ra_fusion, model_kwargs: {backbone: dinov3_sat}, seed: 0, priority: 1}
+  - {id: p1_sn8_baseline_s0, model: sn8_baseline, stages: *sn8_stages, seed: 0, priority: 1}
+  - {id: p1_siamese_unet_s0, model: siamese_unet, stages: *siamese_stages, seed: 0, priority: 1}
+  - {id: p1_snunet_s0, model: snunet, seed: 0, priority: 1}
+  - {id: p1_ra_fusion_s1, model: ra_fusion, model_kwargs: {backbone: dinov3_sat}, seed: 1, priority: 2}
+  - {id: p1_sn8_baseline_s1, model: sn8_baseline, stages: *sn8_stages, seed: 1, priority: 2}
+  - {id: p1_siamese_unet_s1, model: siamese_unet, stages: *siamese_stages, seed: 1, priority: 2}
+  - {id: p1_snunet_s1, model: snunet, seed: 1, priority: 2}
+  - {id: p1_ra_fusion_s2, model: ra_fusion, model_kwargs: {backbone: dinov3_sat}, seed: 2, priority: 3}
+  - {id: p1_sn8_baseline_s2, model: sn8_baseline, stages: *sn8_stages, seed: 2, priority: 3}
+  - {id: p1_siamese_unet_s2, model: siamese_unet, stages: *siamese_stages, seed: 2, priority: 3}
+  - {id: p1_snunet_s2, model: snunet, seed: 2, priority: 3}
+
+  # ── Earlier models (v0) retrained on the corrected pipeline ──
+  - {id: p1_unet_v0_s0, model: unet_v0, seed: 0, priority: 4}
+  - {id: p1_siamese_v0_s0, model: siamese_v0, seed: 0, priority: 4}
+
+  # ── Reverse direction: train Germany → test Louisiana-East ──
+  - {id: p2_ra_fusion_s0, model: ra_fusion, model_kwargs: {backbone: dinov3_sat}, protocol: P2, priority: 5}
+  - {id: p2_sn8_baseline_s0, model: sn8_baseline, stages: *sn8_stages, protocol: P2, priority: 5}
+  - {id: p2_siamese_unet_s0, model: siamese_unet, stages: *siamese_stages, protocol: P2, priority: 5}
+
+  # ── Same region, spatially blocked folds ──
+  - {id: p3_ra_fusion_s0, model: ra_fusion, model_kwargs: {backbone: dinov3_sat}, protocol: P3, priority: 6}
+  - {id: p3_sn8_baseline_s0, model: sn8_baseline, stages: *sn8_stages, protocol: P3, priority: 6}
+  - {id: p3_siamese_unet_s0, model: siamese_unet, stages: *siamese_stages, protocol: P3, priority: 6}
+  - {id: p3_snunet_s0, model: snunet, protocol: P3, priority: 6}
+
+  # ── Ablations of RA-Fusion (P1, seed 0) ──
+  - {id: abl_no_alignment, model: ra_fusion, model_kwargs: {backbone: dinov3_sat, align: false}, priority: 7,
+     notes: learned alignment removed (self-supervised loss off automatically)}
+  - {id: abl_classic_registration, model: ra_fusion, model_kwargs: {backbone: dinov3_sat, align: false}, register_post: true, priority: 7,
+     notes: no learned alignment; post shifted by the phase-correlation estimate instead}
+  - {id: abl_no_shift_training, model: ra_fusion, model_kwargs: {backbone: dinov3_sat}, aug: {shift_prob: 0.0}, ssl: {enabled: false}, priority: 7,
+     notes: no synthetic misalignment and no self-supervised alignment loss}
+  - {id: abl_dense_flood_loss, model: ra_fusion, model_kwargs: {backbone: dinov3_sat}, loss: {object_masked_flood: false}, priority: 7,
+     notes: flood loss on all valid pixels instead of labelled objects}
+  - {id: abl_convnext_backbone, model: ra_fusion, model_kwargs: {backbone: convnext_tiny.dinov3_lvd1689m}, priority: 7,
+     notes: fine-tuned ConvNeXt-T (DINOv3 web pretraining) instead of frozen satellite ViT-L}
+  - {id: abl_no_junction_head, model: ra_fusion, model_kwargs: {backbone: dinov3_sat}, loss: {junction: 0.0}, priority: 7,
+     notes: junction auxiliary loss removed}
