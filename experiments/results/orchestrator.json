@@ -1,0 +1,18 @@
+{
+  "phase": "smoke",
+  "code_commit": "8469b5cedbd8d9f34eb3349db49a8d5ce6680430",
+  "session": 1,
+  "kernel": "sn8-smoke",
+  "kernel_mode": "smoke",
+  "pushed_at": 1792916971.7414093,
+  "wait_until": null,
+  "last_good_train": null,
+  "phase_retries": 0,
+  "stop_reason": null,
+  "events": [
+    {
+      "at": "2026-10-25T08:29:31+00:00",
+      "message": "Started smoke session 1 on sn8-smoke (code 8469b5c)"
+    }
+  ]
+}
