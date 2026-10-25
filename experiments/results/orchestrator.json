@@ -1,6 +1,6 @@
 {
   "phase": "smoke",
-  "code_commit": "b4a70bbf473ece101d97b2a5892dc7c8ff07711a",
+  "code_commit": "26379792d3b4427f54d893008452a7d723fa4814",
   "session": 8,
   "kernel": "sn8-smoke",
   "kernel_mode": "smoke",
@@ -25,6 +25,7 @@
   ],
   "prepared": false,
   "reset_failed": true,
+  "last_command": "61a7a2eb9a7d2b37",
   "tick_errors": 0,
   "events": [
     {
@@ -110,6 +111,10 @@
     {
       "at": "2026-10-25T11:26:45+00:00",
       "message": "Started smoke session 8 on sn8-smoke (code b4a70bb)"
+    },
+    {
+      "at": "2026-10-25T11:39:25+00:00",
+      "message": "Command: training code re-pinned to 2637979"
     }
   ]
 }
