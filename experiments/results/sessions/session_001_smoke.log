@@ -1,0 +1,12 @@
+[{"stream_name":"stderr","time":1.079626337,"data":"Traceback (most recent call last):\n"}
+,{"stream_name":"stderr","time":1.079920884,"data":"  File \"/kaggle/src/script.py\", line 30, in \u003cmodule\u003e\n"}
+,{"stream_name":"stderr","time":1.079931014,"data":"    JOB = {\"mode\": \"smoke\", \"repo\": \"https://github.com/isuryaprakashh/Capstone-Flood-Mapping.git\", \"commit\": \"8469b5cedbd8d9f34eb3349db49a8d5ce6680430\", \"hours\": 3.0, \"queue\": \"kaggle\", \"pip\": [\"rasterio\u003e=1.3.8\", \"timm\u003e=1.0.20\", \"filelock\u003e=3.12\", \"pyyaml\u003e=6.0\"], \"session\": 1, \"data_source\": \"sn8-prepare\", \"previous\": null}\n"}
+,{"stream_name":"stderr","time":1.079938734,"data":"                                                                                                                                                                                                                                                                                                                                ^^^^\n"}
+,{"stream_name":"stderr","time":1.079943249,"data":"NameError: name 'null' is not defined\n"}
+,{"stream_name":"stderr","time":3.338042794,"data":"/usr/local/lib/python3.13/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\\|'\n"}
+,{"stream_name":"stderr","time":3.338070284,"data":"  cells[i][c] = re.sub('\\\\\\\\\\|', '|', cell)\n"}
+,{"stream_name":"stderr","time":3.7192692259999998,"data":"/usr/local/lib/python3.13/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\\_'\n"}
+,{"stream_name":"stderr","time":3.719295323,"data":"  text = re.sub(r'_', '\\_', text) # Escape underscores in display text\n"}
+,{"stream_name":"stderr","time":5.587872326,"data":"[NbConvertApp] Converting notebook __script__.ipynb to html\n"}
+,{"stream_name":"stderr","time":6.660746589,"data":"[NbConvertApp] Writing 301114 bytes to __results__.html\n"}
+]
