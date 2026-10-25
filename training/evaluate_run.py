@@ -54,6 +54,10 @@ logger = logging.getLogger(__name__)
 TUNED_HEADS = ("building", "road", "flooded_building", "flooded_road")
 PIXEL_CLASSES = ("building", "road", "flooded_building", "flooded_road")
 TILE_MARGIN_S = 120
+# APLS scores every control-point pair (exact) for graphs with up to this many control points,
+# i.e. every ground-truth tile and any sensible prediction; a huge, noisy prediction graph is
+# scored from a fixed-seed uniform sample of source points (unbiased; bounded time and memory)
+APLS_MAX_SOURCES = 2000
 
 
 def _time_left(deadline: Optional[float]) -> float:
@@ -136,7 +140,7 @@ def score_tile(probs: dict, tile: dict, gt: dict, thresholds: dict) -> dict:
     b = building_metrics(vec["buildings"], gt["buildings"], valid=t["valid"])
     road = road_length_f1(vec["roads"], gt["roads"], gsd)
     flooded_road = flooded_road_f1(vec["roads"], gt["roads"], gsd)
-    af = apls_flood(gt["roads"], vec["graph"], gsd, max_pairs=None)
+    af = apls_flood(gt["roads"], vec["graph"], gsd, max_pairs=None, max_sources=APLS_MAX_SOURCES)
     pred_stack = binary[[0, 1, 3, 4]].astype(bool)
     target_stack = np.stack([t[k] for k in PIXEL_CLASSES])
     return {
@@ -145,7 +149,7 @@ def score_tile(probs: dict, tile: dict, gt: dict, thresholds: dict) -> dict:
         "building_counts": b["counts"],
         "road_lengths": {k: road[k] for k in ("gt_m", "pred_m", "gt_matched_m", "pred_matched_m")},
         "flooded_road_lengths": {k: flooded_road[k] for k in ("gt_m", "pred_m", "gt_matched_m", "pred_matched_m")},
-        "apls": apls(gt["roads"], vec["graph"], gsd, max_pairs=None),
+        "apls": apls(gt["roads"], vec["graph"], gsd, max_pairs=None, max_sources=APLS_MAX_SOURCES),
         **{k: af[k] for k in ("apls_traversable", "apls_non_traversable", "gt_traversable_m",
                               "gt_non_traversable_m", "pred_non_traversable_m")},
         "pixel_counts": class_pixel_counts(pred_stack, target_stack, PIXEL_CLASSES, t["valid"]),

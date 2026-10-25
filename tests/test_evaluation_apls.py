@@ -396,3 +396,30 @@ def test_apls_runs_fast_on_full_tile():
     assert elapsed < 2.0
     assert 0.0 < exact < 1.0
     assert 0.0 <= result["apls_flood"] <= 1.0
+
+
+def test_streamed_exact_apls_equals_pairwise_exact():
+    rng = np.random.default_rng(3)
+    for _ in range(10):
+        def net(k):
+            pts = rng.uniform(0, 1300, (k, 2))
+            return _fc([[tuple(pts[i]), tuple(pts[j])] for i, j in rng.integers(0, k, (k + 4, 2)) if i != j])
+        gt, pred = net(10), net(12)
+        streamed = apls_detailed(gt, pred, GSD, max_pairs=None)
+        pairwise = apls_detailed(gt, pred, GSD, max_pairs=10**9)  # explicit list of every pair
+        assert streamed["apls"] == pytest.approx(pairwise["apls"], abs=1e-12)
+        assert streamed["n_pairs_gt"] == pairwise["n_pairs_gt"]
+
+
+def test_huge_connected_prediction_is_bounded_by_source_sampling():
+    # A dense mesh like a barely trained model's output (one giant component)
+    step = 20
+    mesh = [[(x, y), (x + step, y)] for x in range(0, 1280, step) for y in range(0, 1300, step)] + \
+           [[(x, y), (x, y + step)] for x in range(0, 1300, step) for y in range(0, 1280, step)]
+    gt = _fc([[(100, 650), (1200, 650)]])
+    t0 = time.time()
+    r = apls_detailed(gt, _fc(mesh), GSD, max_pairs=None, max_sources=300)
+    assert r["n_control_prop"] > 300 and r["n_pairs_prop"] > 0
+    assert 0.0 <= r["apls"] <= 1.0 and time.time() - t0 < 60
+    again = apls_detailed(gt, _fc(mesh), GSD, max_pairs=None, max_sources=300)
+    assert again["apls"] == r["apls"]  # fixed seed: deterministic

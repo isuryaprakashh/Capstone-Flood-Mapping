@@ -40,6 +40,7 @@ logger = logging.getLogger(__name__)
 
 NODE_MERGE_M = 0.05
 MIN_EDGE_WEIGHT_M = 1e-9
+DIJKSTRA_CHUNK = 256  # sources per Dijkstra call (bounds memory)
 
 RoadsLike = Union[Mapping, nx.Graph]
 
@@ -434,6 +435,16 @@ def _triu_pair(q: np.ndarray, n: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     return i, q - before(i) + i + 1
 
 
+def _sample_distinct(rng: np.random.Generator, total: int, size: int) -> np.ndarray:
+    """`size` distinct sorted integers in [0, total) without materializing all of them."""
+    if total <= 2 * size:
+        return np.sort(rng.choice(total, size=size, replace=False))
+    k = np.unique(rng.integers(0, total, size=size))
+    while len(k) < size:  # top up the few duplicates
+        k = np.unique(np.concatenate([k, rng.integers(0, total, size=size - len(k))]))
+    return k
+
+
 def _connected_pairs(graph: _WeightedGraph, max_pairs: Optional[int], seed: int) -> tuple[np.ndarray, np.ndarray]:
     """All, or a uniform sample of, unordered node pairs connected in the graph."""
     if graph.n_nodes < 2:
@@ -451,19 +462,25 @@ def _connected_pairs(graph: _WeightedGraph, max_pairs: Optional[int], seed: int)
     if max_pairs is None or total <= max_pairs:
         k = np.arange(total, dtype=np.int64)
     else:
-        k = np.sort(np.random.default_rng(seed).choice(total, size=max_pairs, replace=False))
+        k = _sample_distinct(np.random.default_rng(seed), total, max_pairs)
     comp = np.searchsorted(offsets, k, side="right") - 1
     i, j = _triu_pair(k - offsets[comp], sizes[comp])
     return order[starts[comp] + i], order[starts[comp] + j]
 
 
-def _path_lengths(graph: _WeightedGraph, src: np.ndarray, dst: np.ndarray) -> np.ndarray:
+def _path_lengths(graph: _WeightedGraph, src: np.ndarray, dst: np.ndarray,
+                  chunk: int = DIJKSTRA_CHUNK) -> np.ndarray:
     """Shortest path lengths src[k] -> dst[k] (inf if disconnected)."""
+    out = np.zeros(len(src))
     if len(src) == 0:
-        return np.zeros(0)
+        return out
     sources, row = np.unique(src, return_inverse=True)
-    dist = dijkstra(graph.adjacency, directed=False, indices=sources)
-    return dist[row, dst]
+    # Sources in blocks: memory stays chunk x n_nodes however large (or noisy) the graph is
+    for start in range(0, len(sources), chunk):
+        dist = dijkstra(graph.adjacency, directed=False, indices=sources[start:start + chunk])
+        sel = (row >= start) & (row < start + chunk)
+        out[sel] = dist[row[sel] - start, dst[sel]]
+    return out
 
 
 def _directional_apls(
@@ -475,8 +492,11 @@ def _directional_apls(
     max_pairs: Optional[int],
     seed: int,
     min_path_m: float,
+    max_sources: Optional[int] = None,
 ) -> tuple[Optional[float], int]:
     """APLS(A -> B) from A's control graph and network B; None if A has no scorable pair."""
+    if max_pairs is None:
+        return _directional_apls_streaming(ctrl_xy, ctrl_graph, target, gsd_m, buffer_m, max_sources, seed, min_path_m)
     pi, pj = _connected_pairs(ctrl_graph, max_pairs, seed)
     len_a = _path_lengths(ctrl_graph, pi, pj)
     keep = np.isfinite(len_a) & (len_a >= min_path_m)
@@ -495,6 +515,61 @@ def _directional_apls(
     return float(np.mean(1.0 - diff)), int(len(len_a))
 
 
+def _directional_apls_streaming(
+    ctrl_xy: np.ndarray,
+    ctrl_graph: _WeightedGraph,
+    target: _Network,
+    gsd_m: float,
+    buffer_m: float,
+    max_sources: Optional[int],
+    seed: int,
+    min_path_m: float,
+) -> tuple[Optional[float], int]:
+    """
+    Every connected pair, accumulated source by source (memory: a block of
+    sources x nodes, never the n^2 pair list). With more than max_sources
+    control points, a uniform sample of sources is used instead: each pair is
+    then included with the same probability, so the mean stays unbiased.
+    Equal to the exact pairwise mean otherwise (pairs are symmetric).
+
+    Returns:
+        (APLS, number of unordered pairs scored, or ordered pairs when sampled).
+    """
+    n = ctrl_graph.n_nodes
+    if n < 2:
+        return None, 0
+    _, labels = connected_components(ctrl_graph.adjacency, directed=False)
+    sampled = max_sources is not None and n > max_sources
+    sources = np.sort(np.random.default_rng(seed).choice(n, size=max_sources, replace=False)) if sampled \
+        else np.arange(n)
+    node_of, target_graph = _snap_points(ctrl_xy, target, gsd_m, buffer_m)
+    snapped = node_of >= 0
+
+    total, count = 0.0, 0
+    for start in range(0, len(sources), DIJKSTRA_CHUNK):
+        src = sources[start:start + DIJKSTRA_CHUNK]
+        len_a = dijkstra(ctrl_graph.adjacency, directed=False, indices=src)  # (block, n)
+        scored = labels[src][:, None] == labels[None, :]
+        scored[np.arange(len(src)), src] = False
+        scored &= np.isfinite(len_a) & (len_a >= min_path_m)
+        if not scored.any():
+            continue
+        len_b = np.full(len_a.shape, np.inf)
+        rows = np.flatnonzero(snapped[src])
+        if len(rows) and snapped.any():
+            uniq, inv = np.unique(node_of[src[rows]], return_inverse=True)
+            dist_b = dijkstra(target_graph.adjacency, directed=False, indices=uniq)
+            len_b[np.ix_(rows, np.flatnonzero(snapped))] = dist_b[inv][:, node_of[snapped]]
+        a, b = len_a[scored], len_b[scored]
+        diff = np.minimum(1.0, np.abs(a - b) / a)
+        diff[~np.isfinite(b)] = 1.0
+        total += float((1.0 - diff).sum())
+        count += int(scored.sum())
+    if count == 0:
+        return None, 0
+    return total / count, count if sampled else count // 2
+
+
 # ─── Metric ─────────────────────────────────────────────────────────────────
 
 
@@ -505,6 +580,7 @@ def apls_detailed(
     buffer_m: float = 4.0,
     node_spacing_m: float = 50.0,
     max_pairs: Optional[int] = 500,
+    max_sources: Optional[int] = None,
     seed: int = 0,
     min_path_m: float = 0.001,
     simplify: bool = True,
@@ -522,8 +598,12 @@ def apls_detailed(
         node_spacing_m: Spacing of control points injected along edges.
         max_pairs: Pairs scored per direction; a uniform sample (fixed by
             seed) is drawn from the connected pairs when there are more.
-            None scores every connected pair (exact).
-        seed: Seed of the pair sample.
+            None scores every connected pair (exact), streamed so memory
+            does not grow with the number of pairs.
+        max_sources: With max_pairs=None, graphs with more control points
+            than this are scored from a uniform sample of this many source
+            points (unbiased; bounds the time on huge, noisy graphs).
+        seed: Seed of the pair or source sample.
         min_path_m: Pairs whose reference path is shorter are skipped.
         simplify: Merge pass-through (degree-2) nodes before injecting
             control points, so both graphs get control points at junctions,
@@ -543,7 +623,8 @@ def apls_detailed(
     gt_xy, gt_ctrl = _control_graph(gt, gsd_m, node_spacing_m)
     prop_xy, prop_ctrl = _control_graph(prop, gsd_m, node_spacing_m)
 
-    kw = dict(gsd_m=gsd_m, buffer_m=buffer_m, max_pairs=max_pairs, seed=seed, min_path_m=min_path_m)
+    kw = dict(gsd_m=gsd_m, buffer_m=buffer_m, max_pairs=max_pairs, seed=seed, min_path_m=min_path_m,
+              max_sources=max_sources)
     gt_to_prop, n_gt = _directional_apls(gt_xy, gt_ctrl, prop, **kw)
     prop_to_gt, n_prop = _directional_apls(prop_xy, prop_ctrl, gt, **kw)
 
@@ -574,6 +655,7 @@ def apls(
     buffer_m: float = 4.0,
     node_spacing_m: float = 50.0,
     max_pairs: Optional[int] = 500,
+    max_sources: Optional[int] = None,
     seed: int = 0,
     min_path_m: float = 0.001,
     simplify: bool = True,
@@ -588,7 +670,8 @@ def apls(
         buffer_m: Snapping distance for control points, in meters.
         node_spacing_m: Spacing of control points injected along edges.
         max_pairs: Pairs scored per direction (None = all connected pairs).
-        seed: Seed of the pair sample.
+        max_sources: Source-point cap when max_pairs is None (see apls_detailed).
+        seed: Seed of the pair or source sample.
         min_path_m: Pairs whose reference path is shorter are skipped.
         simplify: Merge pass-through nodes before injecting control points.
 
@@ -600,6 +683,7 @@ def apls(
         buffer_m=buffer_m,
         node_spacing_m=node_spacing_m,
         max_pairs=max_pairs,
+        max_sources=max_sources,
         seed=seed,
         min_path_m=min_path_m,
         simplify=simplify,
@@ -628,7 +712,7 @@ def apls_flood(
             or a road FeatureCollection.
         gsd_m: Meters per pixel.
         **apls_kwargs: Passed to apls() (buffer_m, node_spacing_m,
-            max_pairs, seed, min_path_m, simplify).
+            max_pairs, max_sources, seed, min_path_m, simplify).
 
     Returns:
         Dict with 'apls_traversable', 'apls_non_traversable', 'apls_flood'

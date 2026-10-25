@@ -83,8 +83,8 @@ def main():
     mode = JOB["mode"]
     deadline = START + JOB["hours"] * 3600
     log(f"Job: {json.dumps(JOB)}")
-    log(f"CPUs: {os.cpu_count()}; shared memory (DataLoader workers): {shutil.disk_usage('/dev/shm').total / 1e9:.1f} GB"
-        if os.path.exists("/dev/shm") else f"CPUs: {os.cpu_count()}")
+    log(f"CPUs: {os.cpu_count()}; RAM: {os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES') / 1e9:.1f} GB; "
+        f"shared memory (DataLoader workers): {shutil.disk_usage('/dev/shm').total / 1e9:.1f} GB")
 
     if mode != "prepare" and gpu_count() == 0:
         sys.exit("No GPU attached: refusing to train on CPU")
