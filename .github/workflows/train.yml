@@ -1,0 +1,61 @@
+name: Train on Kaggle
+
+# Drives the Kaggle training pipeline (orchestration/kaggle_orchestrator.py):
+# smoke test → dataset preparation → training sessions → done.
+# Status: experiments/results/STATUS.md and PROGRESS.md on the `results` branch.
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "tick = normal step · update-code = re-pin code to current main · resume = leave 'stopped'"
+        type: choice
+        options: [tick, update-code, resume]
+        default: tick
+      phase:
+        description: "Phase to resume at (only for action=resume)"
+        type: choice
+        options: [smoke, prepare, train]
+        default: train
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: kaggle-orchestrator
+  cancel-in-progress: false
+
+jobs:
+  orchestrate:
+    # Skipped (not failed) until the KAGGLE_USERNAME repository variable is set
+    if: ${{ vars.KAGGLE_USERNAME != '' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      KAGGLE_API_TOKEN: ${{ secrets.KAGGLE_API_TOKEN }}
+      KAGGLE_USERNAME: ${{ vars.KAGGLE_USERNAME }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      RESULTS_GIT_NAME: isuryaprakashh
+      RESULTS_GIT_EMAIL: isurya2005@gmail.com
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install orchestrator dependencies
+        run: pip install --quiet "kaggle>=1.8.0" "pyyaml>=6.0"
+
+      - name: Run orchestrator
+        run: |
+          case "${{ github.event.inputs.action || 'tick' }}" in
+            update-code) python orchestration/kaggle_orchestrator.py tick --update-code ;;
+            resume)      python orchestration/kaggle_orchestrator.py resume --phase "${{ github.event.inputs.phase }}" ;;
+            *)           python orchestration/kaggle_orchestrator.py tick ;;
+          esac
