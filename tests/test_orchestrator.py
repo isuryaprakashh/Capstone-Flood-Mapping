@@ -60,7 +60,7 @@ def no_hold(monkeypatch, tmp_path):
 def setup(tmp_path):
     runs_file = tmp_path / "runs.yaml"
     runs_file.write_text(yaml.safe_dump({
-        "defaults": {"protocol": "P1", "seed": 0, "queue": "kaggle", "model": "ra_fusion", "epochs": 1},
+        "defaults": {"protocol": "P1", "seed": 0, "queue": "kaggle", "model": "ra_fusion", "epochs": 1, "batch_size": 8},
         "runs": [{"id": "run_a"}, {"id": "run_b"}],
     }))
     kaggle = FakeKaggle()
@@ -74,7 +74,7 @@ def _smoke_output(ok=True, fits=True):
     if not ok:
         out["results/smoke/smoke_snunet/status.json"] = _status("failed", 1)
     out["results/smoke/gpu_probe.json"] = json.dumps(
-        {"models": {"ra_fusion": {"fits_configured_batch": True}, "snunet": {"fits_configured_batch": fits}}}
+        {"models": {"ra_fusion": {"batch_size": 8 if fits else 4, "fits_configured_batch": fits}, "snunet": {"batch_size": 4}}}
     )
     out["sn8-smoke.log"] = "smoke log"
     return out
@@ -380,3 +380,37 @@ def test_rerun_smoke_skips_prepare_once_prepared(setup):
     kaggle.outputs["sn8-smoke"] = _smoke_output()
     st = orch.tick()
     assert st["phase"] == "train" and st["kernel"] == "sn8-train-a"
+
+
+def test_probe_is_judged_against_the_current_batch_sizes(setup, tmp_path):
+    orch, kaggle, _ = setup
+    orch.tick()
+    out = _smoke_output()
+    # Probe ran with batch 8 configured and found only 4 fits; the registry now says 4
+    out["results/smoke/gpu_probe.json"] = json.dumps({"models": {"ra_fusion": {"batch_size": 4, "fits_configured_batch": False}}})
+    runs = yaml.safe_load(orch.runs_file.read_text())
+    runs["defaults"]["batch_size"] = 4
+    orch.runs_file.write_text(yaml.safe_dump(runs))
+    kaggle.statuses["sn8-smoke"] = "complete"
+    kaggle.outputs["sn8-smoke"] = out
+    assert orch.tick()["phase"] == "prepare"
+
+
+def test_command_file_runs_once(setup, monkeypatch, tmp_path):
+    orch, kaggle, _ = setup
+    command = tmp_path / "COMMAND"
+    monkeypatch.setattr(orch_mod, "COMMAND_FILE", command)
+    st = orch.load()
+    st.update({"phase": "stopped", "stop_reason": "x"})
+    orch.store.open()
+    orch.save(st)
+    command.write_text("# maintainer command\nresume smoke\n")
+    st = orch.tick()
+    assert st["phase"] == "smoke" and st["kernel"] == "sn8-smoke" and st["reset_failed"]
+    st = orch.load()
+    st.update({"phase": "stopped", "kernel": None})
+    orch.save(st)
+    assert orch.tick()["phase"] == "stopped"  # same content: not applied again
+    orch.current_commit = "b" * 40
+    command.write_text("update-code\n")
+    assert orch.tick()["code_commit"] == "b" * 40

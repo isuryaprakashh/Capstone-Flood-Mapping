@@ -31,6 +31,7 @@ Usage (GitHub Actions):
 """
 
 import argparse
+import hashlib
 import json
 import logging
 import os
@@ -50,6 +51,7 @@ logger = logging.getLogger(__name__)
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SESSION_TEMPLATE = REPO_ROOT / "orchestration" / "kaggle_session.py"
 HOLD_FILE = REPO_ROOT / "orchestration" / "HOLD"  # while on main, scheduled ticks start no session (resume does)
+COMMAND_FILE = REPO_ROOT / "orchestration" / "COMMAND"  # one-shot operator command (see apply_command)
 JOB_PLACEHOLDER = "JOB = {}  # __JOB__ (replaced by the orchestrator)"
 
 SLUGS = {"smoke": "sn8-smoke", "prepare": "sn8-prepare", "train": ("sn8-train-a", "sn8-train-b")}
@@ -246,6 +248,7 @@ DEFAULT_STATE = {
     "gpu_sessions": [],  # {"start", "hours"} per GPU session, for the weekly quota
     "prepared": False,  # sn8-prepare output exists: a re-run smoke test goes straight to training
     "reset_failed": False,  # set by resume: the next training session resets failed runs
+    "last_command": None,  # hash of the last orchestration/COMMAND applied
     "tick_errors": 0,
     "events": [],
 }
@@ -285,6 +288,7 @@ class Orchestrator:
         if update_code:
             st["code_commit"] = self.current_commit
             self.event(st, f"Code re-pinned to {self.current_commit[:7]}")
+        self.apply_command(st)
 
         if st["phase"] in ("done", "stopped"):
             logger.info(f"Phase {st['phase']}: nothing to do ({st.get('stop_reason') or 'finished'})")
@@ -317,6 +321,33 @@ class Orchestrator:
         self.save(st)
         self.store.commit(f"orchestrator: {st['phase']} (session {st['session']})")
         return st
+
+    def apply_command(self, st: dict):
+        """
+        Run orchestration/COMMAND once per distinct content: 'update-code' (re-pin the
+        training code to current main) or 'resume <phase>' (leave 'stopped'; waits for a
+        running session to end). Lets the maintainer act by pushing a file, without a click.
+        """
+        if not COMMAND_FILE.exists():
+            return
+        text = COMMAND_FILE.read_text()
+        token = hashlib.sha256(text.encode()).hexdigest()[:16]
+        if token == st["last_command"]:
+            return
+        lines = [l.split() for l in text.splitlines() if l.strip() and not l.lstrip().startswith("#")]
+        cmd = lines[0] if lines else []
+        if cmd == ["update-code"]:
+            st["code_commit"] = self.current_commit
+            self.event(st, f"Command: training code re-pinned to {self.current_commit[:7]}")
+        elif len(cmd) == 2 and cmd[0] == "resume" and cmd[1] in ("smoke", "prepare", "train"):
+            if st["kernel"]:
+                return  # applied once the running session has been recorded
+            st.update({"phase": cmd[1], "stop_reason": None, "phase_retries": 0, "wait_until": None,
+                       "reset_failed": True, "tick_errors": 0})
+            self.event(st, f"Command: resumed at phase '{cmd[1]}'")
+        else:
+            self.event(st, f"Command ignored (expected 'update-code' or 'resume <phase>'): {' '.join(cmd)[:80]}")
+        st["last_command"] = token
 
     def safe_tick(self, update_code: bool = False, ignore_hold: bool = False) -> tuple[dict, str | None]:
         """
@@ -516,7 +547,15 @@ class Orchestrator:
         if not probe_path.exists():
             return False, "GPU probe missing"
         probe = json.loads(probe_path.read_text())["models"]
-        too_big = [k for k, v in probe.items() if not v.get("fits_configured_batch")]
+        # Judge against the current registry (a batch size lowered after the probe counts)
+        sys.path.insert(0, str(REPO_ROOT))
+        from training.config import load_runs
+
+        configured = {}
+        for cfg in load_runs(self.runs_file).values():
+            key = cfg["model"] + ("" if not cfg.get("model_kwargs") else f" {cfg['model_kwargs']}")
+            configured[key] = max(configured.get(key, 0), cfg.get("batch_size", 0))
+        too_big = [k for k, v in probe.items() if v.get("batch_size", 0) < configured.get(k, 0)]
         if too_big:
             return False, f"models do not fit their batch size: {too_big} (see smoke/gpu_probe.json)"
         return True, ""

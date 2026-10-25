@@ -5,9 +5,9 @@
 # edit a run's settings once it has started (add a new run instead).
 #
 # priority: lower runs first (the headline comparison is scheduled first).
-# grad_accum: micro-batches per optimizer step. Siamese U-Net and SNUNet do
-# not fit batch 8 on a 16 GB T4, so they use 4 × 2: every model trains with
-# an effective batch of 8.
+# grad_accum: micro-batches per optimizer step. Siamese U-Net, SNUNet and the
+# ConvNeXt ablation do not fit batch 8 on a 16 GB T4, so they use 4 × 2:
+# every model trains with an effective batch of 8.
 
 defaults:
   protocol: P1
@@ -100,7 +100,7 @@ runs:
      notes: no synthetic misalignment and no self-supervised alignment loss}
   - {id: abl_dense_flood_loss, model: ra_fusion, model_kwargs: {backbone: dinov3_sat}, loss: {object_masked_flood: false}, priority: 7,
      notes: flood loss on all valid pixels instead of labelled objects}
-  - {id: abl_convnext_backbone, model: ra_fusion, model_kwargs: {backbone: convnext_tiny.dinov3_lvd1689m}, priority: 7,
+  - {id: abl_convnext_backbone, model: ra_fusion, model_kwargs: {backbone: convnext_tiny.dinov3_lvd1689m}, batch_size: 4, grad_accum: 2, priority: 7,
      notes: fine-tuned ConvNeXt-T (DINOv3 web pretraining) instead of frozen satellite ViT-L}
   - {id: abl_no_junction_head, model: ra_fusion, model_kwargs: {backbone: dinov3_sat}, loss: {junction: 0.0}, priority: 7,
      notes: junction auxiliary loss removed}

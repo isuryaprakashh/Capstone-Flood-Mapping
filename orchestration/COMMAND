@@ -1,0 +1,3 @@
+# One-shot maintainer command, applied by the orchestrator once per distinct content.
+# 'update-code' re-pins the training code to current main; 'resume <phase>' leaves 'stopped'.
+update-code
