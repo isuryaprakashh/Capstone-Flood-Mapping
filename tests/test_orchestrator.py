@@ -266,3 +266,54 @@ def test_stopping_alerts_only_on_the_stopping_tick(setup):
         alerts.append(orch.safe_tick()[1])
     alerts.append(orch.safe_tick()[1])  # already stopped: no second email
     assert [a is not None for a in alerts] == [False, False, True, False]
+
+
+def test_quota_week_starts_saturday_midnight_utc():
+    from datetime import datetime, timezone
+    from orchestration.kaggle_orchestrator import quota_week_start
+
+    def ts(*a):
+        return datetime(*a, tzinfo=timezone.utc).timestamp()
+
+    saturday = ts(2026, 10, 24)
+    assert quota_week_start(ts(2026, 10, 25, 8, 30)) == saturday  # Sunday
+    assert quota_week_start(saturday) == saturday
+    assert quota_week_start(ts(2026, 10, 30, 23, 59)) == saturday  # Friday
+    assert quota_week_start(ts(2026, 10, 31, 0, 1)) == ts(2026, 10, 31)  # next Saturday
+
+
+def test_no_gpu_launch_once_weekly_quota_is_spent(setup, monkeypatch):
+    orch, kaggle, _ = setup
+    _to_training(orch, kaggle)
+    kaggle.statuses["sn8-train-a"] = "complete"
+    kaggle.outputs["sn8-train-a"] = {"results/run_a/status.json": _status("paused"),
+                                     "session.json": json.dumps({"minutes": 31 * 60})}
+    pushes = len(kaggle.pushes)
+    st = orch.tick()
+    assert len(kaggle.pushes) == pushes and st["kernel"] is None
+    assert st["wait_until"] == orch_mod.quota_week_start(orch_mod.now()) + 7 * 86400 + 600
+
+
+def test_early_failure_near_quota_waits_instead_of_counting_a_retry(setup):
+    orch, kaggle, _ = setup
+    _to_training(orch, kaggle)
+    st = orch.load()
+    st["gpu_sessions"].append({"start": orch_mod.now(), "hours": 27.0})
+    orch.save(st)
+    kaggle.statuses["sn8-train-a"] = "error"
+    kaggle.outputs["sn8-train-a"] = {"sn8-train-a.log": "Accelerator not available"}  # no 'quota' wording
+    st = orch.tick()
+    assert st["phase"] == "train" and st["phase_retries"] == 0 and st["wait_until"] is not None
+
+
+def test_smoke_is_judged_only_on_its_own_output(setup):
+    orch, kaggle, store = setup
+    orch.tick()
+    kaggle.statuses["sn8-smoke"] = "complete"
+    kaggle.outputs["sn8-smoke"] = _smoke_output(ok=False)
+    orch.tick()  # attempt 1 fails, leaves smoke files behind
+    kaggle.statuses["sn8-smoke"] = "error"
+    kaggle.outputs["sn8-smoke"] = {}  # attempt 2 crashed before writing anything
+    st = orch.tick()
+    assert not (store.root / "smoke").exists()
+    assert "no smoke results" in st["events"][-2]["message"]

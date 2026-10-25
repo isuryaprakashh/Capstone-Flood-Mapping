@@ -41,7 +41,7 @@ import sys
 import tempfile
 import time
 import urllib.request
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s", datefmt="%H:%M:%S")
@@ -59,6 +59,8 @@ QUOTA_WAIT_S = 6 * 3600
 MAX_PHASE_RETRIES = 2
 MAX_RUN_ATTEMPTS = 3
 TICK_ERRORS_BEFORE_ALERT = 3  # consecutive failing ticks (1.5 h) before one alert email
+WEEKLY_GPU_HOURS = 30.0  # Kaggle's weekly GPU quota, reset Saturday 00:00 UTC
+QUOTA_NEAR_H = 5.0  # an early failure with less than this left is treated as quota, not a bug
 PIP_PACKAGES = ["rasterio>=1.3.8", "timm>=1.0.20", "filelock>=3.12", "pyyaml>=6.0"]
 DOWNLOAD_PATTERN = r"^(?!processed/)(?!.*checkpoints/).*$"
 
@@ -69,6 +71,12 @@ def now() -> float:
 
 def stamp(t: float = None) -> str:
     return datetime.fromtimestamp(t or now(), timezone.utc).isoformat(timespec="seconds")
+
+
+def quota_week_start(t: float) -> float:
+    """Most recent Saturday 00:00 UTC, when Kaggle resets the weekly GPU quota."""
+    day = datetime.fromtimestamp(t, timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+    return (day - timedelta(days=(day.weekday() - 5) % 7)).timestamp()
 
 
 # ─── Kaggle ─────────────────────────────────────────────────────────────────
@@ -217,6 +225,7 @@ DEFAULT_STATE = {
     "last_good_train": None,
     "phase_retries": 0,
     "stop_reason": None,
+    "gpu_sessions": [],  # {"start", "hours"} per GPU session, for the weekly quota
     "tick_errors": 0,
     "events": [],
 }
@@ -276,6 +285,9 @@ class Orchestrator:
         if st["phase"] in ("smoke", "prepare", "train") and not st["kernel"]:
             if st["wait_until"] and now() < st["wait_until"]:
                 logger.info(f"Waiting for GPU quota until {stamp(st['wait_until'])}")
+            elif st["phase"] != "prepare" and self.gpu_hours_this_week(st) >= WEEKLY_GPU_HOURS:
+                # Kaggle refuses new GPU sessions once the quota is spent (a running one may finish)
+                self.quota_wait(st, f"Weekly GPU quota used ({self.gpu_hours_this_week(st):.1f} h)")
             else:
                 st["wait_until"] = None
                 self.launch(st)
@@ -299,8 +311,7 @@ class Orchestrator:
             st = self.load()  # last saved state
             alert = None
             if re.search(r"quota", str(e), re.I) and not st["kernel"]:
-                st["wait_until"] = now() + QUOTA_WAIT_S
-                self.event(st, f"Kaggle refused the session (quota); waiting until {stamp(st['wait_until'])}")
+                self.quota_wait(st, "Kaggle refused the session (quota)")
             else:
                 st["tick_errors"] += 1
                 self.event(st, f"Tick error {st['tick_errors']}: {type(e).__name__}: {str(e)[-300:]}")
@@ -376,8 +387,12 @@ class Orchestrator:
                 self.event(st, f"Could not download output of {slug}: {e}")
             log_text = self.collect(tmp, st["session"], mode)
             produced_results = (tmp / "results").exists()
+            session_info = tmp / "session.json"
+            run_minutes = json.loads(session_info.read_text())["minutes"] if session_info.exists() else minutes
 
         st["kernel"] = None
+        if mode != "prepare":
+            st["gpu_sessions"] = (st["gpu_sessions"] + [{"start": st["pushed_at"], "hours": run_minutes / 60}])[-50:]
         if mode == "smoke":
             ok, reason = self.smoke_passed()
             if ok:
@@ -395,14 +410,26 @@ class Orchestrator:
             if produced_results:
                 # Resume from the newest output with results, even if the session ended in an error
                 st["last_good_train"] = slug
-            if status != "complete" and minutes < 15 and re.search(r"quota|limit", log_text, re.I):
-                st["wait_until"] = now() + QUOTA_WAIT_S
-                self.event(st, "GPU quota appears exhausted; retrying in 6 h")
+            quota_low = self.gpu_hours_this_week(st) >= WEEKLY_GPU_HOURS - QUOTA_NEAR_H
+            if status != "complete" and minutes < 15 and (quota_low or re.search(r"quota|limit", log_text, re.I)):
+                self.quota_wait(st, f"Session {slug} refused or cut short, GPU quota appears exhausted")
             elif status != "complete" and minutes < 15:
                 self.retry_or_stop(st, f"Training session failed early with status {status}")
             if self.all_runs_finished():
                 st["phase"] = "done"
                 self.event(st, "All runs finished")
+
+    def gpu_hours_this_week(self, st: dict) -> float:
+        start = quota_week_start(now())
+        return sum(s["hours"] for s in st["gpu_sessions"] if s["start"] and s["start"] >= start)
+
+    def quota_wait(self, st: dict, reason: str):
+        """Wait for the Saturday reset when this week's quota is (nearly) spent, else retry in 6 h."""
+        if self.gpu_hours_this_week(st) >= WEEKLY_GPU_HOURS - QUOTA_NEAR_H:
+            st["wait_until"] = quota_week_start(now()) + 7 * 86400 + 600
+        else:
+            st["wait_until"] = now() + QUOTA_WAIT_S
+        self.event(st, f"{reason}; waiting until {stamp(st['wait_until'])}")
 
     def retry_or_stop(self, st: dict, reason: str):
         st["phase_retries"] += 1
@@ -415,6 +442,9 @@ class Orchestrator:
     def collect(self, downloaded: Path, session: int, mode: str) -> str:
         """Copy downloaded results into the results branch; return the session log text."""
         results = downloaded / "results"
+        if mode == "smoke":
+            # Judge each smoke session on its own output, never on an earlier attempt's files
+            shutil.rmtree(self.store.root / "smoke", ignore_errors=True)
         if results.exists():
             shutil.copytree(results, self.store.root, dirs_exist_ok=True,
                             ignore=shutil.ignore_patterns("checkpoints", "*.pt", ".queue.lock"))
