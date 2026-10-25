@@ -1,0 +1,13 @@
+{
+  "id": "p1_snunet_s0",
+  "state": "completed",
+  "attempts": 0,
+  "session": "ecdcf5d4",
+  "worker": "1",
+  "pid": 99,
+  "started_at": "2026-10-25T16:56:25+00:00",
+  "updated_at": "2026-10-25T19:44:10+00:00",
+  "error": null,
+  "completed_at": "2026-10-25T19:44:10+00:00",
+  "seconds_total": 10064.6
+}

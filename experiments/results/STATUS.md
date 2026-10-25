@@ -1,16 +1,18 @@
 # Orchestrator status
 
 - **Phase:** train
-- **Sessions started:** 10
-- **Running:** sn8-train-a
+- **Sessions started:** 11
+- **Running:** sn8-train-b
 - **Code commit:** 26379792d3b4427f54d893008452a7d723fa4814
 - **Waiting for quota until:** —
-- **Updated:** 2026-10-25T12:20:31+00:00
+- **Updated:** 2026-10-25T23:39:25+00:00
 
 Per-run progress: [PROGRESS.md](PROGRESS.md)
 
 ## Recent events
 
+- 2026-10-25T23:39:25+00:00 — Started train session 11 on sn8-train-b (code 2637979)
+- 2026-10-25T23:39:01+00:00 — sn8-train-a (train) ended: complete after 678 min
 - 2026-10-25T12:20:31+00:00 — Started train session 10 on sn8-train-a (code 2637979)
 - 2026-10-25T12:20:29+00:00 — Dataset prepared; training starts
 - 2026-10-25T12:20:21+00:00 — sn8-prepare (prepare) ended: complete after 20 min

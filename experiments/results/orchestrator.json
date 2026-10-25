@@ -1,12 +1,12 @@
 {
   "phase": "train",
   "code_commit": "26379792d3b4427f54d893008452a7d723fa4814",
-  "session": 10,
-  "kernel": "sn8-train-a",
+  "session": 11,
+  "kernel": "sn8-train-b",
   "kernel_mode": "train",
-  "pushed_at": 1792930831.587753,
+  "pushed_at": 1792971565.548841,
   "wait_until": null,
-  "last_good_train": null,
+  "last_good_train": "sn8-train-a",
   "phase_retries": 0,
   "stop_reason": null,
   "gpu_sessions": [
@@ -25,6 +25,10 @@
     {
       "start": 1792927605.3397243,
       "hours": 0.38833333333333336
+    },
+    {
+      "start": 1792930831.587753,
+      "hours": 11.296666666666665
     }
   ],
   "prepared": true,
@@ -143,6 +147,14 @@
     {
       "at": "2026-10-25T12:20:31+00:00",
       "message": "Started train session 10 on sn8-train-a (code 2637979)"
+    },
+    {
+      "at": "2026-10-25T23:39:01+00:00",
+      "message": "sn8-train-a (train) ended: complete after 678 min"
+    },
+    {
+      "at": "2026-10-25T23:39:25+00:00",
+      "message": "Started train session 11 on sn8-train-b (code 2637979)"
     }
   ]
 }

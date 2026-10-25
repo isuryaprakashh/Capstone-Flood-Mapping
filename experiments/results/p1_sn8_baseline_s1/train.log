@@ -1,0 +1,42 @@
+2026-10-25 21:51:28 [INFO] Loading pretrained weights from Hugging Face hub (timm/resnet34.tv_in1k)
+2026-10-25 21:51:28 [INFO] HTTP Request: HEAD https://huggingface.co/timm/resnet34.tv_in1k/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-10-25 21:51:28 [INFO] [timm/resnet34.tv_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
+2026-10-25 21:51:28 [INFO] Missing keys (fc.weight, fc.bias) discovered while loading pretrained weights. This is expected if model is being adapted.
+2026-10-25 21:51:28 [INFO] Loading pretrained weights from Hugging Face hub (timm/resnet34.tv_in1k)
+2026-10-25 21:51:28 [INFO] HTTP Request: HEAD https://huggingface.co/timm/resnet34.tv_in1k/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-10-25 21:51:28 [INFO] [timm/resnet34.tv_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
+2026-10-25 21:51:28 [INFO] Missing keys (fc.weight, fc.bias) discovered while loading pretrained weights. This is expected if model is being adapted.
+2026-10-25 21:54:04 [INFO] [p1_sn8_baseline_s1] foundation epoch 1/20 loss 2.0571 val_score 0.4253 * (155s)
+2026-10-25 21:56:27 [INFO] [p1_sn8_baseline_s1] foundation epoch 2/20 loss 1.2359 val_score 0.5815 * (143s)
+2026-10-25 21:58:49 [INFO] [p1_sn8_baseline_s1] foundation epoch 3/20 loss 1.1281 val_score 0.6143 * (141s)
+2026-10-25 22:01:10 [INFO] [p1_sn8_baseline_s1] foundation epoch 4/20 loss 1.0487 val_score 0.6471 * (141s)
+2026-10-25 22:04:01 [INFO] [p1_sn8_baseline_s1] foundation epoch 5/20 loss 0.9892 val_score 0.6582 * (170s)
+2026-10-25 22:07:19 [INFO] [p1_sn8_baseline_s1] foundation epoch 6/20 loss 0.9437 val_score 0.6680 * (197s)
+2026-10-25 22:10:37 [INFO] [p1_sn8_baseline_s1] foundation epoch 7/20 loss 0.8989 val_score 0.6735 * (197s)
+2026-10-25 22:13:55 [INFO] [p1_sn8_baseline_s1] foundation epoch 8/20 loss 0.8710 val_score 0.6787 * (197s)
+2026-10-25 22:17:14 [INFO] [p1_sn8_baseline_s1] foundation epoch 9/20 loss 0.9022 val_score 0.6865 * (199s)
+2026-10-25 22:20:36 [INFO] [p1_sn8_baseline_s1] foundation epoch 10/20 loss 0.8187 val_score 0.6948 * (200s)
+2026-10-25 22:24:01 [INFO] [p1_sn8_baseline_s1] foundation epoch 11/20 loss 0.8244 val_score 0.6970 * (205s)
+2026-10-25 22:27:26 [INFO] [p1_sn8_baseline_s1] foundation epoch 12/20 loss 0.7538 val_score 0.7001 * (203s)
+2026-10-25 22:30:43 [INFO] [p1_sn8_baseline_s1] foundation epoch 13/20 loss 0.7537 val_score 0.6979 (196s)
+2026-10-25 22:34:03 [INFO] [p1_sn8_baseline_s1] foundation epoch 14/20 loss 0.7638 val_score 0.7028 * (200s)
+2026-10-25 22:37:23 [INFO] [p1_sn8_baseline_s1] foundation epoch 15/20 loss 0.7382 val_score 0.7059 * (199s)
+2026-10-25 22:40:42 [INFO] [p1_sn8_baseline_s1] foundation epoch 16/20 loss 0.7043 val_score 0.7091 * (198s)
+2026-10-25 22:44:00 [INFO] [p1_sn8_baseline_s1] foundation epoch 17/20 loss 0.6789 val_score 0.7114 * (197s)
+2026-10-25 22:47:20 [INFO] [p1_sn8_baseline_s1] foundation epoch 18/20 loss 0.6864 val_score 0.7126 * (199s)
+2026-10-25 22:50:41 [INFO] [p1_sn8_baseline_s1] foundation epoch 19/20 loss 0.6466 val_score 0.7137 * (199s)
+2026-10-25 22:54:01 [INFO] [p1_sn8_baseline_s1] foundation epoch 20/20 loss 0.6623 val_score 0.7142 * (200s)
+2026-10-25 22:57:26 [INFO] [p1_sn8_baseline_s1] flood epoch 1/20 loss 2.5881 val_score 0.7826 * (203s)
+2026-10-25 23:00:48 [INFO] [p1_sn8_baseline_s1] flood epoch 2/20 loss 2.1698 val_score 0.7738 (201s)
+2026-10-25 23:04:11 [INFO] [p1_sn8_baseline_s1] flood epoch 3/20 loss 2.2652 val_score 0.7463 (202s)
+2026-10-25 23:07:38 [INFO] [p1_sn8_baseline_s1] flood epoch 4/20 loss 2.4132 val_score 0.7729 (206s)
+2026-10-25 23:11:06 [INFO] [p1_sn8_baseline_s1] flood epoch 5/20 loss 1.6567 val_score 0.8010 * (208s)
+2026-10-25 23:14:36 [INFO] [p1_sn8_baseline_s1] flood epoch 6/20 loss 1.5871 val_score 0.8192 * (209s)
+2026-10-25 23:18:05 [INFO] [p1_sn8_baseline_s1] flood epoch 7/20 loss 1.8897 val_score 0.7972 (208s)
+2026-10-25 23:21:33 [INFO] [p1_sn8_baseline_s1] flood epoch 8/20 loss 1.4031 val_score 0.7779 (207s)
+2026-10-25 23:25:02 [INFO] [p1_sn8_baseline_s1] flood epoch 9/20 loss 1.4669 val_score 0.7920 (208s)
+2026-10-25 23:28:30 [INFO] [p1_sn8_baseline_s1] flood epoch 10/20 loss 1.2197 val_score 0.7421 (207s)
+2026-10-25 23:31:59 [INFO] [p1_sn8_baseline_s1] flood epoch 11/20 loss 1.2238 val_score 0.7237 (208s)
+2026-10-25 23:35:27 [INFO] [p1_sn8_baseline_s1] flood epoch 12/20 loss 1.3136 val_score 0.7238 (207s)
+2026-10-25 23:38:08 [INFO] [p1_sn8_baseline_s1] flood epoch 13/20 loss 1.0920 val_score 0.7194 (160s)
+2026-10-25 23:38:10 [INFO] Pausing before epoch 13: not enough session time left

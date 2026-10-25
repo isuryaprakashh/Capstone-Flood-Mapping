@@ -1,0 +1,15 @@
+{
+  "thresholds": {
+    "building": 0.5,
+    "road": 0.4,
+    "flooded_building": 0.3,
+    "flooded_road": 0.3
+  },
+  "val_pixel_f1_at_threshold": {
+    "building": 0.8171,
+    "road": 0.6296,
+    "flooded_building": 0.9277,
+    "flooded_road": 0.8489
+  },
+  "n_tiles": 120
+}
