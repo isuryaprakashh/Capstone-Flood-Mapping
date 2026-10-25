@@ -53,15 +53,29 @@ def test_road_graph_splits_at_junction_and_marks_flooded_arm():
     lengths = [d["length_m"] for _, _, d in G.edges(data=True)]
     flooded_edges = [d for _, _, d in G.edges(data=True) if d["flooded"]]
 
-    # Junction pixel clusters merge into one node: exactly four arms
-    assert G.number_of_edges() == 4
-    assert sorted(dict(G.degree()).values()) == [1, 1, 1, 1, 4]
+    # Junction pixel clusters merge into one node (degree 4); the partly flooded
+    # northern arm is split at the flood boundary (one extra degree-2 node)
+    assert G.number_of_edges() == 5
+    assert sorted(dict(G.degree()).values()) == [1, 1, 1, 1, 2, 4]
     assert len(flooded_edges) == 1
     assert sum(lengths) == pytest.approx(2 * 90 * 0.5, rel=0.15)
 
     fc = road_graph_to_geojson(G)
     assert len(fc["features"]) == G.number_of_edges()
     assert all(len(f["geometry"]["coordinates"]) >= 2 for f in fc["features"])
+
+
+def test_road_graph_splits_at_flood_boundary():
+    road = np.zeros((40, 200), dtype=np.uint8)
+    road[18:23, 5:195] = 1                 # one straight road, no junctions
+    flooded = np.zeros_like(road)
+    flooded[:, 120:] = road[:, 120:]       # its eastern part is flooded
+
+    G = build_road_graph(road, flooded, gsd_m=0.5, flood_dilation_px=1, min_component_m=1.0)
+    states = sorted(d["flooded"] for _, _, d in G.edges(data=True))
+    assert states == [False, True]         # split into a dry and a flooded segment
+    flooded_len = sum(d["length_m"] for _, _, d in G.edges(data=True) if d["flooded"])
+    assert flooded_len == pytest.approx((193 - 120) * 0.5, abs=3.0)
 
 
 def test_road_graph_drops_short_fragments():

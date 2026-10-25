@@ -170,7 +170,10 @@ def _contract_chains(
     Adjacent junction pixels (the small pixel clusters skeletonization leaves
     at intersections) are merged into one node, and junction-free pass-through
     nodes are merged away, so a "+" intersection yields exactly four edges.
-    A MultiGraph keeps parallel roads between the same two junctions.
+    Chains are also split where the (dilated) flood mask starts or ends, so
+    flood attribution follows flood boundaries instead of one majority vote
+    over a whole junction-to-junction road. A MultiGraph keeps parallel roads
+    between the same two junctions.
     """
     junctions = [n for n in G.nodes if G.degree(n) > 2]
     rep = {}
@@ -183,6 +186,11 @@ def _contract_chains(
     for n in G.nodes:
         if G.degree(n) < 2:
             rep[n] = n
+    # Split chains where flood status changes, so each edge gets a uniform flood label
+    if flooded is not None:
+        for n in G.nodes:
+            if n not in rep and flooded[n] and any(not flooded[m] for m in G.neighbors(n)):
+                rep[n] = n
     # Pure cycles have no junctions or endpoints: anchor one node per cycle
     for component in nx.connected_components(G):
         if not any(p in rep for p in component):
@@ -241,8 +249,8 @@ def _merge_pass_through_nodes(G: "nx.MultiGraph", flood_fraction: float):
             if G.degree(n) != 2 or len(edges) != 2:
                 continue  # junction, endpoint or self-loop
             (_, a, ka, da), (_, b, kb, db) = edges
-            if a == n or b == n:
-                continue
+            if a == n or b == n or da["flooded"] != db["flooded"]:
+                continue  # self-loop, or a flood boundary that must stay a node
             pa = da["path"] if da["path"][-1] == n else da["path"][::-1]  # a ... n
             pb = db["path"] if db["path"][0] == n else db["path"][::-1]   # n ... b
             n_px = da["n_px"] + db["n_px"]
