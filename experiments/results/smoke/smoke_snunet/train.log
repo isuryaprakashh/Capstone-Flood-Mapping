@@ -1,0 +1,5 @@
+2026-10-25 08:40:27 [INFO] [smoke_snunet] joint epoch 1/2 loss 26.4893 val_score 0.0000 * (2s)
+2026-10-25 08:40:27 [INFO] Pausing after 1 epoch(s) as requested
+2026-10-25 08:40:28 [INFO] Resuming smoke_snunet at stage 0 epoch 1
+2026-10-25 08:41:04 [INFO] Resuming smoke_snunet at stage 0 epoch 1
+2026-10-25 08:41:05 [INFO] Resuming smoke_snunet at stage 0 epoch 1

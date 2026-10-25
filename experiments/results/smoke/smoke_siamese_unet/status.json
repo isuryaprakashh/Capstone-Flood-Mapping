@@ -1,0 +1,11 @@
+{
+  "id": "smoke_siamese_unet",
+  "state": "failed",
+  "attempts": 3,
+  "session": "f061bf3d",
+  "worker": "0",
+  "started_at": "2026-10-25T08:39:56+00:00",
+  "updated_at": "2026-10-25T08:41:01+00:00",
+  "error": "RuntimeError: Expected all tensors to be on the same device, but found at least two devices, cuda:0 and cpu!",
+  "seconds_total": 28.3
+}

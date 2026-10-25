@@ -1,0 +1,69 @@
+{
+  "gpu": "Tesla T4",
+  "models": {
+    "ra_fusion {'backbone': 'dinov3_sat'}": {
+      "batch_size": 8,
+      "peak_memory_gb": 8.47,
+      "sec_per_step": 2.118,
+      "epoch_minutes": 4.2,
+      "run_hours_train_only": 2.8,
+      "fits_configured_batch": true
+    },
+    "sn8_baseline": {
+      "batch_size": 8,
+      "peak_memory_gb": 6.88,
+      "sec_per_step": 0.714,
+      "epoch_minutes": 1.4,
+      "run_hours_train_only": 0.94,
+      "fits_configured_batch": true
+    },
+    "siamese_unet": {
+      "batch_size": 4,
+      "peak_memory_gb": 12.42,
+      "sec_per_step": 0.736,
+      "epoch_minutes": 2.9,
+      "run_hours_train_only": 1.95,
+      "fits_configured_batch": false
+    },
+    "snunet": {
+      "batch_size": 4,
+      "peak_memory_gb": 8.11,
+      "sec_per_step": 0.823,
+      "epoch_minutes": 3.3,
+      "run_hours_train_only": 2.19,
+      "fits_configured_batch": false
+    },
+    "unet_v0": {
+      "batch_size": 8,
+      "peak_memory_gb": 2.27,
+      "sec_per_step": 0.208,
+      "epoch_minutes": 0.4,
+      "run_hours_train_only": 0.27,
+      "fits_configured_batch": true
+    },
+    "siamese_v0": {
+      "batch_size": 8,
+      "peak_memory_gb": 5.38,
+      "sec_per_step": 0.525,
+      "epoch_minutes": 1.0,
+      "run_hours_train_only": 0.69,
+      "fits_configured_batch": true
+    },
+    "ra_fusion {'backbone': 'dinov3_sat', 'align': False}": {
+      "batch_size": 8,
+      "peak_memory_gb": 7.45,
+      "sec_per_step": 1.574,
+      "epoch_minutes": 3.1,
+      "run_hours_train_only": 2.08,
+      "fits_configured_batch": true
+    },
+    "ra_fusion {'backbone': 'convnext_tiny.dinov3_lvd1689m'}": {
+      "batch_size": 8,
+      "peak_memory_gb": 13.81,
+      "sec_per_step": 1.2,
+      "epoch_minutes": 2.4,
+      "run_hours_train_only": 1.59,
+      "fits_configured_batch": true
+    }
+  }
+}

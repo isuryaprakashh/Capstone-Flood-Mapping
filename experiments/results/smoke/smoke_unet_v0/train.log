@@ -1,0 +1,5 @@
+2026-10-25 08:40:41 [INFO] [smoke_unet_v0] joint epoch 1/2 loss 6.4972 val_score 0.0000 * (2s)
+2026-10-25 08:40:41 [INFO] Pausing after 1 epoch(s) as requested
+2026-10-25 08:40:42 [INFO] Resuming smoke_unet_v0 at stage 0 epoch 1
+2026-10-25 08:41:09 [INFO] Resuming smoke_unet_v0 at stage 0 epoch 1
+2026-10-25 08:41:10 [INFO] Resuming smoke_unet_v0 at stage 0 epoch 1

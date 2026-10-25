@@ -1,0 +1,263 @@
+[{"stream_name":"stdout","time":1.11710932,"data":"[08:35:54 +0m] Job: {\"mode\": \"smoke\", \"repo\": \"https://github.com/isuryaprakashh/Capstone-Flood-Mapping.git\", \"commit\": \"60e6bfd09b2319ee06560ebbaaafc513db16301d\", \"hours\": 3.0, \"queue\": \"kaggle\", \"pip\": [\"rasterio\u003e=1.3.8\", \"timm\u003e=1.0.20\", \"filelock\u003e=3.12\", \"pyyaml\u003e=6.0\"], \"session\": 2, \"data_source\": \"sn8-prepare\", \"previous\": null}\n"}
+,{"stream_name":"stdout","time":10.362307925,"data":"[08:36:03 +0m] GPUs: 2 ['Tesla T4', 'Tesla T4']\n"}
+,{"stream_name":"stdout","time":10.362337819,"data":"[08:36:03 +0m] $ /usr/bin/python3 -m pip install -q \"rasterio\u003e=1.3.8\" \"timm\u003e=1.0.20\" \"filelock\u003e=3.12\" \"pyyaml\u003e=6.0\"\n"}
+,{"stream_name":"stdout","time":13.396528573,"data":"[08:36:06 +0m] $ git clone --quiet https://github.com/isuryaprakashh/Capstone-Flood-Mapping.git /kaggle/tmp/code\n"}
+,{"stream_name":"stdout","time":14.125352323,"data":"[08:36:07 +0m] $ git checkout --quiet 60e6bfd09b2319ee06560ebbaaafc513db16301d\n"}
+,{"stream_name":"stdout","time":14.136277824,"data":"[08:36:07 +0m] Downloading Germany_Training_Public\n"}
+,{"stream_name":"stderr","time":37.980383218,"data":"/kaggle/src/script.py:77: DeprecationWarning: Python 3.14 will, by default, filter extracted tar archives and reject files or modify their metadata. Use the filter argument to control this behavior.\n"}
+,{"stream_name":"stderr","time":37.980437516,"data":"  tar.extractall(dest)\n"}
+,{"stream_name":"stdout","time":57.026023473,"data":"[08:36:50 +1m] Downloading Louisiana-East_Training_Public\n"}
+,{"stream_name":"stdout","time":159.55168955,"data":"[08:38:33 +3m] $ /usr/bin/python3 scripts/prepare_data.py --data-root /kaggle/tmp/raw --out-dir /kaggle/tmp/processed_smoke --workers 4 --limit 12\n"}
+,{"stream_name":"stderr","time":163.998280599,"data":"08:38:37 [INFO] Preparing 24 tiles (0 already done) with 4 workers\n"}
+,{"stream_name":"stderr","time":180.534036453,"data":"08:38:54 [INFO]   24/24 tiles\n"}
+,{"stream_name":"stderr","time":180.552454795,"data":"08:38:54 [INFO] P1: train 11 | val 1 | test 12\n"}
+,{"stream_name":"stderr","time":180.552487078,"data":"08:38:54 [INFO] P2: train 9 | val 3 | test 12\n"}
+,{"stream_name":"stderr","time":180.552494954,"data":"08:38:54 [INFO] P3: train 16 | val 4 | test 4\n"}
+,{"stream_name":"stdout","time":184.329285065,"data":"[08:38:57 +3m] $ /usr/bin/python3 scripts/run_queue.py --processed /kaggle/tmp/processed_smoke --results /kaggle/working/results/smoke --smoke\n"}
+,{"stream_name":"stderr","time":186.676258094,"data":"08:39:00 [INFO] [worker 0] starting smoke_ra_fusion\n"}
+,{"stream_name":"stderr","time":205.235693708,"data":"08:39:18 [INFO] Loading pretrained weights from Hugging Face hub (timm/vit_large_patch16_dinov3.sat493m)\n"}
+,{"stream_name":"stderr","time":205.346896079,"data":"08:39:18 [INFO] HTTP Request: GET https://huggingface.co/api/agent-harnesses \"HTTP/1.1 200 OK\"\n"}
+,{"stream_name":"stderr","time":205.38726755,"data":"08:39:18 [INFO] HTTP Request: HEAD https://huggingface.co/timm/vit_large_patch16_dinov3.sat493m/resolve/main/model.safetensors \"HTTP/1.1 302 Found\"\n"}
+,{"stream_name":"stderr","time":205.387892295,"data":"Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.\n"}
+,{"stream_name":"stderr","time":205.387954987,"data":"08:39:18 [WARNING] Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.\n"}
+,{"stream_name":"stderr","time":205.508477158,"data":"08:39:19 [INFO] HTTP Request: GET https://huggingface.co/api/models/timm/vit_large_patch16_dinov3.sat493m/xet-read-token/ce148bd5ed3de1eb75ebdccafcb2c280bb3e8f7c \"HTTP/1.1 200 OK\"\n"}
+,{"stream_name":"stderr","time":215.970760672,"data":"08:39:29 [INFO] [timm/vit_large_patch16_dinov3.sat493m] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.\n"}
+,{"stream_name":"stderr","time":216.465841422,"data":"08:39:29 [INFO] Loading pretrained weights from Hugging Face hub (timm/resnet18.a1_in1k)\n"}
+,{"stream_name":"stderr","time":216.565552903,"data":"08:39:30 [INFO] HTTP Request: HEAD https://huggingface.co/timm/resnet18.a1_in1k/resolve/main/model.safetensors \"HTTP/1.1 302 Found\"\n"}
+,{"stream_name":"stderr","time":216.603164716,"data":"08:39:30 [INFO] HTTP Request: GET https://huggingface.co/api/models/timm/resnet18.a1_in1k/xet-read-token/491b427b45c94c7fb0e78b5474cc919aff584bbf \"HTTP/1.1 200 OK\"\n"}
+,{"stream_name":"stderr","time":220.560955626,"data":"08:39:34 [INFO] [timm/resnet18.a1_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.\n"}
+,{"stream_name":"stderr","time":220.581935714,"data":"08:39:34 [INFO] Missing keys (fc.weight, fc.bias) discovered while loading pretrained weights. This is expected if model is being adapted.\n"}
+,{"stream_name":"stderr","time":232.810384644,"data":"/kaggle/tmp/code/training/engine.py:462: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.\n"}
+,{"stream_name":"stderr","time":232.810420625,"data":"Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:836.)\n"}
+,{"stream_name":"stderr","time":232.810425807,"data":"  sums[k] = sums.get(k, 0.0) + float(v)\n"}
+,{"stream_name":"stderr","time":237.106751797,"data":"08:39:50 [INFO] [smoke_ra_fusion] joint epoch 1/2 loss 6.5934 val_score 0.0000 * (16s)\n"}
+,{"stream_name":"stderr","time":237.475451392,"data":"08:39:50 [INFO] Pausing after 1 epoch(s) as requested\n"}
+,{"stream_name":"stderr","time":237.482943774,"data":"08:39:50 [INFO] Smoke pass 1 (stop after 1 epoch): {'smoke_ra_fusion': 'paused'}\n"}
+,{"stream_name":"stderr","time":237.483901492,"data":"08:39:50 [INFO] [worker 0] starting smoke_ra_fusion\n"}
+,{"stream_name":"stderr","time":241.480619207,"data":"08:39:54 [INFO] Loading pretrained weights from Hugging Face hub (timm/vit_large_patch16_dinov3.sat493m)\n"}
+,{"stream_name":"stderr","time":241.56589313,"data":"08:39:55 [INFO] HTTP Request: HEAD https://huggingface.co/timm/vit_large_patch16_dinov3.sat493m/resolve/main/model.safetensors \"HTTP/1.1 302 Found\"\n"}
+,{"stream_name":"stderr","time":241.566939406,"data":"08:39:55 [INFO] [timm/vit_large_patch16_dinov3.sat493m] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.\n"}
+,{"stream_name":"stderr","time":241.871893568,"data":"08:39:55 [INFO] Loading pretrained weights from Hugging Face hub (timm/resnet18.a1_in1k)\n"}
+,{"stream_name":"stderr","time":241.908250002,"data":"08:39:55 [INFO] HTTP Request: HEAD https://huggingface.co/timm/resnet18.a1_in1k/resolve/main/model.safetensors \"HTTP/1.1 302 Found\"\n"}
+,{"stream_name":"stderr","time":241.909269307,"data":"08:39:55 [INFO] [timm/resnet18.a1_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.\n"}
+,{"stream_name":"stderr","time":241.919101502,"data":"08:39:55 [INFO] Missing keys (fc.weight, fc.bias) discovered while loading pretrained weights. This is expected if model is being adapted.\n"}
+,{"stream_name":"stderr","time":242.659231588,"data":"08:39:56 [INFO] Resuming smoke_ra_fusion at stage 0 epoch 1\n"}
+,{"stream_name":"stderr","time":243.391686945,"data":"08:39:56 [ERROR] [worker 0] smoke_ra_fusion failed (attempt 1): Expected all tensors to be on the same device, but found at least two devices, cuda:0 and cpu!\n"}
+,{"stream_name":"stderr","time":243.41010302,"data":"08:39:56 [INFO] [worker 0] starting smoke_siamese_unet\n"}
+,{"stream_name":"stderr","time":243.760868231,"data":"08:39:57 [INFO] Loading pretrained weights from Hugging Face hub (timm/efficientnet_b5.sw_in12k_ft_in1k)\n"}
+,{"stream_name":"stderr","time":243.801656816,"data":"08:39:57 [INFO] HTTP Request: HEAD https://huggingface.co/timm/efficientnet_b5.sw_in12k_ft_in1k/resolve/main/model.safetensors \"HTTP/1.1 302 Found\"\n"}
+,{"stream_name":"stderr","time":243.838390773,"data":"08:39:57 [INFO] HTTP Request: GET https://huggingface.co/api/models/timm/efficientnet_b5.sw_in12k_ft_in1k/xet-read-token/13dc77aa3a148f79df28798eef496172f7611691 \"HTTP/1.1 200 OK\"\n"}
+,{"stream_name":"stderr","time":245.18221069,"data":"08:39:58 [INFO] [timm/efficientnet_b5.sw_in12k_ft_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.\n"}
+,{"stream_name":"stderr","time":245.230905955,"data":"08:39:58 [WARNING] Unexpected keys (bn2.num_batches_tracked, bn2.bias, bn2.running_mean, bn2.running_var, bn2.weight, classifier.bias, classifier.weight, conv_head.weight) found while loading pretrained weights. This may be expected if model is being adapted.\n"}
+,{"stream_name":"stderr","time":245.631098239,"data":"08:39:59 [INFO] Loading pretrained weights from Hugging Face hub (timm/efficientnet_b5.sw_in12k_ft_in1k)\n"}
+,{"stream_name":"stderr","time":245.672303853,"data":"08:39:59 [INFO] HTTP Request: HEAD https://huggingface.co/timm/efficientnet_b5.sw_in12k_ft_in1k/resolve/main/model.safetensors \"HTTP/1.1 302 Found\"\n"}
+,{"stream_name":"stderr","time":245.67334672,"data":"08:39:59 [INFO] [timm/efficientnet_b5.sw_in12k_ft_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.\n"}
+,{"stream_name":"stderr","time":245.905379179,"data":"08:39:59 [WARNING] Unexpected keys (bn2.num_batches_tracked, bn2.bias, bn2.running_mean, bn2.running_var, bn2.weight, classifier.bias, classifier.weight, conv_head.weight) found while loading pretrained weights. This may be expected if model is being adapted.\n"}
+,{"stream_name":"stderr","time":257.408969933,"data":"/kaggle/tmp/code/training/engine.py:458: UserWarning: Detected call of `lr_scheduler.step()` before `optimizer.step()`. In PyTorch 1.1.0 and later, you should call them in the opposite order: `optimizer.step()` before `lr_scheduler.step()`.  Failure to do this will result in PyTorch skipping the first value of the learning rate schedule. See more details at https://pytorch.org/docs/stable/optim.html#how-to-adjust-learning-rate\n"}
+,{"stream_name":"stderr","time":257.40904933,"data":"  scheduler.step()\n"}
+,{"stream_name":"stderr","time":263.645878572,"data":"08:40:17 [INFO] [smoke_siamese_unet] foundation epoch 1/2 loss 4.0029 val_score 0.0000 * (18s)\n"}
+,{"stream_name":"stderr","time":264.531730896,"data":"08:40:18 [INFO] Pausing after 1 epoch(s) as requested\n"}
+,{"stream_name":"stderr","time":264.548766074,"data":"08:40:18 [INFO] [worker 0] starting smoke_siamese_unet\n"}
+,{"stream_name":"stderr","time":264.892402114,"data":"08:40:18 [INFO] Loading pretrained weights from Hugging Face hub (timm/efficientnet_b5.sw_in12k_ft_in1k)\n"}
+,{"stream_name":"stderr","time":264.972645993,"data":"08:40:18 [INFO] HTTP Request: HEAD https://huggingface.co/timm/efficientnet_b5.sw_in12k_ft_in1k/resolve/main/model.safetensors \"HTTP/1.1 302 Found\"\n"}
+,{"stream_name":"stderr","time":264.973807033,"data":"08:40:18 [INFO] [timm/efficientnet_b5.sw_in12k_ft_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.\n"}
+,{"stream_name":"stderr","time":265.019329907,"data":"08:40:18 [WARNING] Unexpected keys (bn2.num_batches_tracked, bn2.bias, bn2.running_mean, bn2.running_var, bn2.weight, classifier.bias, classifier.weight, conv_head.weight) found while loading pretrained weights. This may be expected if model is being adapted.\n"}
+,{"stream_name":"stderr","time":265.389430223,"data":"08:40:18 [INFO] Loading pretrained weights from Hugging Face hub (timm/efficientnet_b5.sw_in12k_ft_in1k)\n"}
+,{"stream_name":"stderr","time":265.442953564,"data":"08:40:18 [INFO] HTTP Request: HEAD https://huggingface.co/timm/efficientnet_b5.sw_in12k_ft_in1k/resolve/main/model.safetensors \"HTTP/1.1 302 Found\"\n"}
+,{"stream_name":"stderr","time":265.443976438,"data":"08:40:18 [INFO] [timm/efficientnet_b5.sw_in12k_ft_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.\n"}
+,{"stream_name":"stderr","time":265.490817719,"data":"08:40:19 [WARNING] Unexpected keys (bn2.num_batches_tracked, bn2.bias, bn2.running_mean, bn2.running_var, bn2.weight, classifier.bias, classifier.weight, conv_head.weight) found while loading pretrained weights. This may be expected if model is being adapted.\n"}
+,{"stream_name":"stderr","time":266.259577485,"data":"08:40:19 [INFO] Resuming smoke_siamese_unet at stage 0 epoch 1\n"}
+,{"stream_name":"stderr","time":266.947649658,"data":"08:40:20 [ERROR] [worker 0] smoke_siamese_unet failed (attempt 1): Expected all tensors to be on the same device, but found at least two devices, cuda:0 and cpu!\n"}
+,{"stream_name":"stderr","time":267.029593147,"data":"08:40:20 [INFO] [worker 0] starting smoke_sn8_baseline\n"}
+,{"stream_name":"stderr","time":267.269814514,"data":"08:40:20 [INFO] Loading pretrained weights from Hugging Face hub (timm/resnet34.tv_in1k)\n"}
+,{"stream_name":"stderr","time":267.319353756,"data":"08:40:20 [INFO] HTTP Request: HEAD https://huggingface.co/timm/resnet34.tv_in1k/resolve/main/model.safetensors \"HTTP/1.1 302 Found\"\n"}
+,{"stream_name":"stderr","time":267.357372336,"data":"08:40:20 [INFO] HTTP Request: GET https://huggingface.co/api/models/timm/resnet34.tv_in1k/xet-read-token/1b7b21cca82ff974d341713f777bf740c2db38c4 \"HTTP/1.1 200 OK\"\n"}
+,{"stream_name":"stderr","time":268.406558062,"data":"08:40:21 [INFO] [timm/resnet34.tv_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.\n"}
+,{"stream_name":"stderr","time":268.434223986,"data":"08:40:21 [INFO] Missing keys (fc.weight, fc.bias) discovered while loading pretrained weights. This is expected if model is being adapted.\n"}
+,{"stream_name":"stderr","time":268.744660382,"data":"08:40:22 [INFO] Loading pretrained weights from Hugging Face hub (timm/resnet34.tv_in1k)\n"}
+,{"stream_name":"stderr","time":268.78461325,"data":"08:40:22 [INFO] HTTP Request: HEAD https://huggingface.co/timm/resnet34.tv_in1k/resolve/main/model.safetensors \"HTTP/1.1 302 Found\"\n"}
+,{"stream_name":"stderr","time":268.785647363,"data":"08:40:22 [INFO] [timm/resnet34.tv_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.\n"}
+,{"stream_name":"stderr","time":268.809481741,"data":"08:40:22 [INFO] Missing keys (fc.weight, fc.bias) discovered while loading pretrained weights. This is expected if model is being adapted.\n"}
+,{"stream_name":"stderr","time":269.323289581,"data":"/kaggle/tmp/code/training/engine.py:458: UserWarning: Detected call of `lr_scheduler.step()` before `optimizer.step()`. In PyTorch 1.1.0 and later, you should call them in the opposite order: `optimizer.step()` before `lr_scheduler.step()`.  Failure to do this will result in PyTorch skipping the first value of the learning rate schedule. See more details at https://pytorch.org/docs/stable/optim.html#how-to-adjust-learning-rate\n"}
+,{"stream_name":"stderr","time":269.32334255,"data":"  scheduler.step()\n"}
+,{"stream_name":"stderr","time":270.637361452,"data":"08:40:24 [INFO] [smoke_sn8_baseline] foundation epoch 1/2 loss 6.8467 val_score 0.0000 * (2s)\n"}
+,{"stream_name":"stderr","time":270.989107592,"data":"08:40:24 [INFO] Pausing after 1 epoch(s) as requested\n"}
+,{"stream_name":"stderr","time":270.996052433,"data":"08:40:24 [INFO] [worker 0] starting smoke_sn8_baseline\n"}
+,{"stream_name":"stderr","time":271.26160228,"data":"08:40:24 [INFO] Loading pretrained weights from Hugging Face hub (timm/resnet34.tv_in1k)\n"}
+,{"stream_name":"stderr","time":271.306973866,"data":"08:40:24 [INFO] HTTP Request: HEAD https://huggingface.co/timm/resnet34.tv_in1k/resolve/main/model.safetensors \"HTTP/1.1 302 Found\"\n"}
+,{"stream_name":"stderr","time":271.307869667,"data":"08:40:24 [INFO] [timm/resnet34.tv_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.\n"}
+,{"stream_name":"stderr","time":271.326405311,"data":"08:40:24 [INFO] Missing keys (fc.weight, fc.bias) discovered while loading pretrained weights. This is expected if model is being adapted.\n"}
+,{"stream_name":"stderr","time":271.600085212,"data":"08:40:25 [INFO] Loading pretrained weights from Hugging Face hub (timm/resnet34.tv_in1k)\n"}
+,{"stream_name":"stderr","time":271.640860067,"data":"08:40:25 [INFO] HTTP Request: HEAD https://huggingface.co/timm/resnet34.tv_in1k/resolve/main/model.safetensors \"HTTP/1.1 302 Found\"\n"}
+,{"stream_name":"stderr","time":271.64171443,"data":"08:40:25 [INFO] [timm/resnet34.tv_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.\n"}
+,{"stream_name":"stderr","time":271.659632901,"data":"08:40:25 [INFO] Missing keys (fc.weight, fc.bias) discovered while loading pretrained weights. This is expected if model is being adapted.\n"}
+,{"stream_name":"stderr","time":271.956902162,"data":"08:40:25 [INFO] Resuming smoke_sn8_baseline at stage 0 epoch 1\n"}
+,{"stream_name":"stderr","time":272.314243762,"data":"08:40:25 [ERROR] [worker 0] smoke_sn8_baseline failed (attempt 1): Expected all tensors to be on the same device, but found at least two devices, cuda:0 and cpu!\n"}
+,{"stream_name":"stderr","time":272.350831661,"data":"08:40:25 [INFO] [worker 0] starting smoke_snunet\n"}
+,{"stream_name":"stderr","time":273.0316839,"data":"/kaggle/tmp/code/training/engine.py:458: UserWarning: Detected call of `lr_scheduler.step()` before `optimizer.step()`. In PyTorch 1.1.0 and later, you should call them in the opposite order: `optimizer.step()` before `lr_scheduler.step()`.  Failure to do this will result in PyTorch skipping the first value of the learning rate schedule. See more details at https://pytorch.org/docs/stable/optim.html#how-to-adjust-learning-rate\n"}
+,{"stream_name":"stderr","time":273.031726264,"data":"  scheduler.step()\n"}
+,{"stream_name":"stderr","time":274.343418946,"data":"08:40:27 [INFO] [smoke_snunet] joint epoch 1/2 loss 26.4893 val_score 0.0000 * (2s)\n"}
+,{"stream_name":"stderr","time":274.464879357,"data":"08:40:27 [INFO] Pausing after 1 epoch(s) as requested\n"}
+,{"stream_name":"stderr","time":274.470614132,"data":"08:40:27 [INFO] [worker 0] starting smoke_snunet\n"}
+,{"stream_name":"stderr","time":274.713391382,"data":"08:40:28 [INFO] Resuming smoke_snunet at stage 0 epoch 1\n"}
+,{"stream_name":"stderr","time":275.098578081,"data":"08:40:28 [ERROR] [worker 0] smoke_snunet failed (attempt 1): Expected all tensors to be on the same device, but found at least two devices, cuda:0 and cpu!\n"}
+,{"stream_name":"stderr","time":275.130603134,"data":"08:40:28 [INFO] [worker 0] starting smoke_siamese_v0\n"}
+,{"stream_name":"stdout","time":275.469616501,"data":"Downloading: \"https://download.pytorch.org/models/resnet34-b627a593.pth\" to /root/.cache/torch/hub/checkpoints/resnet34-b627a593.pth\n"}
+,{"stream_name":"stderr","time":275.900397986,"data":"\r  0%|          | 0.00/83.3M [00:00\u003c?, ?B/s]\r 11%|█         | 9.12M/83.3M [00:00\u003c00:00, 95.6MB/s]\r 37%|███▋      | 31.1M/83.3M [00:00\u003c00:00, 175MB/s] \r 64%|██████▍   | 53.1M/83.3M [00:00\u003c00:00, 200MB/s]\r 91%|█████████ | 75.8M/83.3M [00:00\u003c00:00, 214MB/s]\r100%|██████████| 83.3M/83.3M [00:00\u003c00:00, 203MB/s]\n"}
+,{"stream_name":"stderr","time":283.506426403,"data":"08:40:37 [INFO] [smoke_siamese_v0] joint epoch 1/2 loss 6.6823 val_score 0.0000 * (7s)\n"}
+,{"stream_name":"stderr","time":284.204273304,"data":"08:40:37 [INFO] Pausing after 1 epoch(s) as requested\n"}
+,{"stream_name":"stderr","time":284.212378564,"data":"08:40:37 [INFO] [worker 0] starting smoke_siamese_v0\n"}
+,{"stream_name":"stderr","time":285.053182051,"data":"08:40:38 [INFO] Resuming smoke_siamese_v0 at stage 0 epoch 1\n"}
+,{"stream_name":"stderr","time":285.622344624,"data":"08:40:39 [ERROR] [worker 0] smoke_siamese_v0 failed (attempt 1): Expected all tensors to be on the same device, but found at least two devices, cuda:0 and cpu!\n"}
+,{"stream_name":"stderr","time":285.66670257,"data":"08:40:39 [INFO] [worker 0] starting smoke_unet_v0\n"}
+,{"stream_name":"stderr","time":287.686319373,"data":"08:40:41 [INFO] [smoke_unet_v0] joint epoch 1/2 loss 6.4972 val_score 0.0000 * (2s)\n"}
+,{"stream_name":"stderr","time":288.370029241,"data":"08:40:41 [INFO] Pausing after 1 epoch(s) as requested\n"}
+,{"stream_name":"stderr","time":288.403441425,"data":"08:40:41 [INFO] [worker 0] starting smoke_unet_v0\n"}
+,{"stream_name":"stderr","time":289.363180147,"data":"08:40:42 [INFO] Resuming smoke_unet_v0 at stage 0 epoch 1\n"}
+,{"stream_name":"stderr","time":289.922712737,"data":"08:40:43 [ERROR] [worker 0] smoke_unet_v0 failed (attempt 1): Expected all tensors to be on the same device, but found at least two devices, cuda:0 and cpu!\n"}
+,{"stream_name":"stderr","time":289.974817382,"data":"08:40:43 [INFO] [worker 0] starting smoke_ra_fusion\n"}
+,{"stream_name":"stderr","time":296.083141012,"data":"08:40:49 [INFO] Loading pretrained weights from Hugging Face hub (timm/vit_large_patch16_dinov3.sat493m)\n"}
+,{"stream_name":"stderr","time":298.333884822,"data":"08:40:49 [INFO] HTTP Request: HEAD https://huggingface.co/timm/vit_large_patch16_dinov3.sat493m/resolve/main/model.safetensors \"HTTP/1.1 302 Found\"\n"}
+,{"stream_name":"stderr","time":298.333903338,"data":"08:40:49 [INFO] [timm/vit_large_patch16_dinov3.sat493m] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.\n"}
+,{"stream_name":"stderr","time":298.333909136,"data":"08:40:50 [INFO] Loading pretrained weights from Hugging Face hub (timm/resnet18.a1_in1k)\n"}
+,{"stream_name":"stderr","time":298.333914138,"data":"08:40:50 [INFO] HTTP Request: HEAD https://huggingface.co/timm/resnet18.a1_in1k/resolve/main/model.safetensors \"HTTP/1.1 302 Found\"\n"}
+,{"stream_name":"stderr","time":298.333935618,"data":"08:40:50 [INFO] [timm/resnet18.a1_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.\n"}
+,{"stream_name":"stderr","time":298.33394223,"data":"08:40:50 [INFO] Missing keys (fc.weight, fc.bias) discovered while loading pretrained weights. This is expected if model is being adapted.\n"}
+,{"stream_name":"stderr","time":298.333947381,"data":"08:40:50 [INFO] Resuming smoke_ra_fusion at stage 0 epoch 1\n"}
+,{"stream_name":"stderr","time":298.333952225,"data":"08:40:51 [ERROR] [worker 0] smoke_ra_fusion failed (attempt 2): Expected all tensors to be on the same device, but found at least two devices, cuda:0 and cpu!\n"}
+,{"stream_name":"stderr","time":298.333957532,"data":"08:40:51 [INFO] [worker 0] starting smoke_ra_fusion\n"}
+,{"stream_name":"stderr","time":301.732026368,"data":"08:40:55 [INFO] Loading pretrained weights from Hugging Face hub (timm/vit_large_patch16_dinov3.sat493m)\n"}
+,{"stream_name":"stderr","time":301.825955931,"data":"08:40:55 [INFO] HTTP Request: HEAD https://huggingface.co/timm/vit_large_patch16_dinov3.sat493m/resolve/main/model.safetensors \"HTTP/1.1 302 Found\"\n"}
+,{"stream_name":"stderr","time":301.827028526,"data":"08:40:55 [INFO] [timm/vit_large_patch16_dinov3.sat493m] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.\n"}
+,{"stream_name":"stderr","time":302.119510299,"data":"08:40:55 [INFO] Loading pretrained weights from Hugging Face hub (timm/resnet18.a1_in1k)\n"}
+,{"stream_name":"stderr","time":302.162453535,"data":"08:40:55 [INFO] HTTP Request: HEAD https://huggingface.co/timm/resnet18.a1_in1k/resolve/main/model.safetensors \"HTTP/1.1 302 Found\"\n"}
+,{"stream_name":"stderr","time":302.163515654,"data":"08:40:55 [INFO] [timm/resnet18.a1_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.\n"}
+,{"stream_name":"stderr","time":302.174096424,"data":"08:40:55 [INFO] Missing keys (fc.weight, fc.bias) discovered while loading pretrained weights. This is expected if model is being adapted.\n"}
+,{"stream_name":"stderr","time":302.838497418,"data":"08:40:56 [INFO] Resuming smoke_ra_fusion at stage 0 epoch 1\n"}
+,{"stream_name":"stderr","time":303.493621531,"data":"08:40:57 [ERROR] [worker 0] smoke_ra_fusion failed (attempt 3): Expected all tensors to be on the same device, but found at least two devices, cuda:0 and cpu!\n"}
+,{"stream_name":"stderr","time":303.510000445,"data":"08:40:57 [INFO] [worker 0] starting smoke_siamese_unet\n"}
+,{"stream_name":"stderr","time":304.030095807,"data":"08:40:57 [INFO] Loading pretrained weights from Hugging Face hub (timm/efficientnet_b5.sw_in12k_ft_in1k)\n"}
+,{"stream_name":"stderr","time":304.070166405,"data":"08:40:57 [INFO] HTTP Request: HEAD https://huggingface.co/timm/efficientnet_b5.sw_in12k_ft_in1k/resolve/main/model.safetensors \"HTTP/1.1 302 Found\"\n"}
+,{"stream_name":"stderr","time":304.071148708,"data":"08:40:57 [INFO] [timm/efficientnet_b5.sw_in12k_ft_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.\n"}
+,{"stream_name":"stderr","time":304.121115901,"data":"08:40:57 [WARNING] Unexpected keys (bn2.num_batches_tracked, bn2.bias, bn2.running_mean, bn2.running_var, bn2.weight, classifier.bias, classifier.weight, conv_head.weight) found while loading pretrained weights. This may be expected if model is being adapted.\n"}
+,{"stream_name":"stderr","time":304.497688248,"data":"08:40:58 [INFO] Loading pretrained weights from Hugging Face hub (timm/efficientnet_b5.sw_in12k_ft_in1k)\n"}
+,{"stream_name":"stderr","time":304.537847471,"data":"08:40:58 [INFO] HTTP Request: HEAD https://huggingface.co/timm/efficientnet_b5.sw_in12k_ft_in1k/resolve/main/model.safetensors \"HTTP/1.1 302 Found\"\n"}
+,{"stream_name":"stderr","time":304.538840455,"data":"08:40:58 [INFO] [timm/efficientnet_b5.sw_in12k_ft_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.\n"}
+,{"stream_name":"stderr","time":304.584036379,"data":"08:40:58 [WARNING] Unexpected keys (bn2.num_batches_tracked, bn2.bias, bn2.running_mean, bn2.running_var, bn2.weight, classifier.bias, classifier.weight, conv_head.weight) found while loading pretrained weights. This may be expected if model is being adapted.\n"}
+,{"stream_name":"stderr","time":305.264307508,"data":"08:40:58 [INFO] Resuming smoke_siamese_unet at stage 0 epoch 1\n"}
+,{"stream_name":"stderr","time":305.912234167,"data":"08:40:59 [ERROR] [worker 0] smoke_siamese_unet failed (attempt 2): Expected all tensors to be on the same device, but found at least two devices, cuda:0 and cpu!\n"}
+,{"stream_name":"stderr","time":305.974464998,"data":"08:40:59 [INFO] [worker 0] starting smoke_siamese_unet\n"}
+,{"stream_name":"stderr","time":306.317032865,"data":"08:40:59 [INFO] Loading pretrained weights from Hugging Face hub (timm/efficientnet_b5.sw_in12k_ft_in1k)\n"}
+,{"stream_name":"stderr","time":306.359532708,"data":"08:40:59 [INFO] HTTP Request: HEAD https://huggingface.co/timm/efficientnet_b5.sw_in12k_ft_in1k/resolve/main/model.safetensors \"HTTP/1.1 302 Found\"\n"}
+,{"stream_name":"stderr","time":306.360543995,"data":"08:40:59 [INFO] [timm/efficientnet_b5.sw_in12k_ft_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.\n"}
+,{"stream_name":"stderr","time":306.40668263,"data":"08:40:59 [WARNING] Unexpected keys (bn2.num_batches_tracked, bn2.bias, bn2.running_mean, bn2.running_var, bn2.weight, classifier.bias, classifier.weight, conv_head.weight) found while loading pretrained weights. This may be expected if model is being adapted.\n"}
+,{"stream_name":"stderr","time":306.780452804,"data":"08:41:00 [INFO] Loading pretrained weights from Hugging Face hub (timm/efficientnet_b5.sw_in12k_ft_in1k)\n"}
+,{"stream_name":"stderr","time":306.818291604,"data":"08:41:00 [INFO] HTTP Request: HEAD https://huggingface.co/timm/efficientnet_b5.sw_in12k_ft_in1k/resolve/main/model.safetensors \"HTTP/1.1 302 Found\"\n"}
+,{"stream_name":"stderr","time":306.819364132,"data":"08:41:00 [INFO] [timm/efficientnet_b5.sw_in12k_ft_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.\n"}
+,{"stream_name":"stderr","time":306.864968638,"data":"08:41:00 [WARNING] Unexpected keys (bn2.num_batches_tracked, bn2.bias, bn2.running_mean, bn2.running_var, bn2.weight, classifier.bias, classifier.weight, conv_head.weight) found while loading pretrained weights. This may be expected if model is being adapted.\n"}
+,{"stream_name":"stderr","time":307.536786116,"data":"08:41:01 [INFO] Resuming smoke_siamese_unet at stage 0 epoch 1\n"}
+,{"stream_name":"stderr","time":308.150444136,"data":"08:41:01 [ERROR] [worker 0] smoke_siamese_unet failed (attempt 3): Expected all tensors to be on the same device, but found at least two devices, cuda:0 and cpu!\n"}
+,{"stream_name":"stderr","time":308.17960364,"data":"08:41:01 [INFO] [worker 0] starting smoke_sn8_baseline\n"}
+,{"stream_name":"stderr","time":308.418416464,"data":"08:41:01 [INFO] Loading pretrained weights from Hugging Face hub (timm/resnet34.tv_in1k)\n"}
+,{"stream_name":"stderr","time":308.457452638,"data":"08:41:01 [INFO] HTTP Request: HEAD https://huggingface.co/timm/resnet34.tv_in1k/resolve/main/model.safetensors \"HTTP/1.1 302 Found\"\n"}
+,{"stream_name":"stderr","time":308.458487356,"data":"08:41:01 [INFO] [timm/resnet34.tv_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.\n"}
+,{"stream_name":"stderr","time":308.476889305,"data":"08:41:01 [INFO] Missing keys (fc.weight, fc.bias) discovered while loading pretrained weights. This is expected if model is being adapted.\n"}
+,{"stream_name":"stderr","time":308.749204274,"data":"08:41:02 [INFO] Loading pretrained weights from Hugging Face hub (timm/resnet34.tv_in1k)\n"}
+,{"stream_name":"stderr","time":308.78846818,"data":"08:41:02 [INFO] HTTP Request: HEAD https://huggingface.co/timm/resnet34.tv_in1k/resolve/main/model.safetensors \"HTTP/1.1 302 Found\"\n"}
+,{"stream_name":"stderr","time":308.789494508,"data":"08:41:02 [INFO] [timm/resnet34.tv_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.\n"}
+,{"stream_name":"stderr","time":308.810579011,"data":"08:41:02 [INFO] Missing keys (fc.weight, fc.bias) discovered while loading pretrained weights. This is expected if model is being adapted.\n"}
+,{"stream_name":"stderr","time":309.104615515,"data":"08:41:02 [INFO] Resuming smoke_sn8_baseline at stage 0 epoch 1\n"}
+,{"stream_name":"stderr","time":309.44886694,"data":"08:41:02 [ERROR] [worker 0] smoke_sn8_baseline failed (attempt 2): Expected all tensors to be on the same device, but found at least two devices, cuda:0 and cpu!\n"}
+,{"stream_name":"stderr","time":309.475518154,"data":"08:41:02 [INFO] [worker 0] starting smoke_sn8_baseline\n"}
+,{"stream_name":"stderr","time":309.719789507,"data":"08:41:03 [INFO] Loading pretrained weights from Hugging Face hub (timm/resnet34.tv_in1k)\n"}
+,{"stream_name":"stderr","time":309.765508332,"data":"08:41:03 [INFO] HTTP Request: HEAD https://huggingface.co/timm/resnet34.tv_in1k/resolve/main/model.safetensors \"HTTP/1.1 302 Found\"\n"}
+,{"stream_name":"stderr","time":309.766648016,"data":"08:41:03 [INFO] [timm/resnet34.tv_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.\n"}
+,{"stream_name":"stderr","time":309.784978747,"data":"08:41:03 [INFO] Missing keys (fc.weight, fc.bias) discovered while loading pretrained weights. This is expected if model is being adapted.\n"}
+,{"stream_name":"stderr","time":310.058369116,"data":"08:41:03 [INFO] Loading pretrained weights from Hugging Face hub (timm/resnet34.tv_in1k)\n"}
+,{"stream_name":"stderr","time":310.098841002,"data":"08:41:03 [INFO] HTTP Request: HEAD https://huggingface.co/timm/resnet34.tv_in1k/resolve/main/model.safetensors \"HTTP/1.1 302 Found\"\n"}
+,{"stream_name":"stderr","time":310.099844272,"data":"08:41:03 [INFO] [timm/resnet34.tv_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.\n"}
+,{"stream_name":"stderr","time":310.118053903,"data":"08:41:03 [INFO] Missing keys (fc.weight, fc.bias) discovered while loading pretrained weights. This is expected if model is being adapted.\n"}
+,{"stream_name":"stderr","time":310.411449057,"data":"08:41:03 [INFO] Resuming smoke_sn8_baseline at stage 0 epoch 1\n"}
+,{"stream_name":"stderr","time":310.774879104,"data":"08:41:04 [ERROR] [worker 0] smoke_sn8_baseline failed (attempt 3): Expected all tensors to be on the same device, but found at least two devices, cuda:0 and cpu!\n"}
+,{"stream_name":"stderr","time":310.788052296,"data":"08:41:04 [INFO] [worker 0] starting smoke_snunet\n"}
+,{"stream_name":"stderr","time":311.033729699,"data":"08:41:04 [INFO] Resuming smoke_snunet at stage 0 epoch 1\n"}
+,{"stream_name":"stderr","time":311.483978264,"data":"08:41:04 [ERROR] [worker 0] smoke_snunet failed (attempt 2): Expected all tensors to be on the same device, but found at least two devices, cuda:0 and cpu!\n"}
+,{"stream_name":"stderr","time":311.526061282,"data":"08:41:05 [INFO] [worker 0] starting smoke_snunet\n"}
+,{"stream_name":"stderr","time":311.767732679,"data":"08:41:05 [INFO] Resuming smoke_snunet at stage 0 epoch 1\n"}
+,{"stream_name":"stderr","time":312.180737092,"data":"08:41:05 [ERROR] [worker 0] smoke_snunet failed (attempt 3): Expected all tensors to be on the same device, but found at least two devices, cuda:0 and cpu!\n"}
+,{"stream_name":"stderr","time":312.221777186,"data":"08:41:05 [INFO] [worker 0] starting smoke_siamese_v0\n"}
+,{"stream_name":"stderr","time":313.035009158,"data":"08:41:06 [INFO] Resuming smoke_siamese_v0 at stage 0 epoch 1\n"}
+,{"stream_name":"stderr","time":313.542351728,"data":"08:41:07 [ERROR] [worker 0] smoke_siamese_v0 failed (attempt 2): Expected all tensors to be on the same device, but found at least two devices, cuda:0 and cpu!\n"}
+,{"stream_name":"stderr","time":313.564437266,"data":"08:41:07 [INFO] [worker 0] starting smoke_siamese_v0\n"}
+,{"stream_name":"stderr","time":314.378482029,"data":"08:41:07 [INFO] Resuming smoke_siamese_v0 at stage 0 epoch 1\n"}
+,{"stream_name":"stderr","time":314.89457992,"data":"08:41:08 [ERROR] [worker 0] smoke_siamese_v0 failed (attempt 3): Expected all tensors to be on the same device, but found at least two devices, cuda:0 and cpu!\n"}
+,{"stream_name":"stderr","time":314.920655756,"data":"08:41:08 [INFO] [worker 0] starting smoke_unet_v0\n"}
+,{"stream_name":"stderr","time":315.671323241,"data":"08:41:09 [INFO] Resuming smoke_unet_v0 at stage 0 epoch 1\n"}
+,{"stream_name":"stderr","time":316.117748669,"data":"08:41:09 [ERROR] [worker 0] smoke_unet_v0 failed (attempt 2): Expected all tensors to be on the same device, but found at least two devices, cuda:0 and cpu!\n"}
+,{"stream_name":"stderr","time":316.144119084,"data":"08:41:09 [INFO] [worker 0] starting smoke_unet_v0\n"}
+,{"stream_name":"stderr","time":316.884573676,"data":"08:41:10 [INFO] Resuming smoke_unet_v0 at stage 0 epoch 1\n"}
+,{"stream_name":"stderr","time":317.321929936,"data":"08:41:10 [ERROR] [worker 0] smoke_unet_v0 failed (attempt 3): Expected all tensors to be on the same device, but found at least two devices, cuda:0 and cpu!\n"}
+,{"stream_name":"stdout","time":319.251867498,"data":"[08:41:12 +5m] $ /usr/bin/python3 scripts/gpu_probe.py --output /kaggle/working/results/smoke/gpu_probe.json\n"}
+,{"stream_name":"stderr","time":327.889895381,"data":"08:41:21 [INFO] Loading pretrained weights from Hugging Face hub (timm/vit_large_patch16_dinov3.sat493m)\n"}
+,{"stream_name":"stderr","time":328.012642579,"data":"08:41:21 [INFO] HTTP Request: HEAD https://huggingface.co/timm/vit_large_patch16_dinov3.sat493m/resolve/main/model.safetensors \"HTTP/1.1 302 Found\"\n"}
+,{"stream_name":"stderr","time":328.013380589,"data":"Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.\n"}
+,{"stream_name":"stderr","time":328.013407096,"data":"08:41:21 [WARNING] Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.\n"}
+,{"stream_name":"stderr","time":328.014190853,"data":"08:41:21 [INFO] [timm/vit_large_patch16_dinov3.sat493m] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.\n"}
+,{"stream_name":"stderr","time":328.327260276,"data":"08:41:21 [INFO] Loading pretrained weights from Hugging Face hub (timm/resnet18.a1_in1k)\n"}
+,{"stream_name":"stderr","time":328.364805768,"data":"08:41:21 [INFO] HTTP Request: HEAD https://huggingface.co/timm/resnet18.a1_in1k/resolve/main/model.safetensors \"HTTP/1.1 302 Found\"\n"}
+,{"stream_name":"stderr","time":328.365796999,"data":"08:41:21 [INFO] [timm/resnet18.a1_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.\n"}
+,{"stream_name":"stderr","time":328.375497821,"data":"08:41:21 [INFO] Missing keys (fc.weight, fc.bias) discovered while loading pretrained weights. This is expected if model is being adapted.\n"}
+,{"stream_name":"stderr","time":352.528141221,"data":"08:41:46 [INFO] ra_fusion {'backbone': 'dinov3_sat'}: {'batch_size': 8, 'peak_memory_gb': 8.47, 'sec_per_step': 2.118, 'epoch_minutes': 4.2, 'run_hours_train_only': 2.8, 'fits_configured_batch': True}\n"}
+,{"stream_name":"stderr","time":353.025771345,"data":"08:41:46 [INFO] Loading pretrained weights from Hugging Face hub (timm/resnet34.tv_in1k)\n"}
+,{"stream_name":"stderr","time":353.120600346,"data":"08:41:46 [INFO] HTTP Request: HEAD https://huggingface.co/timm/resnet34.tv_in1k/resolve/main/model.safetensors \"HTTP/1.1 302 Found\"\n"}
+,{"stream_name":"stderr","time":353.121615573,"data":"08:41:46 [INFO] [timm/resnet34.tv_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.\n"}
+,{"stream_name":"stderr","time":353.144659602,"data":"08:41:46 [INFO] Missing keys (fc.weight, fc.bias) discovered while loading pretrained weights. This is expected if model is being adapted.\n"}
+,{"stream_name":"stderr","time":353.465282002,"data":"08:41:46 [INFO] Loading pretrained weights from Hugging Face hub (timm/resnet34.tv_in1k)\n"}
+,{"stream_name":"stderr","time":353.506844021,"data":"08:41:47 [INFO] HTTP Request: HEAD https://huggingface.co/timm/resnet34.tv_in1k/resolve/main/model.safetensors \"HTTP/1.1 302 Found\"\n"}
+,{"stream_name":"stderr","time":353.507758196,"data":"08:41:47 [INFO] [timm/resnet34.tv_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.\n"}
+,{"stream_name":"stderr","time":353.525705087,"data":"08:41:47 [INFO] Missing keys (fc.weight, fc.bias) discovered while loading pretrained weights. This is expected if model is being adapted.\n"}
+,{"stream_name":"stderr","time":358.629043002,"data":"08:41:52 [INFO] sn8_baseline: {'batch_size': 8, 'peak_memory_gb': 6.88, 'sec_per_step': 0.714, 'epoch_minutes': 1.4, 'run_hours_train_only': 0.94, 'fits_configured_batch': True}\n"}
+,{"stream_name":"stderr","time":359.135158886,"data":"08:41:52 [INFO] Loading pretrained weights from Hugging Face hub (timm/efficientnet_b5.sw_in12k_ft_in1k)\n"}
+,{"stream_name":"stderr","time":359.219370897,"data":"08:41:52 [INFO] HTTP Request: HEAD https://huggingface.co/timm/efficientnet_b5.sw_in12k_ft_in1k/resolve/main/model.safetensors \"HTTP/1.1 302 Found\"\n"}
+,{"stream_name":"stderr","time":359.220439597,"data":"08:41:52 [INFO] [timm/efficientnet_b5.sw_in12k_ft_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.\n"}
+,{"stream_name":"stderr","time":359.267020577,"data":"08:41:52 [WARNING] Unexpected keys (bn2.num_batches_tracked, bn2.bias, bn2.running_mean, bn2.running_var, bn2.weight, classifier.bias, classifier.weight, conv_head.weight) found while loading pretrained weights. This may be expected if model is being adapted.\n"}
+,{"stream_name":"stderr","time":359.706876284,"data":"08:41:53 [INFO] Loading pretrained weights from Hugging Face hub (timm/efficientnet_b5.sw_in12k_ft_in1k)\n"}
+,{"stream_name":"stderr","time":359.745865,"data":"08:41:53 [INFO] HTTP Request: HEAD https://huggingface.co/timm/efficientnet_b5.sw_in12k_ft_in1k/resolve/main/model.safetensors \"HTTP/1.1 302 Found\"\n"}
+,{"stream_name":"stderr","time":359.746736127,"data":"08:41:53 [INFO] [timm/efficientnet_b5.sw_in12k_ft_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.\n"}
+,{"stream_name":"stderr","time":359.794244605,"data":"08:41:53 [WARNING] Unexpected keys (bn2.num_batches_tracked, bn2.bias, bn2.running_mean, bn2.running_var, bn2.weight, classifier.bias, classifier.weight, conv_head.weight) found while loading pretrained weights. This may be expected if model is being adapted.\n"}
+,{"stream_name":"stderr","time":365.042683365,"data":"08:41:58 [WARNING] siamese_unet: out of memory at batch 8\n"}
+,{"stream_name":"stderr","time":365.811094582,"data":"08:41:59 [INFO] Loading pretrained weights from Hugging Face hub (timm/efficientnet_b5.sw_in12k_ft_in1k)\n"}
+,{"stream_name":"stderr","time":365.909657258,"data":"08:41:59 [INFO] HTTP Request: HEAD https://huggingface.co/timm/efficientnet_b5.sw_in12k_ft_in1k/resolve/main/model.safetensors \"HTTP/1.1 302 Found\"\n"}
+,{"stream_name":"stderr","time":365.910728056,"data":"08:41:59 [INFO] [timm/efficientnet_b5.sw_in12k_ft_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.\n"}
+,{"stream_name":"stderr","time":365.95952705,"data":"08:41:59 [WARNING] Unexpected keys (bn2.num_batches_tracked, bn2.bias, bn2.running_mean, bn2.running_var, bn2.weight, classifier.bias, classifier.weight, conv_head.weight) found while loading pretrained weights. This may be expected if model is being adapted.\n"}
+,{"stream_name":"stderr","time":366.561180267,"data":"08:42:00 [INFO] Loading pretrained weights from Hugging Face hub (timm/efficientnet_b5.sw_in12k_ft_in1k)\n"}
+,{"stream_name":"stderr","time":366.602873796,"data":"08:42:00 [INFO] HTTP Request: HEAD https://huggingface.co/timm/efficientnet_b5.sw_in12k_ft_in1k/resolve/main/model.safetensors \"HTTP/1.1 302 Found\"\n"}
+,{"stream_name":"stderr","time":366.603856892,"data":"08:42:00 [INFO] [timm/efficientnet_b5.sw_in12k_ft_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.\n"}
+,{"stream_name":"stderr","time":366.649182536,"data":"08:42:00 [WARNING] Unexpected keys (bn2.num_batches_tracked, bn2.bias, bn2.running_mean, bn2.running_var, bn2.weight, classifier.bias, classifier.weight, conv_head.weight) found while loading pretrained weights. This may be expected if model is being adapted.\n"}
+,{"stream_name":"stderr","time":383.651637888,"data":"08:42:17 [INFO] siamese_unet: {'batch_size': 4, 'peak_memory_gb': 12.42, 'sec_per_step': 0.736, 'epoch_minutes': 2.9, 'run_hours_train_only': 1.95, 'fits_configured_batch': False}\n"}
+,{"stream_name":"stderr","time":384.340696357,"data":"08:42:17 [WARNING] snunet: out of memory at batch 8\n"}
+,{"stream_name":"stderr","time":390.804037005,"data":"08:42:24 [INFO] snunet: {'batch_size': 4, 'peak_memory_gb': 8.11, 'sec_per_step': 0.823, 'epoch_minutes': 3.3, 'run_hours_train_only': 2.19, 'fits_configured_batch': False}\n"}
+,{"stream_name":"stderr","time":392.998522933,"data":"08:42:26 [INFO] unet_v0: {'batch_size': 8, 'peak_memory_gb': 2.27, 'sec_per_step': 0.208, 'epoch_minutes': 0.4, 'run_hours_train_only': 0.27, 'fits_configured_batch': True}\n"}
+,{"stream_name":"stderr","time":401.324396059,"data":"08:42:34 [INFO] siamese_v0: {'batch_size': 8, 'peak_memory_gb': 5.38, 'sec_per_step': 0.525, 'epoch_minutes': 1.0, 'run_hours_train_only': 0.69, 'fits_configured_batch': True}\n"}
+,{"stream_name":"stderr","time":405.392735363,"data":"08:42:38 [INFO] Loading pretrained weights from Hugging Face hub (timm/vit_large_patch16_dinov3.sat493m)\n"}
+,{"stream_name":"stderr","time":405.477773049,"data":"08:42:38 [INFO] HTTP Request: HEAD https://huggingface.co/timm/vit_large_patch16_dinov3.sat493m/resolve/main/model.safetensors \"HTTP/1.1 302 Found\"\n"}
+,{"stream_name":"stderr","time":405.47876397,"data":"08:42:38 [INFO] [timm/vit_large_patch16_dinov3.sat493m] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.\n"}
+,{"stream_name":"stderr","time":405.777919273,"data":"08:42:39 [INFO] Loading pretrained weights from Hugging Face hub (timm/resnet18.a1_in1k)\n"}
+,{"stream_name":"stderr","time":405.815496023,"data":"08:42:39 [INFO] HTTP Request: HEAD https://huggingface.co/timm/resnet18.a1_in1k/resolve/main/model.safetensors \"HTTP/1.1 302 Found\"\n"}
+,{"stream_name":"stderr","time":405.8165358,"data":"08:42:39 [INFO] [timm/resnet18.a1_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.\n"}
+,{"stream_name":"stderr","time":405.82703844,"data":"08:42:39 [INFO] Missing keys (fc.weight, fc.bias) discovered while loading pretrained weights. This is expected if model is being adapted.\n"}
+,{"stream_name":"stderr","time":417.335891042,"data":"08:42:50 [INFO] ra_fusion {'backbone': 'dinov3_sat', 'align': False}: {'batch_size': 8, 'peak_memory_gb': 7.45, 'sec_per_step': 1.574, 'epoch_minutes': 3.1, 'run_hours_train_only': 2.08, 'fits_configured_batch': True}\n"}
+,{"stream_name":"stderr","time":417.870984486,"data":"08:42:51 [INFO] Loading pretrained weights from Hugging Face hub (timm/convnext_tiny.dinov3_lvd1689m)\n"}
+,{"stream_name":"stderr","time":417.957162042,"data":"08:42:51 [INFO] HTTP Request: HEAD https://huggingface.co/timm/convnext_tiny.dinov3_lvd1689m/resolve/main/model.safetensors \"HTTP/1.1 302 Found\"\n"}
+,{"stream_name":"stderr","time":417.998266196,"data":"08:42:51 [INFO] HTTP Request: GET https://huggingface.co/api/models/timm/convnext_tiny.dinov3_lvd1689m/xet-read-token/39c7bb32f83c11bbb13cb23058f8852a4dac88ed \"HTTP/1.1 200 OK\"\n"}
+,{"stream_name":"stderr","time":419.210541739,"data":"08:42:52 [INFO] [timm/convnext_tiny.dinov3_lvd1689m] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.\n"}
+,{"stream_name":"stderr","time":455.546122258,"data":"08:43:29 [INFO] ra_fusion {'backbone': 'convnext_tiny.dinov3_lvd1689m'}: {'batch_size': 8, 'peak_memory_gb': 13.81, 'sec_per_step': 1.2, 'epoch_minutes': 2.4, 'run_hours_train_only': 1.59, 'fits_configured_batch': True}\n"}
+,{"stream_name":"stderr","time":455.5468447,"data":"08:43:29 [INFO] Wrote /kaggle/working/results/smoke/gpu_probe.json\n"}
+,{"stream_name":"stdout","time":456.760590467,"data":"[08:43:30 +8m] Session finished\n"}
+,{"stream_name":"stderr","time":459.23281549,"data":"/usr/local/lib/python3.13/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\\|'\n"}
+,{"stream_name":"stderr","time":459.232840323,"data":"  cells[i][c] = re.sub('\\\\\\\\\\|', '|', cell)\n"}
+,{"stream_name":"stderr","time":459.501326753,"data":"/usr/local/lib/python3.13/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\\_'\n"}
+,{"stream_name":"stderr","time":459.501351097,"data":"  text = re.sub(r'_', '\\_', text) # Escape underscores in display text\n"}
+,{"stream_name":"stderr","time":460.276715319,"data":"[NbConvertApp] Converting notebook __script__.ipynb to html\n"}
+,{"stream_name":"stderr","time":461.334310717,"data":"[NbConvertApp] Writing 301115 bytes to __results__.html\n"}
+]

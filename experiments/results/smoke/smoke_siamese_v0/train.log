@@ -1,0 +1,5 @@
+2026-10-25 08:40:37 [INFO] [smoke_siamese_v0] joint epoch 1/2 loss 6.6823 val_score 0.0000 * (7s)
+2026-10-25 08:40:37 [INFO] Pausing after 1 epoch(s) as requested
+2026-10-25 08:40:38 [INFO] Resuming smoke_siamese_v0 at stage 0 epoch 1
+2026-10-25 08:41:06 [INFO] Resuming smoke_siamese_v0 at stage 0 epoch 1
+2026-10-25 08:41:07 [INFO] Resuming smoke_siamese_v0 at stage 0 epoch 1
