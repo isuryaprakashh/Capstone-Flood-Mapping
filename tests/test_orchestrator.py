@@ -50,6 +50,12 @@ def _status(state, attempts=0):
     return json.dumps({"state": state, "attempts": attempts})
 
 
+@pytest.fixture(autouse=True)
+def no_hold(monkeypatch, tmp_path):
+    """Tests ignore the repository's real orchestration/HOLD file."""
+    monkeypatch.setattr(orch_mod, "HOLD_FILE", tmp_path / "no_hold")
+
+
 @pytest.fixture
 def setup(tmp_path):
     runs_file = tmp_path / "runs.yaml"
@@ -329,3 +335,29 @@ def test_kaggle_reported_quota_is_preferred(setup):
     pushes = len(kaggle.pushes)
     st = orch.tick()
     assert len(kaggle.pushes) == pushes and st["wait_until"] == reset + 600
+
+
+def test_hold_file_blocks_gpu_sessions_but_not_prepare(setup, monkeypatch, tmp_path):
+    orch, kaggle, _ = setup
+    hold = tmp_path / "HOLD"
+    hold.write_text("hold")
+    monkeypatch.setattr(orch_mod, "HOLD_FILE", hold)
+    assert orch.tick()["kernel"] is None and not kaggle.pushes  # no smoke launch
+    hold.unlink()
+    _to_training(orch, kaggle)  # smoke passes -> prepare launches
+    hold.write_text("hold")
+    kaggle.statuses["sn8-prepare"] = "complete"
+    pushes = len(kaggle.pushes)
+    st = orch.tick()  # prepare finished; training held
+    assert st["phase"] == "train" and st["prepared"] and len(kaggle.pushes) == pushes
+
+
+def test_rerun_smoke_skips_prepare_once_prepared(setup):
+    orch, kaggle, _ = setup
+    _to_training(orch, kaggle)  # smoke -> prepare -> train
+    orch.resume("smoke")
+    orch.tick()  # smoke relaunched
+    kaggle.statuses["sn8-smoke"] = "complete"
+    kaggle.outputs["sn8-smoke"] = _smoke_output()
+    st = orch.tick()
+    assert st["phase"] == "train" and st["kernel"] == "sn8-train-a"

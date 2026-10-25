@@ -49,6 +49,7 @@ logger = logging.getLogger(__name__)
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SESSION_TEMPLATE = REPO_ROOT / "orchestration" / "kaggle_session.py"
+HOLD_FILE = REPO_ROOT / "orchestration" / "HOLD"  # while present on main, no new GPU sessions start
 JOB_PLACEHOLDER = "JOB = {}  # __JOB__ (replaced by the orchestrator)"
 
 SLUGS = {"smoke": "sn8-smoke", "prepare": "sn8-prepare", "train": ("sn8-train-a", "sn8-train-b")}
@@ -242,6 +243,7 @@ DEFAULT_STATE = {
     "phase_retries": 0,
     "stop_reason": None,
     "gpu_sessions": [],  # {"start", "hours"} per GPU session, for the weekly quota
+    "prepared": False,  # sn8-prepare output exists: a re-run smoke test goes straight to training
     "tick_errors": 0,
     "events": [],
 }
@@ -301,6 +303,8 @@ class Orchestrator:
         if st["phase"] in ("smoke", "prepare", "train") and not st["kernel"]:
             if st["wait_until"] and now() < st["wait_until"]:
                 logger.info(f"Waiting for GPU quota until {stamp(st['wait_until'])}")
+            elif st["phase"] != "prepare" and HOLD_FILE.exists():
+                logger.info(f"{HOLD_FILE.name} present on main: not starting GPU sessions")
             elif st["phase"] != "prepare" and self.gpu_quota(st)[0] <= 0:
                 # Kaggle refuses new GPU sessions once the quota is spent (a running one may finish)
                 self.quota_wait(st, "Weekly GPU quota used up")
@@ -412,13 +416,17 @@ class Orchestrator:
         if mode == "smoke":
             ok, reason = self.smoke_passed()
             if ok:
-                st.update({"phase": "prepare", "phase_retries": 0})
-                self.event(st, "Smoke test passed; preparing the full dataset")
+                if st["prepared"]:
+                    st.update({"phase": "train", "phase_retries": 0})
+                    self.event(st, "Smoke test passed; dataset already prepared, training starts")
+                else:
+                    st.update({"phase": "prepare", "phase_retries": 0})
+                    self.event(st, "Smoke test passed; preparing the full dataset")
             else:
                 self.retry_or_stop(st, f"Smoke test failed: {reason}")
         elif mode == "prepare":
             if status == "complete":
-                st.update({"phase": "train", "phase_retries": 0})
+                st.update({"phase": "train", "phase_retries": 0, "prepared": True})
                 self.event(st, "Dataset prepared; training starts")
             else:
                 self.retry_or_stop(st, f"Data preparation ended with status {status}")

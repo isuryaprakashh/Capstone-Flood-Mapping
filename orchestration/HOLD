@@ -1,0 +1,2 @@
+Pipeline hold: while this file exists on main, the orchestrator finishes and records
+Kaggle sessions but starts no new GPU session. Delete it to continue.
