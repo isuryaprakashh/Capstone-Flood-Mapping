@@ -27,7 +27,7 @@ def test_unet_baseline_predict(sample_batch):
     pre = sample_batch["pre_image"]
     post = sample_batch["post_image"]
 
-    preds = model.predict(pre, post, threshold=0.5)
+    preds = model.predict(pre, post, thresholds=[0.5] * 5)
     assert preds.shape == (2, 5, 128, 128)
     assert set(preds.unique().tolist()).issubset({0.0, 1.0})
 
@@ -49,7 +49,7 @@ def test_siamese_fusion_predict(sample_batch):
     pre = sample_batch["pre_image"]
     post = sample_batch["post_image"]
 
-    preds = model.predict(pre, post, threshold=0.5)
+    preds = model.predict(pre, post, thresholds=[0.5] * 5)
     assert preds.shape == (2, 5, 128, 128)
     assert set(preds.unique().tolist()).issubset({0.0, 1.0})
 

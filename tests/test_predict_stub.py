@@ -2,6 +2,8 @@
 Tests for standalone prediction stub module.
 """
 
+import pytest
+
 from inference.predict import create_stub_prediction
 from inference.eval import compute_prediction_metrics, mask_to_rgba
 import numpy as np
@@ -36,4 +38,17 @@ def test_prediction_metrics_computation():
 
     metrics = compute_prediction_metrics(pred, gt)
     assert "mean_iou" in metrics
-    assert metrics["mean_iou"] == 1.0  # Identity match
+    assert metrics["mean_iou"] == pytest.approx(1.0)  # Identity match
+
+
+def test_prediction_metrics_undefined_for_absent_class():
+    """A class missing from both prediction and ground truth is None, not 0."""
+    pred = {"binary_mask": np.zeros((5, 8, 8), dtype=np.uint8)}
+    gt = np.zeros((5, 8, 8), dtype=np.uint8)
+    pred["binary_mask"][0, :4] = 1
+    gt[0, :4] = 1
+
+    metrics = compute_prediction_metrics(pred, gt)
+    assert metrics["iou_building"] == pytest.approx(1.0)
+    assert metrics["iou_flooded_road"] is None
+    assert metrics["mean_iou"] == pytest.approx(1.0)

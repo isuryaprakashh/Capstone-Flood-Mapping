@@ -6,6 +6,7 @@ sliding-window prediction → post-process → output masks.
 """
 
 import logging
+import time
 from pathlib import Path
 from typing import Optional, Union
 
@@ -13,9 +14,43 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 
+from dataloader.align import apply_shift, estimate_shift_blocks, load_aligned_pair
 from dataloader.dataset import read_geotiff, normalize_image, NUM_CLASSES
 
 logger = logging.getLogger(__name__)
+
+# Shifts beyond this are treated as registration failures (p90 on SN8 is ~40 px)
+MAX_REGISTRATION_SHIFT_PX = 80.0
+
+# Per-class thresholds calibrated during training/evaluation
+# [building, road, flood, flooded_building, flooded_road]
+DEFAULT_THRESHOLDS = [0.45, 0.38, 0.35, 0.30, 0.30]
+
+
+def binarize(prob_map: np.ndarray, thresholds: list[float]) -> np.ndarray:
+    """
+    Apply per-class thresholds and the overlap heuristics used in evaluation.
+
+    Flooded buildings/roads must lie on a building/road, and a building or
+    road that overlaps predicted flood is attributed as flooded.
+
+    Args:
+        prob_map: Probabilities (NUM_CLASSES, H, W).
+        thresholds: Per-class thresholds.
+
+    Returns:
+        Binary mask (NUM_CLASSES, H, W) uint8.
+    """
+    binary = np.zeros_like(prob_map, dtype=np.uint8)
+    for c in range(min(prob_map.shape[0], len(thresholds))):
+        binary[c] = prob_map[c] > thresholds[c]
+
+    if binary.shape[0] >= 5:
+        bldg, road, flood = binary[0], binary[1], binary[2]
+        binary[3] = np.clip(binary[3] + bldg * flood, 0, 1) * bldg
+        binary[4] = np.clip(binary[4] + road * flood, 0, 1) * road
+
+    return binary
 
 
 class FloodPredictor:
@@ -31,7 +66,7 @@ class FloodPredictor:
         device: Torch device ('cuda' or 'cpu').
         tile_size: Sliding window tile size.
         overlap: Overlap between sliding window tiles.
-        threshold: Binarization threshold for output masks.
+        thresholds: Per-class binarization thresholds.
     """
 
     def __init__(
@@ -41,11 +76,13 @@ class FloodPredictor:
         device: str = "auto",
         tile_size: int = 512,
         overlap: int = 64,
-        threshold: float = 0.5,
+        thresholds: Optional[list[float]] = None,
     ):
         self.tile_size = tile_size
         self.overlap = overlap
-        self.threshold = threshold
+        self.thresholds = thresholds or DEFAULT_THRESHOLDS
+        self.model_type = model_type
+        self.checkpoint_name = Path(checkpoint_path).name
 
         # Device
         if device == "auto":
@@ -77,10 +114,13 @@ class FloodPredictor:
             ckpt = torch.load(checkpoint_path, map_location=self.device, weights_only=False)
             state_dict = ckpt.get("model_state_dict", ckpt)
 
-            # Clean DataParallel prefix
+            # Clean DataParallel prefix; strict so an architecture mismatch fails loudly
             clean = {k.replace("module.", ""): v for k, v in state_dict.items()}
-            model.load_state_dict(clean, strict=False)
-            logger.info(f"Loaded checkpoint: {checkpoint_path.name}")
+            model.load_state_dict(clean, strict=True)
+            logger.info(
+                f"Loaded checkpoint: {checkpoint_path.name} "
+                f"(epoch {ckpt.get('epoch', '?')}, best mIoU {ckpt.get('best_iou', '?')})"
+            )
         else:
             logger.warning(f"Checkpoint not found: {checkpoint_path}, using random weights")
 
@@ -127,8 +167,7 @@ class FloodPredictor:
         # Sliding window inference
         prob_map = self._sliding_window_inference(pre_norm, post_norm, H, W)
 
-        # Binary mask
-        binary = (prob_map > self.threshold).astype(np.uint8)
+        binary = binarize(prob_map, self.thresholds)
 
         return {
             "probabilities": prob_map,
@@ -140,20 +179,67 @@ class FloodPredictor:
         self,
         pre_path: Union[str, Path],
         post_path: Union[str, Path],
+        register: bool = True,
     ) -> dict:
         """
         Run prediction on GeoTIFF file paths.
 
+        The post-event image is resampled onto the pre-event pixel grid
+        using the GeoTIFF georeferencing, then the residual global shift
+        (median ~12 px on SpaceNet 8) is estimated by block-wise phase
+        correlation and corrected when the estimate is confident.
+
         Args:
             pre_path: Path to pre-event GeoTIFF.
             post_path: Path to post-event GeoTIFF.
+            register: Correct the residual shift after resampling.
 
         Returns:
-            Prediction dictionary (same as predict()).
+            Prediction dictionary (same as predict()) plus 'pre_rgb' /
+            'post_rgb' aligned uint8 previews and an 'alignment' report.
         """
-        pre_img = read_geotiff(pre_path, max_bands=3)
-        post_img = read_geotiff(post_path, max_bands=3)
-        return self.predict(pre_img, post_img)
+        start = time.perf_counter()
+        try:
+            pair = load_aligned_pair(pre_path, post_path)
+        except Exception as e:
+            # Files without usable georeferencing: fall back to raw pixels
+            logger.warning(f"Georeferenced alignment failed ({e}); using raw pixel grids")
+            pre_img = read_geotiff(pre_path, max_bands=3)
+            post_img = read_geotiff(post_path, max_bands=3)
+            result = self.predict(pre_img, post_img)
+            h, w = result["binary_mask"].shape[1:]
+            result["pre_rgb"] = (pre_img[:, :h, :w] * 255).astype(np.uint8)
+            result["post_rgb"] = (post_img[:, :h, :w] * 255).astype(np.uint8)
+            result["alignment"] = {"method": "none (no georeferencing)", "applied": False}
+            result["inference_s"] = round(time.perf_counter() - start, 2)
+            return result
+
+        post = pair["post"]
+        alignment = {"method": "georeferenced resampling", "applied": False}
+        if register:
+            reg = estimate_shift_blocks(pair["pre"], post, pair["valid"])
+            known = reg["n_confident"] >= 2 and reg["magnitude"] == reg["magnitude"]
+            alignment.update({
+                "method": "georeferenced resampling + block phase correlation",
+                "residual_shift_px": round(reg["magnitude"], 1) if known else None,
+                "dy_px": round(reg["dy"], 1) if known else None,
+                "dx_px": round(reg["dx"], 1) if known else None,
+                "confident_blocks": reg["n_confident"],
+                "applied": bool(known and reg["magnitude"] <= MAX_REGISTRATION_SHIFT_PX),
+            })
+            if alignment["applied"]:
+                post = apply_shift(post, reg["dy"], reg["dx"])
+
+        result = self.predict(
+            pair["pre"].astype(np.float32) / 255.0,
+            post.astype(np.float32) / 255.0,
+        )
+        result["pre_rgb"] = pair["pre"]
+        result["post_rgb"] = post
+        result["alignment"] = alignment
+        result["gsd_m"] = pair["pre_gsd_m"]
+        result["inference_s"] = round(time.perf_counter() - start, 2)
+        return result
 
     def _sliding_window_inference(
         self,

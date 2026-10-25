@@ -8,10 +8,19 @@ Supports both real model inference and stub mode for development.
 import logging
 import os
 from pathlib import Path
+import sys
+
+# Ensure project root is in python path
+ROOT_DIR = Path(__file__).resolve().parent.parent
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+
+from dotenv import load_dotenv
+load_dotenv(ROOT_DIR / ".env")
 
 from backend.routes import router
 
@@ -72,10 +81,18 @@ async def startup():
         try:
             from inference.predict import FloodPredictor
 
-            ckpt = os.getenv(
-                "O3_FUSION_WEIGHTS", "./weights/fusion_net_best.pth"
-            )
             model_type = os.getenv("MODEL_TYPE", "fusion")
+            env_key = "O2_BASELINE_WEIGHTS" if model_type == "unet" else "O3_FUSION_WEIGHTS"
+            default = f"./weights/{'unet' if model_type == 'unet' else 'fusion'}_net_best.pth"
+
+            # Resolve relative to the project root so the server can start from any cwd
+            ckpt = Path(os.getenv(env_key, default))
+            if not ckpt.is_absolute():
+                ckpt = ROOT_DIR / ckpt
+            if not ckpt.exists():
+                raise FileNotFoundError(
+                    f"{env_key} checkpoint not found: {ckpt}. Download the weights into weights/."
+                )
 
             app.state.predictor = FloodPredictor(
                 checkpoint_path=ckpt,
@@ -89,6 +106,11 @@ async def startup():
     else:
         app.state.predictor = None
         logger.info("Running in STUB mode (no model loaded)")
+
+    # Build the pre/post pair index so dataset tiles can be picked by name
+    from backend.routes import get_pair_index
+
+    get_pair_index(app)
 
 
 def run():

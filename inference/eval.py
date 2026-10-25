@@ -21,7 +21,9 @@ def compute_prediction_metrics(
         ground_truth: Ground truth mask (NUM_CLASSES, H, W).
 
     Returns:
-        Dictionary of per-class metrics.
+        Dictionary of per-class metrics. A class absent from both the
+        prediction and the ground truth has undefined metrics (None) and
+        is excluded from the mean.
     """
     binary = prediction["binary_mask"]
     metrics = {}
@@ -37,11 +39,15 @@ def compute_prediction_metrics(
         fp = (pred_c * (1 - targ_c)).sum()
         fn = ((1 - pred_c) * targ_c).sum()
 
-        metrics[f"iou_{name}"] = float(tp / (tp + fp + fn + 1e-8))
-        metrics[f"f1_{name}"] = float(2 * tp / (2 * tp + fp + fn + 1e-8))
+        if tp + fp + fn == 0:
+            metrics[f"iou_{name}"] = None
+            metrics[f"f1_{name}"] = None
+            continue
+        metrics[f"iou_{name}"] = float(tp / (tp + fp + fn))
+        metrics[f"f1_{name}"] = float(2 * tp / (2 * tp + fp + fn))
 
-    ious = [metrics[f"iou_{n}"] for n in CLASS_NAMES if f"iou_{n}" in metrics]
-    metrics["mean_iou"] = float(np.mean(ious)) if ious else 0.0
+    ious = [metrics[f"iou_{n}"] for n in CLASS_NAMES if metrics.get(f"iou_{n}") is not None]
+    metrics["mean_iou"] = float(np.mean(ious)) if ious else None
 
     return metrics
 
