@@ -1,0 +1,20 @@
+{
+  "mode": "prepare",
+  "repo": "https://github.com/isuryaprakashh/Capstone-Flood-Mapping.git",
+  "commit": "26379792d3b4427f54d893008452a7d723fa4814",
+  "hours": 2.0,
+  "queue": "kaggle",
+  "pip": [
+    "rasterio>=1.3.8",
+    "timm==1.0.30",
+    "filelock>=3.12",
+    "pyyaml>=6.0"
+  ],
+  "session": 9,
+  "data_source": "sn8-prepare",
+  "previous": null,
+  "reset_failed": false,
+  "started": 1792929606.8269725,
+  "finished": 1792930228.8434103,
+  "minutes": 10.4
+}

@@ -1,0 +1,39 @@
+[{"stream_name":"stdout","time":1.066583487,"data":"[12:00:06 +0m] Job: {\"mode\": \"prepare\", \"repo\": \"https://github.com/isuryaprakashh/Capstone-Flood-Mapping.git\", \"commit\": \"26379792d3b4427f54d893008452a7d723fa4814\", \"hours\": 2.0, \"queue\": \"kaggle\", \"pip\": [\"rasterio\u003e=1.3.8\", \"timm==1.0.30\", \"filelock\u003e=3.12\", \"pyyaml\u003e=6.0\"], \"session\": 9, \"data_source\": \"sn8-prepare\", \"previous\": null, \"reset_failed\": false}\n"}
+,{"stream_name":"stdout","time":1.071251654,"data":"[12:00:06 +0m] CPUs: 4; RAM: 33.7 GB; shared memory (DataLoader workers): 15.0 GB\n"}
+,{"stream_name":"stdout","time":1.071296584,"data":"[12:00:06 +0m] $ /usr/bin/python3 -m pip install -q \"rasterio\u003e=1.3.8\" \"timm==1.0.30\" \"filelock\u003e=3.12\" \"pyyaml\u003e=6.0\"\n"}
+,{"stream_name":"stdout","time":7.829260658,"data":"[12:00:13 +0m] $ git clone --quiet https://github.com/isuryaprakashh/Capstone-Flood-Mapping.git /kaggle/tmp/code\n"}
+,{"stream_name":"stdout","time":9.237014609,"data":"[12:00:14 +0m] $ git checkout --quiet 26379792d3b4427f54d893008452a7d723fa4814\n"}
+,{"stream_name":"stdout","time":9.2480903,"data":"[12:00:15 +0m] Downloading Germany_Training_Public\n"}
+,{"stream_name":"stderr","time":73.844110398,"data":"/kaggle/src/script.py:77: DeprecationWarning: Python 3.14 will, by default, filter extracted tar archives and reject files or modify their metadata. Use the filter argument to control this behavior.\n"}
+,{"stream_name":"stderr","time":73.844139048,"data":"  tar.extractall(dest)\n"}
+,{"stream_name":"stdout","time":86.066782209,"data":"[12:01:31 +1m] Downloading Louisiana-East_Training_Public\n"}
+,{"stream_name":"stdout","time":276.101369603,"data":"[12:04:41 +5m] $ /usr/bin/python3 scripts/prepare_data.py --data-root /kaggle/tmp/raw --out-dir /kaggle/working/processed --workers 4\n"}
+,{"stream_name":"stderr","time":288.405269307,"data":"12:04:54 [INFO] Preparing 801 tiles (0 already done) with 4 workers\n"}
+,{"stream_name":"stderr","time":320.318987379,"data":"12:05:26 [INFO]   50/801 tiles\n"}
+,{"stream_name":"stderr","time":344.961108156,"data":"12:05:50 [INFO]   100/801 tiles\n"}
+,{"stream_name":"stderr","time":378.288004444,"data":"12:06:24 [INFO]   150/801 tiles\n"}
+,{"stream_name":"stderr","time":407.715139562,"data":"12:06:53 [INFO]   200/801 tiles\n"}
+,{"stream_name":"stderr","time":426.206221976,"data":"12:07:11 [INFO]   250/801 tiles\n"}
+,{"stream_name":"stderr","time":444.215481318,"data":"12:07:29 [INFO]   300/801 tiles\n"}
+,{"stream_name":"stderr","time":462.3313582,"data":"12:07:48 [INFO]   350/801 tiles\n"}
+,{"stream_name":"stderr","time":478.397117623,"data":"12:08:04 [INFO]   400/801 tiles\n"}
+,{"stream_name":"stderr","time":501.280095623,"data":"12:08:27 [INFO]   450/801 tiles\n"}
+,{"stream_name":"stderr","time":517.326758366,"data":"12:08:43 [INFO]   500/801 tiles\n"}
+,{"stream_name":"stderr","time":533.052347671,"data":"12:08:58 [INFO]   550/801 tiles\n"}
+,{"stream_name":"stderr","time":550.587308846,"data":"12:09:16 [INFO]   600/801 tiles\n"}
+,{"stream_name":"stderr","time":569.336017594,"data":"12:09:35 [INFO]   650/801 tiles\n"}
+,{"stream_name":"stderr","time":590.04136446,"data":"12:09:55 [INFO]   700/801 tiles\n"}
+,{"stream_name":"stderr","time":605.70833514,"data":"12:10:11 [INFO]   750/801 tiles\n"}
+,{"stream_name":"stderr","time":622.408506727,"data":"12:10:28 [INFO]   800/801 tiles\n"}
+,{"stream_name":"stderr","time":622.408551646,"data":"12:10:28 [INFO]   801/801 tiles\n"}
+,{"stream_name":"stderr","time":622.445929626,"data":"12:10:28 [INFO] P1: train 479 | val 120 | test 202\n"}
+,{"stream_name":"stderr","time":622.445965376,"data":"12:10:28 [INFO] P2: train 181 | val 21 | test 599\n"}
+,{"stream_name":"stderr","time":622.446009116,"data":"12:10:28 [INFO] P3: train 494 | val 166 | test 141\n"}
+,{"stream_name":"stdout","time":623.082621967,"data":"[12:10:28 +10m] Session finished\n"}
+,{"stream_name":"stderr","time":625.239125285,"data":"/usr/local/lib/python3.13/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\\|'\n"}
+,{"stream_name":"stderr","time":625.239166095,"data":"  cells[i][c] = re.sub('\\\\\\\\\\|', '|', cell)\n"}
+,{"stream_name":"stderr","time":625.60449977,"data":"/usr/local/lib/python3.13/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\\_'\n"}
+,{"stream_name":"stderr","time":625.60453609,"data":"  text = re.sub(r'_', '\\_', text) # Escape underscores in display text\n"}
+,{"stream_name":"stderr","time":626.373252958,"data":"[NbConvertApp] Converting notebook __script__.ipynb to html\n"}
+,{"stream_name":"stderr","time":627.488224322,"data":"[NbConvertApp] Writing 303079 bytes to __results__.html\n"}
+]

@@ -1,10 +1,10 @@
 {
-  "phase": "prepare",
+  "phase": "train",
   "code_commit": "26379792d3b4427f54d893008452a7d723fa4814",
-  "session": 9,
-  "kernel": "sn8-prepare",
-  "kernel_mode": "prepare",
-  "pushed_at": 1792929602.1172345,
+  "session": 10,
+  "kernel": "sn8-train-a",
+  "kernel_mode": "train",
+  "pushed_at": 1792930831.587753,
   "wait_until": null,
   "last_good_train": null,
   "phase_retries": 0,
@@ -27,8 +27,8 @@
       "hours": 0.38833333333333336
     }
   ],
-  "prepared": false,
-  "reset_failed": true,
+  "prepared": true,
+  "reset_failed": false,
   "last_command": "61a7a2eb9a7d2b37",
   "tick_errors": 0,
   "events": [
@@ -131,6 +131,18 @@
     {
       "at": "2026-10-25T12:00:02+00:00",
       "message": "Started prepare session 9 on sn8-prepare (code 2637979)"
+    },
+    {
+      "at": "2026-10-25T12:20:21+00:00",
+      "message": "sn8-prepare (prepare) ended: complete after 20 min"
+    },
+    {
+      "at": "2026-10-25T12:20:29+00:00",
+      "message": "Dataset prepared; training starts"
+    },
+    {
+      "at": "2026-10-25T12:20:31+00:00",
+      "message": "Started train session 10 on sn8-train-a (code 2637979)"
     }
   ]
 }

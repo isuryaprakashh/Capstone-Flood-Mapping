@@ -1,16 +1,19 @@
 # Orchestrator status
 
-- **Phase:** prepare
-- **Sessions started:** 9
-- **Running:** sn8-prepare
+- **Phase:** train
+- **Sessions started:** 10
+- **Running:** sn8-train-a
 - **Code commit:** 26379792d3b4427f54d893008452a7d723fa4814
 - **Waiting for quota until:** —
-- **Updated:** 2026-10-25T12:00:02+00:00
+- **Updated:** 2026-10-25T12:20:31+00:00
 
 Per-run progress: [PROGRESS.md](PROGRESS.md)
 
 ## Recent events
 
+- 2026-10-25T12:20:31+00:00 — Started train session 10 on sn8-train-a (code 2637979)
+- 2026-10-25T12:20:29+00:00 — Dataset prepared; training starts
+- 2026-10-25T12:20:21+00:00 — sn8-prepare (prepare) ended: complete after 20 min
 - 2026-10-25T12:00:02+00:00 — Started prepare session 9 on sn8-prepare (code 2637979)
 - 2026-10-25T12:00:00+00:00 — Smoke test passed; preparing the full dataset
 - 2026-10-25T11:59:46+00:00 — sn8-smoke (smoke) ended: complete after 33 min
