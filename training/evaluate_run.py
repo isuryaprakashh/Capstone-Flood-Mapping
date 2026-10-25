@@ -105,6 +105,8 @@ def tune_thresholds(model, cfg, processed_dir, run_dir, val_ids, deadline, devic
                 c[1] += int((pred & ~target).sum())
                 c[2] += int((~pred & target).sum())
         state["done"].append(tile_id)
+        if len(state["done"]) % 10 == 0:
+            write_json(state_path, state)  # a crash (not only a pause) keeps the tiles done so far
 
     thresholds, f1s = {}, {}
     for head in TUNED_HEADS:

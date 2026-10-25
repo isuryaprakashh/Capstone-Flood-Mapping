@@ -31,6 +31,11 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+ABORT_EXIT_CODE = 3  # a worker gave up after repeated failures: the session fails
+WORKER_GRACE_S = 900  # terminate workers still running this long after the deadline
+MAX_WORKER_RESTARTS = 2
+RESTART_MIN_SECONDS = 2700
+
 SMOKE_MODELS = ("ra_fusion", "sn8_baseline", "siamese_unet", "snunet", "unet_v0", "siamese_v0")
 
 
@@ -44,7 +49,7 @@ def smoke_runs(runs: dict) -> list[dict]:
             c["epochs"] = 2
             c["batch_size"] = 2
             c["crop_size"] = 256
-            c["num_workers"] = 0
+            c["num_workers"] = min(2, c.get("num_workers", 2))  # data loading as in real runs
             c["deadline_margin_s"] = 0
             if c.get("stages"):
                 c["stages"] = [{**s, "epochs": 2} for s in c["stages"]]  # a mid-stage resume in each
@@ -65,11 +70,12 @@ def main():
     parser.add_argument("--hours", type=float, default=None, help="Session time budget")
     parser.add_argument("--deadline", type=float, default=None, help="Absolute deadline (unix time)")
     parser.add_argument("--smoke", action="store_true", help="Short runs of every model + resume test")
+    parser.add_argument("--reset-failed", action="store_true", help="Give failed runs a fresh set of attempts")
     parser.add_argument("--worker", type=str, default=None, help=argparse.SUPPRESS)
     parser.add_argument("--session", type=str, default=None, help=argparse.SUPPRESS)
     args = parser.parse_args()
 
-    from training.queue import run_worker, write_progress
+    from training.queue import QueueAborted, reset_failed, run_worker, write_progress
 
     runs = load_runs(args.runs_file)
     if args.smoke:
@@ -82,43 +88,95 @@ def main():
     session = args.session or uuid.uuid4().hex[:8]
     max_steps = 3 if args.smoke else None
 
+    if args.reset_failed:
+        reset = reset_failed(selected, args.results)
+        logger.info(f"Fresh attempts for previously failed runs: {reset or 'none'}")
+
     if args.worker is not None:
-        run_worker(selected, args.processed, args.results, deadline, session, args.worker, max_steps)
+        try:
+            run_worker(selected, args.processed, args.results, deadline, session, args.worker, max_steps)
+        except QueueAborted as e:
+            logger.error(str(e))
+            sys.exit(ABORT_EXIT_CODE)
         return
 
     if args.smoke:
-        # Checkpoint/resume test: stop every run after one epoch, then resume it to completion
-        first = run_worker(selected, args.processed, args.results, deadline, session, "0", max_steps,
-                           stop_after_epochs=1)
-        logger.info(f"Smoke pass 1 (stop after 1 epoch): {first}")
+        # Checkpoint/resume test: stop every run after one epoch, then resume it to completion.
+        # Each pass is its own session (the queue does not re-claim a run paused in the same session).
+        npass = 0
         while True:
-            outcome = run_worker(selected, args.processed, args.results, deadline, session, "0", max_steps,
-                                 stop_after_epochs=1)
+            npass += 1
+            outcome = run_worker(selected, args.processed, args.results, deadline, f"{session}-{npass}", "0",
+                                 max_steps, stop_after_epochs=1, max_consecutive_failures=None)
+            logger.info(f"Smoke pass {npass}: {outcome}")
             if not outcome:
                 break
         write_progress(selected, args.results)
         return
 
     logger.info(f"{len(selected)} runs selected · {args.gpus} worker(s) · session {session}")
+    aborted = False
     if args.gpus <= 1:
-        run_worker(selected, args.processed, args.results, deadline, session, "0")
+        try:
+            run_worker(selected, args.processed, args.results, deadline, session, "0")
+        except QueueAborted as e:
+            logger.error(str(e))
+            aborted = True
     else:
-        procs = []
-        for gpu in range(args.gpus):
-            env = {**os.environ, "CUDA_VISIBLE_DEVICES": str(gpu)}
-            cmd = [sys.executable, __file__, "--processed", args.processed, "--results", args.results,
-                   "--runs-file", args.runs_file, "--worker", str(gpu), "--session", session]
-            if args.queue:
-                cmd += ["--queue", args.queue]
-            if args.only:
-                cmd += ["--only", *args.only]
-            if deadline:
-                cmd += ["--deadline", str(deadline)]
-            procs.append(subprocess.Popen(cmd, env=env))
-            time.sleep(20)  # stagger startup (model download, cache warm-up)
-        codes = [p.wait() for p in procs]
-        logger.info(f"Workers finished with exit codes {codes}")
+        aborted = supervise_workers(args, session, deadline)
     write_progress(selected, args.results)
+    if aborted:
+        sys.exit(ABORT_EXIT_CODE)
+
+
+def supervise_workers(args, session: str, deadline: float) -> bool:
+    """
+    One worker process per GPU. A worker that crashes is restarted while time
+    remains (its run resumes from the last checkpoint); one still running past
+    the deadline is terminated so a hang cannot run into Kaggle's hard limit.
+
+    Returns:
+        True if a worker aborted after repeated failures.
+    """
+    def spawn(gpu: int) -> subprocess.Popen:
+        env = {**os.environ, "CUDA_VISIBLE_DEVICES": str(gpu)}
+        cmd = [sys.executable, __file__, "--processed", args.processed, "--results", args.results,
+               "--runs-file", args.runs_file, "--worker", str(gpu), "--session", session]
+        if args.queue:
+            cmd += ["--queue", args.queue]
+        if args.only:
+            cmd += ["--only", *args.only]
+        if deadline:
+            cmd += ["--deadline", str(deadline)]
+        return subprocess.Popen(cmd, env=env)
+
+    procs, restarts, aborted = {}, {}, False
+    for gpu in range(args.gpus):
+        procs[gpu], restarts[gpu] = spawn(gpu), 0
+        time.sleep(20)  # stagger startup (model download, cache warm-up)
+    while procs:
+        time.sleep(15)
+        for gpu, proc in list(procs.items()):
+            code = proc.poll()
+            if code is None:
+                if deadline and time.time() > deadline + WORKER_GRACE_S:
+                    logger.error(f"Worker {gpu} still running {WORKER_GRACE_S}s past the deadline; terminating it")
+                    proc.terminate()
+                    try:
+                        proc.wait(timeout=60)
+                    except subprocess.TimeoutExpired:
+                        proc.kill()
+                continue
+            del procs[gpu]
+            logger.info(f"Worker {gpu} exited with code {code}")
+            if code == ABORT_EXIT_CODE:
+                aborted = True
+            elif code != 0 and restarts[gpu] < MAX_WORKER_RESTARTS and (
+                    deadline is None or deadline - time.time() > RESTART_MIN_SECONDS):
+                restarts[gpu] += 1
+                logger.warning(f"Restarting worker {gpu} ({restarts[gpu]}/{MAX_WORKER_RESTARTS})")
+                procs[gpu] = spawn(gpu)
+    return aborted
 
 
 if __name__ == "__main__":

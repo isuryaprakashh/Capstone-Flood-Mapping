@@ -188,7 +188,7 @@ class SN8CropDataset(Dataset):
             shifted = shift_image(post, dy, dx)
             if use and self.aug["photometric"]:
                 shifted = photometric(shifted, rng)
-            sample["ssl_a"] = sample["post"]
+            # The pair is (post, ssl_b): post itself is not duplicated
             sample["ssl_b"] = torch.from_numpy(shifted.transpose(2, 0, 1).copy())
             sample["ssl_flow"] = torch.tensor([dx, dy], dtype=torch.float32)
             sample["ssl"] = torch.tensor(float(use))
@@ -227,6 +227,11 @@ class SN8CenterCropDataset(Dataset):
             "flood_image": torch.tensor([float(labels[LABEL_CHANNELS.index("flooded_building")].any()
                                                or labels[LABEL_CHANNELS.index("flooded_road")].any())]),
         }
+
+
+def loader_worker_init(_worker_id: int):
+    """DataLoader workers: no OpenCV thread pools (few vCPUs shared by two GPU workers)."""
+    cv2.setNumThreads(0)
 
 
 def tile_weights(manifest_tiles: dict[str, dict], tile_ids: list[str], flood_oversample: float = 2.0) -> torch.Tensor:

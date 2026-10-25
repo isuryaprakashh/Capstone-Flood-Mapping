@@ -52,7 +52,6 @@ def probe(cfg: dict, batch_size: int, steps: int, device: torch.device) -> dict:
             "labels": labels,
             "valid": torch.ones(batch_size, 1, c, c, device=device),
             "flood_image": torch.ones(batch_size, 1, device=device),
-            "ssl_a": torch.rand(batch_size, 3, c, c, device=device),
             "ssl_b": torch.rand(batch_size, 3, c, c, device=device),
             "ssl_flow": torch.zeros(batch_size, 2, device=device),
             "ssl": torch.ones(batch_size, device=device),
@@ -67,9 +66,8 @@ def probe(cfg: dict, batch_size: int, steps: int, device: torch.device) -> dict:
         optimizer.zero_grad(set_to_none=True)
         with torch.autocast("cuda", dtype=torch.float16):
             out = model(b["pre"], b["post"])
-            flows = model.estimate_flow(b["ssl_a"][: batch_size // 2], b["ssl_b"][: batch_size // 2]) if has_align else None
-            if flows is not None:
-                b = {**b, "ssl": torch.cat([torch.ones(batch_size // 2), torch.zeros(batch_size - batch_size // 2)]).to(device)}
+            # Worst case for memory: every sample of the batch carries a self-supervised pair
+            flows = model.estimate_flow(b["post"], b["ssl_b"]) if has_align else None
             loss = criterion(out, b, flows)["total"]
         scaler.scale(loss).backward()
         scaler.step(optimizer)

@@ -37,7 +37,7 @@ from torch.utils.data import DataLoader, WeightedRandomSampler
 
 from models import build_research_model
 from training.config import config_hash
-from training.dataset import LABEL_CHANNELS, SN8CenterCropDataset, SN8CropDataset, tile_weights
+from training.dataset import LABEL_CHANNELS, SN8CenterCropDataset, SN8CropDataset, loader_worker_init, tile_weights
 from training.losses import MultiTaskLoss
 
 logger = logging.getLogger(__name__)
@@ -128,11 +128,27 @@ def write_json(path: Path, data: dict):
     os.replace(tmp, path)
 
 
+MAX_NONFINITE_BATCHES = 20  # consecutive non-finite losses before a run fails
+LOADER_TIMEOUT_S = 600  # a stuck data-loading worker fails the run instead of hanging the session
+
+
+def _loader_options(cfg: dict) -> dict:
+    workers = cfg.get("num_workers", 2)
+    return {"num_workers": workers, "timeout": LOADER_TIMEOUT_S if workers else 0,
+            "worker_init_fn": loader_worker_init if workers else None}
+
+
 class EMA:
-    """Exponential moving average of a model's floating-point state."""
+    """
+    Exponential moving average of a model's floating-point state, with the
+    usual warm-up: after t updates the decay is min(decay, (1 + t) / (10 + t)),
+    so short stages (e.g. 900 steps for P2) are not dominated by their
+    initial weights.
+    """
 
     def __init__(self, model: torch.nn.Module, decay: float = 0.999):
         self.decay = decay
+        self.updates = 0
         skip = getattr(model, "frozen_prefixes", ())  # frozen weights never change: no shadow copy
         self.shadow = {
             k: v.detach().clone() for k, v in model.state_dict().items()
@@ -141,17 +157,20 @@ class EMA:
 
     @torch.no_grad()
     def update(self, model: torch.nn.Module):
+        self.updates += 1
+        d = min(self.decay, (1 + self.updates) / (10 + self.updates))
         for k, v in model.state_dict().items():
             if k in self.shadow:
-                self.shadow[k].mul_(self.decay).add_(v.detach(), alpha=1 - self.decay)
+                self.shadow[k].mul_(d).add_(v.detach(), alpha=1 - d)
 
     def state_dict(self) -> dict:
-        return self.shadow
+        return {"shadow": self.shadow, "updates": self.updates}
 
     def load_state_dict(self, state: dict):
         # Copy into the existing shadow so it stays on the model's device (checkpoints load on CPU)
-        for k, v in state.items():
+        for k, v in state["shadow"].items():
             self.shadow[k].copy_(v)
+        self.updates = state["updates"]
 
     def apply_to(self, model: torch.nn.Module) -> dict:
         """Load EMA weights into the model; returns the replaced weights."""
@@ -272,8 +291,11 @@ def train_run(
     """
     run_dir = Path(run_dir)
     ckpt_dir = run_dir / "checkpoints"
+    if (run_dir / "timing.json").exists() and (ckpt_dir / "best.pt").exists() and not (ckpt_dir / "last.pt").exists():
+        return "completed"  # finished, but the session ended before the queue recorded it
     ckpt_dir.mkdir(parents=True, exist_ok=True)
     device = device or torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    torch.backends.cudnn.benchmark = True  # fixed crop/window sizes: let cuDNN pick the fastest kernels
     processed_dir = Path(processed_dir)
     chash = config_hash(cfg)
 
@@ -325,9 +347,10 @@ def _train(cfg, chash, processed_dir, run_dir, ckpt_dir, deadline, device, max_s
     if state.get("training_done"):
         return _final_evaluation(cfg, model, processed_dir, run_dir, ckpt_dir, splits, tiles, deadline, device)
 
+    loader_opts = _loader_options(cfg)
     val_loader = DataLoader(
         SN8CenterCropDataset(processed_dir, split["val"], cfg["crop_size"], cfg.get("register_post", False)),
-        batch_size=cfg["batch_size"], shuffle=False, num_workers=cfg.get("num_workers", 2),
+        batch_size=cfg["batch_size"], shuffle=False, **loader_opts,
     )
     train_ds = SN8CropDataset(
         processed_dir, split["train"], cfg["crop_size"],
@@ -389,7 +412,7 @@ def _train(cfg, chash, processed_dir, run_dir, ckpt_dir, deadline, device, max_s
             sampler = [pos * len(train_ds) + int(t) for pos, t in enumerate(draws)]
             loader = DataLoader(
                 train_ds, batch_size=cfg["batch_size"], sampler=sampler, drop_last=True,
-                num_workers=cfg.get("num_workers", 2), pin_memory=device.type == "cuda",
+                pin_memory=device.type == "cuda", **loader_opts,
             )
             train_metrics = _train_epoch(
                 model, loader, criterion, optimizer, scheduler, scaler, ema, device, use_amp,
@@ -439,7 +462,7 @@ def _train_epoch(model, loader, criterion, optimizer, scheduler, scaler, ema, de
                  grad_clip, max_steps, use_ssl, grad_accum=1) -> dict:
     """max_steps counts optimizer steps; each takes grad_accum micro-batches."""
     train_mode(model)
-    sums, n, steps = {}, 0, 0
+    sums, n, steps, nonfinite = {}, 0, 0, 0
     optimizer.zero_grad(set_to_none=True)
     for micro, batch in enumerate(loader):
         if steps >= max_steps:
@@ -450,10 +473,17 @@ def _train_epoch(model, loader, criterion, optimizer, scheduler, scaler, ema, de
             ssl_flows = None
             if use_ssl and batch["ssl"].any():
                 idx = batch["ssl"] > 0
-                ssl_flows = model.estimate_flow(batch["ssl_a"][idx], batch["ssl_b"][idx])
+                ssl_flows = model.estimate_flow(batch["post"][idx], batch["ssl_b"][idx])
             losses = criterion(outputs, batch, ssl_flows)
         if not torch.isfinite(losses["total"]):
-            raise FloatingPointError(f"Non-finite loss at step {steps}: { {k: float(v) for k, v in losses.items()} }")
+            # An fp16 overflow on one batch: skip it; give up only if it keeps happening
+            nonfinite += 1
+            detail = {k: float(v) for k, v in losses.items()}
+            if nonfinite >= MAX_NONFINITE_BATCHES:
+                raise FloatingPointError(f"{nonfinite} non-finite losses in a row at step {steps}: {detail}")
+            logger.warning(f"Skipping a batch with non-finite loss at step {steps}: {detail}")
+            continue
+        nonfinite = 0
         scaler.scale(losses["total"] / grad_accum).backward()
         if (micro + 1) % grad_accum == 0:
             scaler.unscale_(optimizer)

@@ -83,6 +83,8 @@ def main():
     mode = JOB["mode"]
     deadline = START + JOB["hours"] * 3600
     log(f"Job: {json.dumps(JOB)}")
+    log(f"CPUs: {os.cpu_count()}; shared memory (DataLoader workers): {shutil.disk_usage('/dev/shm').total / 1e9:.1f} GB"
+        if os.path.exists("/dev/shm") else f"CPUs: {os.cpu_count()}")
 
     if mode != "prepare" and gpu_count() == 0:
         sys.exit("No GPU attached: refusing to train on CPU")
@@ -126,7 +128,8 @@ def main():
             sys.exit("Prepared dataset not attached (expected <input>/processed/manifest.json)")
         sh(
             f"{py} scripts/run_queue.py --processed {manifest.parent} --results {results} "
-            f"--queue {JOB['queue']} --gpus {max(1, gpu_count())} --deadline {deadline}",
+            f"--queue {JOB['queue']} --gpus {max(1, gpu_count())} --deadline {deadline}"
+            + (" --reset-failed" if JOB.get("reset_failed") else ""),
             cwd=code,
         )
     else:

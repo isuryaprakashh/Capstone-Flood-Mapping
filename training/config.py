@@ -47,12 +47,16 @@ def load_runs(path: Union[str, Path] = DEFAULT_RUNS_FILE) -> dict[str, dict]:
     return runs
 
 
+HASH_EXCLUDED = ("queue", "priority", "notes", "num_workers", "deadline_margin_s", "eval")
+
+
 def config_hash(cfg: dict) -> str:
     """
     Stable hash of the settings that affect training results.
 
-    Bookkeeping fields (queue, priority, notes) are excluded so a run can be
-    moved between queues without invalidating its checkpoint.
+    Bookkeeping and operational fields (queue, priority, notes, data-loader
+    workers, the pause margin, evaluation settings) are excluded, so they can
+    be adjusted without invalidating a run's training checkpoints.
     """
-    relevant = {k: v for k, v in cfg.items() if k not in ("queue", "priority", "notes")}
+    relevant = {k: v for k, v in cfg.items() if k not in HASH_EXCLUDED}
     return hashlib.sha256(json.dumps(relevant, sort_keys=True).encode()).hexdigest()[:16]
