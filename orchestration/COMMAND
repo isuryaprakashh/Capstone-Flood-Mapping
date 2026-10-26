@@ -1,3 +1,4 @@
 # One-shot maintainer command, applied by the orchestrator once per distinct content.
 # 'update-code' re-pins the training code to current main; 'resume <phase>' leaves 'stopped'.
+# 2026-10-26: stress test on flooded tiles first, flood-branch ablations on P3
 update-code
