@@ -64,6 +64,8 @@ MAX_RUN_ATTEMPTS = 3
 TICK_ERRORS_BEFORE_ALERT = 3  # consecutive failing ticks (1.5 h) before one alert email
 WEEKLY_GPU_HOURS = 30.0  # Kaggle's weekly GPU quota, reset Saturday 00:00 UTC
 QUOTA_NEAR_H = 5.0  # an early failure with less than this left is treated as quota, not a bug
+QUOTA_MARGIN_H = 0.5  # a GPU session plans to end this long before the quota would cut it off
+MIN_SESSION_H = 1.5  # no GPU session is started that could not train at least this long
 PIP_PACKAGES = ["rasterio>=1.3.8", "timm==1.0.30", "filelock>=3.12", "pyyaml>=6.0"]  # timm pinned: same encoders every session
 DOWNLOAD_PATTERN = r"^(?!processed/)(?!.*checkpoints/).*$"
 
@@ -313,8 +315,8 @@ class Orchestrator:
                 logger.info(f"Waiting for GPU quota until {stamp(st['wait_until'])}")
             elif HOLD_FILE.exists() and not ignore_hold:
                 logger.info(f"{HOLD_FILE.name} present on main: not starting new sessions")
-            elif st["phase"] != "prepare" and self.gpu_quota(st)[0] <= 0:
-                # Kaggle refuses new GPU sessions once the quota is spent (a running one may finish)
+            elif st["phase"] != "prepare" and self.gpu_quota(st)[0] < MIN_SESSION_H + QUOTA_MARGIN_H:
+                # Kaggle refuses new GPU sessions once the quota is spent, and kills one that runs out mid-epoch
                 self.quota_wait(st, "Weekly GPU quota used up")
             else:
                 st["wait_until"] = None
@@ -404,11 +406,15 @@ class Orchestrator:
         mode = st["phase"]
         if mode == "smoke" or not st["code_commit"]:
             st["code_commit"] = self.current_commit
+        hours = SESSION_HOURS[mode]
+        if mode != "prepare":
+            # End (pausing every run cleanly) before the weekly quota runs out, rather than be killed by Kaggle
+            hours = min(hours, round(self.gpu_quota(st)[0] - QUOTA_MARGIN_H, 2))
         job = {
             "mode": mode,
             "repo": self.repo_url,
             "commit": st["code_commit"],
-            "hours": SESSION_HOURS[mode],
+            "hours": hours,
             "queue": "kaggle",
             "pip": PIP_PACKAGES,
             "session": st["session"] + 1,
@@ -434,7 +440,7 @@ class Orchestrator:
         script = script.replace(JOB_PLACEHOLDER, "JOB = " + repr(job))  # a Python literal (None, not null)
         self.kaggle.push(slug, script, gpu=mode != "prepare", sources=sources)
         st.update({"kernel": slug, "kernel_mode": mode, "pushed_at": now(), "session": st["session"] + 1})
-        self.event(st, f"Started {mode} session {st['session']} on {slug} (code {st['code_commit'][:7]})")
+        self.event(st, f"Started {mode} session {st['session']} on {slug} (code {st['code_commit'][:7]}, {hours:g} h)")
 
     def finish(self, st: dict, status: str):
         slug, mode = st["kernel"], st["kernel_mode"]

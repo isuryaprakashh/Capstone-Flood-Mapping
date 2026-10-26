@@ -353,6 +353,30 @@ def test_kaggle_reported_quota_is_preferred(setup):
     assert len(kaggle.pushes) == pushes and st["wait_until"] == reset + 600
 
 
+def test_session_length_is_capped_to_the_remaining_quota(setup):
+    orch, kaggle, _ = setup
+    _to_training(orch, kaggle)
+    assert _job(kaggle.pushes[-1])["hours"] == orch_mod.SESSION_HOURS["train"]  # plenty of quota
+    kaggle.quota = lambda: (4.0, orch_mod.now() + 86400)
+    kaggle.statuses["sn8-train-a"] = "complete"
+    kaggle.outputs["sn8-train-a"] = {"results/run_a/status.json": _status("paused")}
+    st = orch.tick()
+    assert st["kernel"] == "sn8-train-b"
+    assert _job(kaggle.pushes[-1])["hours"] == 4.0 - orch_mod.QUOTA_MARGIN_H  # ends before Kaggle would kill it
+
+
+def test_no_gpu_session_too_short_to_be_useful(setup):
+    orch, kaggle, _ = setup
+    _to_training(orch, kaggle)
+    reset = orch_mod.now() + 86400
+    kaggle.quota = lambda: (orch_mod.MIN_SESSION_H, reset)  # under the minimum once the margin is kept back
+    kaggle.statuses["sn8-train-a"] = "complete"
+    kaggle.outputs["sn8-train-a"] = {"results/run_a/status.json": _status("paused")}
+    pushes = len(kaggle.pushes)
+    st = orch.tick()
+    assert len(kaggle.pushes) == pushes and st["kernel"] is None and st["wait_until"] == reset + 600
+
+
 def test_hold_file_blocks_scheduled_launches_but_not_a_manual_resume(setup, monkeypatch, tmp_path):
     orch, kaggle, _ = setup
     hold = tmp_path / "HOLD"
