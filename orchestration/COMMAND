@@ -1,4 +1,4 @@
 # One-shot maintainer command, applied by the orchestrator once per distinct content.
 # 'update-code' re-pins the training code to current main; 'resume <phase>' leaves 'stopped'.
-# 2026-10-26: stress test on flooded tiles first, flood-branch ablations on P3
+# 2026-10-26: P3 seeds 1-2 for RA-Fusion, SN8 baseline and Siamese U-Net
 update-code
