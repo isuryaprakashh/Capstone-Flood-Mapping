@@ -90,23 +90,30 @@ runs:
   - {id: p3_sn8_baseline_s0, model: sn8_baseline, stages: *sn8_stages, protocol: P3, priority: 6}
   - {id: p3_siamese_unet_s0, model: siamese_unet, batch_size: 4, grad_accum: 2, stages: *siamese_stages, protocol: P3, priority: 6}
   - {id: p3_snunet_s0, model: snunet, batch_size: 4, grad_accum: 2, protocol: P3, priority: 6}
+  # Seeds 1-2 for the main flood comparison (P1 flood does not transfer across events)
+  - {id: p3_ra_fusion_s1, model: ra_fusion, model_kwargs: {backbone: dinov3_sat}, protocol: P3, seed: 1, priority: 7}
+  - {id: p3_sn8_baseline_s1, model: sn8_baseline, stages: *sn8_stages, protocol: P3, seed: 1, priority: 7}
+  - {id: p3_siamese_unet_s1, model: siamese_unet, batch_size: 4, grad_accum: 2, stages: *siamese_stages, protocol: P3, seed: 1, priority: 7}
+  - {id: p3_ra_fusion_s2, model: ra_fusion, model_kwargs: {backbone: dinov3_sat}, protocol: P3, seed: 2, priority: 7}
+  - {id: p3_sn8_baseline_s2, model: sn8_baseline, stages: *sn8_stages, protocol: P3, seed: 2, priority: 7}
+  - {id: p3_siamese_unet_s2, model: siamese_unet, batch_size: 4, grad_accum: 2, stages: *siamese_stages, protocol: P3, seed: 2, priority: 7}
 
   # ── Ablations of RA-Fusion's flood branch (P3, seed 0; reference p3_ra_fusion_s0) ──
   # On P1 every model's flood scores sit near the floor: Louisiana-East shows standing water,
   # Germany the mud and debris left after the water receded, so flood learned on one event does
   # not transfer to the other. Flood components are compared on P3, whose training and test
   # tiles both cover the two events.
-  - {id: p3_abl_no_alignment, model: ra_fusion, model_kwargs: {backbone: dinov3_sat, align: false}, protocol: P3, priority: 7,
+  - {id: p3_abl_no_alignment, model: ra_fusion, model_kwargs: {backbone: dinov3_sat, align: false}, protocol: P3, priority: 8,
      notes: learned alignment removed (self-supervised loss off automatically)}
-  - {id: p3_abl_classic_registration, model: ra_fusion, model_kwargs: {backbone: dinov3_sat, align: false}, register_post: true, protocol: P3, priority: 7,
+  - {id: p3_abl_classic_registration, model: ra_fusion, model_kwargs: {backbone: dinov3_sat, align: false}, register_post: true, protocol: P3, priority: 8,
      notes: no learned alignment; post shifted by the phase-correlation estimate instead}
-  - {id: p3_abl_no_shift_training, model: ra_fusion, model_kwargs: {backbone: dinov3_sat}, aug: {shift_prob: 0.0}, ssl: {enabled: false}, protocol: P3, priority: 7,
+  - {id: p3_abl_no_shift_training, model: ra_fusion, model_kwargs: {backbone: dinov3_sat}, aug: {shift_prob: 0.0}, ssl: {enabled: false}, protocol: P3, priority: 8,
      notes: no synthetic misalignment and no self-supervised alignment loss}
-  - {id: p3_abl_dense_flood_loss, model: ra_fusion, model_kwargs: {backbone: dinov3_sat}, loss: {object_masked_flood: false}, protocol: P3, priority: 7,
+  - {id: p3_abl_dense_flood_loss, model: ra_fusion, model_kwargs: {backbone: dinov3_sat}, loss: {object_masked_flood: false}, protocol: P3, priority: 8,
      notes: flood loss on all valid pixels instead of labelled objects}
 
   # ── Ablations of RA-Fusion's building/road side (P1, seed 0; reference p1_ra_fusion) ──
-  - {id: abl_convnext_backbone, model: ra_fusion, model_kwargs: {backbone: convnext_tiny.dinov3_lvd1689m}, batch_size: 4, grad_accum: 2, priority: 7,
+  - {id: abl_convnext_backbone, model: ra_fusion, model_kwargs: {backbone: convnext_tiny.dinov3_lvd1689m}, batch_size: 4, grad_accum: 2, priority: 8,
      notes: fine-tuned ConvNeXt-T (DINOv3 web pretraining) instead of frozen satellite ViT-L}
-  - {id: abl_no_junction_head, model: ra_fusion, model_kwargs: {backbone: dinov3_sat}, loss: {junction: 0.0}, priority: 7,
+  - {id: abl_no_junction_head, model: ra_fusion, model_kwargs: {backbone: dinov3_sat}, loss: {junction: 0.0}, priority: 8,
      notes: junction auxiliary loss removed}
