@@ -3,14 +3,15 @@
 - **Phase:** train
 - **Sessions started:** 12
 - **Running:** sn8-train-a
-- **Code commit:** 793cc61a8054a44c6e2b89e4726654c0c17ef706
+- **Code commit:** 7d4177d07c6e323169f785d081d010c2126e1f48
 - **Waiting for quota until:** —
-- **Updated:** 2026-10-26T16:42:56+00:00
+- **Updated:** 2026-10-26T16:47:15+00:00
 
 Per-run progress: [PROGRESS.md](PROGRESS.md)
 
 ## Recent events
 
+- 2026-10-26T16:47:15+00:00 — Command: training code re-pinned to 7d4177d
 - 2026-10-26T16:42:56+00:00 — Command: training code re-pinned to 793cc61
 - 2026-10-26T11:15:59+00:00 — Started train session 12 on sn8-train-a (code 2637979)
 - 2026-10-26T11:15:13+00:00 — sn8-train-b (train) ended: complete after 696 min
@@ -40,4 +41,3 @@ Per-run progress: [PROGRESS.md](PROGRESS.md)
 - 2026-10-25T08:47:51+00:00 — Started smoke session 3 on sn8-smoke (code 60e6bfd)
 - 2026-10-25T08:47:49+00:00 — Smoke test failed: runs not completed: ['smoke_snunet', 'smoke_unet_v0', 'smoke_siamese_v0', 'smoke_sn8_baseline', 'smoke_siamese_unet', 'smoke_ra_fusion'] — retry 2/2
 - 2026-10-25T08:47:44+00:00 — sn8-smoke (smoke) ended: complete after 12 min
-- 2026-10-25T08:35:51+00:00 — Started smoke session 2 on sn8-smoke (code 60e6bfd)
