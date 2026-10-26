@@ -189,6 +189,27 @@ def reset_failed(runs: list[dict], results_dir: Union[str, Path]) -> list[str]:
     return reset
 
 
+def reopen_stale_evaluations(runs: list[dict], results_dir: Union[str, Path]) -> list[str]:
+    """
+    Re-open completed runs whose evaluation is out of date (e.g. a revised
+    stress test) so a worker redoes just those steps; returns their ids. Only
+    runs that kept best.pt are re-opened: without it the engine would retrain.
+    """
+    from training.evaluate_run import evaluation_complete
+
+    results_dir = Path(results_dir)
+    reopened = []
+    for cfg in runs:
+        st = read_status(results_dir, cfg["id"])
+        run_dir = results_dir / cfg["id"]
+        if (st["state"] == "completed" and (run_dir / "checkpoints" / "best.pt").exists()
+                and not evaluation_complete(run_dir)):
+            st.update({"state": "paused", "session": None})
+            write_status(results_dir, cfg["id"], st)
+            reopened.append(cfg["id"])
+    return reopened
+
+
 def write_progress(runs: list[dict], results_dir: Union[str, Path]):
     """Write results/PROGRESS.md (never raises: a progress page must not kill a worker)."""
     try:

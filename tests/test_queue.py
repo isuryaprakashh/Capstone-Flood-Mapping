@@ -72,6 +72,31 @@ def test_reset_failed_gives_fresh_attempts(tmp_path):
     assert _status(tmp_path, "run_0")["attempts"] == 0
 
 
+def _finished_run(results, run_id, stress_selection, keep_best=True):
+    run = results / run_id
+    (run / "checkpoints").mkdir(parents=True)
+    if keep_best:
+        (run / "checkpoints" / "best.pt").write_text("weights")
+    (run / "metrics_val.json").write_text(json.dumps({"thresholds": {"building": 0.5}}))
+    (run / "metrics_test.json").write_text("{}")
+    (run / "timing.json").write_text("{}")
+    (run / "stress_test.json").write_text(json.dumps({"shift_px": {}, "selection": stress_selection}))
+    queue.write_status(results, run_id, {"id": run_id, "state": "completed", "attempts": 1, "session": "s"})
+
+
+def test_stale_stress_tests_reopen_only_runs_that_kept_their_weights(tmp_path):
+    from training.evaluate_run import STRESS_SELECTION
+
+    _finished_run(tmp_path, "run_0", stress_selection=None)  # made under the old tile rule
+    _finished_run(tmp_path, "run_1", stress_selection=STRESS_SELECTION)
+    _finished_run(tmp_path, "run_2", stress_selection=None, keep_best=False)  # re-opening would retrain
+    assert queue.reopen_stale_evaluations(_runs(3), tmp_path) == ["run_0"]
+    st = _status(tmp_path, "run_0")
+    assert st["state"] == "paused" and st["attempts"] == 1 and st["session"] is None
+    assert _status(tmp_path, "run_1")["state"] == "completed" and _status(tmp_path, "run_2")["state"] == "completed"
+    assert queue.claim_next(_runs(3), tmp_path, "s2", "0")["id"] == "run_0"
+
+
 def test_progress_page_never_kills_a_worker(tmp_path, monkeypatch):
     monkeypatch.setattr(queue, "_write_progress", lambda *a: (_ for _ in ()).throw(FileNotFoundError("race")))
     queue.write_progress(_runs(1), tmp_path)  # logs a warning, does not raise

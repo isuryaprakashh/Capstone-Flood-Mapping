@@ -27,7 +27,9 @@ METRICS = [
     ("apls_flooded_network", "APLS flooded"),
     ("flooded_road_f1", "Flooded road F1"),
 ]
-STRESS_METRICS = ("building_f1", "apls")
+STRESS_METRICS = ("flooded_building_f1", "flooded_road_f1", "building_flood_iou", "building_f1", "apls")
+# Tile rule of current stress tests, as in training/evaluate_run.py (not imported: it needs torch)
+STRESS_SELECTION = "flooded_first"
 
 
 def load_completed(results_dir: Path) -> list[dict]:
@@ -116,8 +118,10 @@ def main():
                          "seconds_per_tile": statistics.mean(timings) if timings else None})
         lines.append("")
 
-    # Robustness to added pre/post misalignment (first seed of each group)
-    stressed = [(g, groups[g][0]["stress"]) for g in order if groups[g][0]["stress"]]
+    # Robustness to added pre/post misalignment (first seed of each group). Stress tests made under
+    # an older tile rule are left out until their run is re-evaluated.
+    stressed = [(g, groups[g][0]["stress"]) for g in order
+                if (groups[g][0]["stress"] or {}).get("selection") == STRESS_SELECTION]
     if stressed:
         shifts = sorted({int(s) for _, st in stressed for s in st["shift_px"]})
         for key in STRESS_METRICS:

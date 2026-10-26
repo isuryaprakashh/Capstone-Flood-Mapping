@@ -289,9 +289,14 @@ def train_run(
         'completed' or 'paused'. Exceptions propagate (the queue records
         them as failures and retries).
     """
+    from training.evaluate_run import evaluation_complete
+
     run_dir = Path(run_dir)
     ckpt_dir = run_dir / "checkpoints"
-    if (run_dir / "timing.json").exists() and (ckpt_dir / "best.pt").exists() and not (ckpt_dir / "last.pt").exists():
+    # Training finished and its checkpoints were finalized (only best.pt is left)
+    finalized = ((ckpt_dir / "best.pt").exists() and not (ckpt_dir / "last.pt").exists()
+                 and (run_dir / "metrics_test.json").exists())
+    if finalized and evaluation_complete(run_dir):
         return "completed"  # finished, but the session ended before the queue recorded it
     ckpt_dir.mkdir(parents=True, exist_ok=True)
     device = device or torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -303,10 +308,11 @@ def train_run(
     file_handler.setFormatter(logging.Formatter("%(asctime)s [%(levelname)s] %(message)s", "%Y-%m-%d %H:%M:%S"))
     logging.getLogger().addHandler(file_handler)
     try:
-        (run_dir / "config.yaml").write_text(yaml.safe_dump({**cfg, "config_hash": chash}, sort_keys=False))
-        write_json(run_dir / "environment.json", environment_info())
+        if not finalized:  # a re-evaluation keeps the record of how the run was trained
+            (run_dir / "config.yaml").write_text(yaml.safe_dump({**cfg, "config_hash": chash}, sort_keys=False))
+            write_json(run_dir / "environment.json", environment_info())
         return _train(cfg, chash, processed_dir, run_dir, ckpt_dir, deadline, device, max_steps_per_epoch,
-                      stop_after_epochs)
+                      stop_after_epochs, finalized)
     finally:
         logging.getLogger().removeHandler(file_handler)
         file_handler.close()
@@ -317,7 +323,7 @@ def _time_left(deadline: Optional[float]) -> float:
 
 
 def _train(cfg, chash, processed_dir, run_dir, ckpt_dir, deadline, device, max_steps_per_epoch,
-           stop_after_epochs) -> str:
+           stop_after_epochs, finalized=False) -> str:
     manifest = json.loads((processed_dir / "manifest.json").read_text())
     splits = json.loads((processed_dir / "splits.json").read_text())
     tiles = {t["id"]: t for t in manifest["tiles"]}
@@ -325,6 +331,10 @@ def _train(cfg, chash, processed_dir, run_dir, ckpt_dir, deadline, device, max_s
 
     set_seed(cfg["seed"])
     model = build_research_model(cfg["model"], **cfg.get("model_kwargs", {})).to(device)
+    if finalized:
+        # e.g. a revised stress test: redo only the missing evaluation steps with the kept best.pt
+        logger.info(f"Re-evaluating finished run {cfg['id']}")
+        return _final_evaluation(cfg, model, processed_dir, run_dir, ckpt_dir, splits, tiles, deadline, device)
     base_trainable = {n: p.requires_grad for n, p in model.named_parameters()}
     stages = resolve_stages(cfg)
     use_amp = cfg.get("amp", True) and device.type == "cuda"

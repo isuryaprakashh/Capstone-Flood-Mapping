@@ -12,8 +12,9 @@ tile granularity:
    traversable / flooded networks), road and flooded-road length F1, pixel
    IoU. Per-tile records go to tiles_test.jsonl; aggregates and tile-level
    bootstrap 95% confidence intervals to metrics_test.json.
-3. Stress test: the post image of a fixed subset of test tiles is shifted
-   by 0-40 px to measure robustness to residual misalignment.
+3. Stress test: the post image of a fixed subset of test tiles (tiles with
+   flood first, so the flood metrics are measured) is shifted by 0-40 px to
+   measure robustness to residual misalignment.
 4. Timing: seconds to map one 1300 x 1300 tile.
 
 The non-traversable (flooded) APLS is averaged only over tiles that contain
@@ -58,6 +59,8 @@ TILE_MARGIN_S = 120
 # i.e. every ground-truth tile and any sensible prediction; a huge, noisy prediction graph is
 # scored from a fixed-seed uniform sample of source points (unbiased; bounded time and memory)
 APLS_MAX_SOURCES = 2000
+# Recorded in stress_test.json; a stress test made under another tile rule is redone
+STRESS_SELECTION = "flooded_first"
 
 
 def _time_left(deadline: Optional[float]) -> float:
@@ -239,15 +242,42 @@ def evaluate_test(model, cfg, processed_dir, run_dir, test_ids, thresholds, dead
 # ─── 3. Stress test and 4. timing ───────────────────────────────────────────
 
 
-def stress_test(model, cfg, processed_dir, run_dir, test_ids, thresholds, deadline, device) -> bool:
+def stress_tile_ids(test_ids: list[str], tiles: dict, n: int) -> list[str]:
+    """
+    The stress-test subset: test tiles with reference flood first, then dry
+    ones, each in id order. Only flooded tiles can show how misalignment hurts
+    flood attribution (an id-ordered subset held almost none).
+    """
+    ids = sorted(test_ids)
+    flooded = [i for i in ids if tiles[i]["has_flood"]]
+    return (flooded + [i for i in ids if not tiles[i]["has_flood"]])[:n]
+
+
+def stress_current(run_dir: Path) -> bool:
+    """Whether the run has a stress test made under the current tile rule."""
+    path = Path(run_dir) / "stress_test.json"
+    return path.exists() and json.loads(path.read_text()).get("selection") == STRESS_SELECTION
+
+
+def evaluation_complete(run_dir: Path) -> bool:
+    """Whether every final-evaluation output of the run is present and current."""
+    run_dir = Path(run_dir)
+    val = run_dir / "metrics_val.json"
+    return (val.exists() and "thresholds" in json.loads(val.read_text())
+            and (run_dir / "metrics_test.json").exists() and stress_current(run_dir)
+            and (run_dir / "timing.json").exists())
+
+
+def stress_test(model, cfg, processed_dir, run_dir, test_ids, tiles_meta, thresholds, deadline, device) -> bool:
     """Accuracy vs synthetic post-image shift; False if paused."""
     path = run_dir / "stress_partial.json"
     partial = _load_state(path)
-    tiles = sorted(test_ids)[: cfg["eval"]["stress_tiles"]]
+    tiles = stress_tile_ids(test_ids, tiles_meta, cfg["eval"]["stress_tiles"])
 
     for shift in cfg["eval"]["stress_shifts_px"]:
         key = str(shift)
-        partial.setdefault(key, {})
+        # A tile's score is the same under any rule; scores of tiles outside the subset are dropped
+        partial[key] = {t: rec for t, rec in partial.get(key, {}).items() if t in tiles}
         d = int(round(shift / np.sqrt(2)))  # diagonal shift of the requested magnitude
         for tile_id in tiles:
             if tile_id in partial[key]:
@@ -265,7 +295,9 @@ def stress_test(model, cfg, processed_dir, run_dir, test_ids, thresholds, deadli
     for key, recs in partial.items():
         agg = aggregate(list(recs.values()))
         curve[key] = {**agg["summary"], "n_tiles": len(recs)}
-    write_json(run_dir / "stress_test.json", {"shift_px": curve, "tiles": tiles})
+    n_flooded = sum(tiles_meta[t]["has_flood"] for t in tiles)
+    write_json(run_dir / "stress_test.json",
+               {"shift_px": curve, "tiles": tiles, "selection": STRESS_SELECTION, "n_flooded_tiles": n_flooded})
     return True
 
 
@@ -317,8 +349,8 @@ def final_evaluation(cfg, model, processed_dir, run_dir, splits, tiles, deadline
             return "paused"
         logger.info(f"[{cfg['id']}] test {result['summary']}")
 
-    if not (run_dir / "stress_test.json").exists():
-        if not stress_test(model, cfg, processed_dir, run_dir, test_ids, thresholds, deadline, device):
+    if not stress_current(run_dir):
+        if not stress_test(model, cfg, processed_dir, run_dir, test_ids, tiles, thresholds, deadline, device):
             return "paused"
 
     if not (run_dir / "timing.json").exists():

@@ -78,7 +78,7 @@ def main():
     args = parser.parse_args()
 
     from training import memguard
-    from training.queue import QueueAborted, reset_failed, run_worker, write_progress
+    from training.queue import QueueAborted, reopen_stale_evaluations, reset_failed, run_worker, write_progress
 
     # One GPU worker of several may use 40% of RAM; a lone process (smoke, single GPU) 75%.
     # The supervisor (multi-GPU parent) only waits, so it needs no guard.
@@ -101,6 +101,9 @@ def main():
     if args.reset_failed:
         reset = reset_failed(selected, args.results)
         logger.info(f"Fresh attempts for previously failed runs: {reset or 'none'}")
+    if args.worker is None and not args.smoke:
+        reopened = reopen_stale_evaluations(selected, args.results)
+        logger.info(f"Finished runs re-opened for an updated evaluation: {reopened or 'none'}")
 
     if args.worker is not None:
         try:
