@@ -1,0 +1,13 @@
+{
+  "id": "p1_siamese_v0_s0",
+  "state": "completed",
+  "attempts": 0,
+  "session": "a0fdb116",
+  "worker": "1",
+  "pid": 101,
+  "started_at": "2026-10-26T05:19:06+00:00",
+  "updated_at": "2026-10-26T07:36:58+00:00",
+  "error": null,
+  "completed_at": "2026-10-26T07:36:58+00:00",
+  "seconds_total": 8272.2
+}

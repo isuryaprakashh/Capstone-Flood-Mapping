@@ -1,0 +1,12 @@
+{
+  "id": "p2_sn8_baseline_s0",
+  "state": "paused",
+  "attempts": 0,
+  "session": "a0fdb116",
+  "worker": "1",
+  "pid": 101,
+  "started_at": "2026-10-26T10:45:40+00:00",
+  "updated_at": "2026-10-26T10:58:21+00:00",
+  "error": null,
+  "seconds_total": 761.0
+}

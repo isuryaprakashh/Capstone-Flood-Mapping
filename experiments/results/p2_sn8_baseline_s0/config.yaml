@@ -1,0 +1,77 @@
+protocol: P2
+seed: 0
+epochs: 40
+batch_size: 8
+crop_size: 512
+samples_per_tile: 2
+lr: 0.0003
+weight_decay: 0.0001
+warmup_epochs: 1
+ema_decay: 0.999
+amp: true
+grad_clip: 1.0
+num_workers: 2
+flood_oversample: 2.0
+deadline_margin_s: 600
+register_post: false
+aug:
+  flip: true
+  rot90: true
+  photometric: true
+  clouds: 0.15
+  shift_prob: 0.5
+  shift_max_px: 32
+  object_crop_prob: 0.5
+  flood_crop_prob: 0.5
+ssl:
+  enabled: true
+  prob: 0.5
+  max_px: 32
+loss:
+  object_masked_flood: true
+eval:
+  window: 512
+  overlap: 64
+  window_batch: 4
+  tta: true
+  threshold_grid:
+  - 0.2
+  - 0.3
+  - 0.4
+  - 0.5
+  - 0.6
+  - 0.7
+  stress_shifts_px:
+  - 0
+  - 5
+  - 10
+  - 20
+  - 30
+  - 40
+  stress_tiles: 50
+  timing_tiles: 10
+queue: kaggle
+id: p2_sn8_baseline_s0
+model: sn8_baseline
+stages:
+- name: foundation
+  epochs: 20
+  heads:
+  - building
+  - building_border
+  - road
+  - junction
+  param_prefixes:
+  - foundation.
+  init: null
+- name: flood
+  epochs: 20
+  heads:
+  - flooded_building
+  - flooded_road
+  - flood_image
+  param_prefixes:
+  - flood.
+  init: null
+priority: 5
+config_hash: 84651c2cf3cf19f5

@@ -1,16 +1,18 @@
 # Orchestrator status
 
 - **Phase:** train
-- **Sessions started:** 11
-- **Running:** sn8-train-b
+- **Sessions started:** 12
+- **Running:** sn8-train-a
 - **Code commit:** 26379792d3b4427f54d893008452a7d723fa4814
 - **Waiting for quota until:** —
-- **Updated:** 2026-10-25T23:39:25+00:00
+- **Updated:** 2026-10-26T11:15:59+00:00
 
 Per-run progress: [PROGRESS.md](PROGRESS.md)
 
 ## Recent events
 
+- 2026-10-26T11:15:59+00:00 — Started train session 12 on sn8-train-a (code 2637979)
+- 2026-10-26T11:15:13+00:00 — sn8-train-b (train) ended: complete after 696 min
 - 2026-10-25T23:39:25+00:00 — Started train session 11 on sn8-train-b (code 2637979)
 - 2026-10-25T23:39:01+00:00 — sn8-train-a (train) ended: complete after 678 min
 - 2026-10-25T12:20:31+00:00 — Started train session 10 on sn8-train-a (code 2637979)
@@ -39,5 +41,3 @@ Per-run progress: [PROGRESS.md](PROGRESS.md)
 - 2026-10-25T08:47:44+00:00 — sn8-smoke (smoke) ended: complete after 12 min
 - 2026-10-25T08:35:51+00:00 — Started smoke session 2 on sn8-smoke (code 60e6bfd)
 - 2026-10-25T08:35:49+00:00 — Smoke test failed: no smoke results — retry 1/2
-- 2026-10-25T08:35:49+00:00 — sn8-smoke (smoke) ended: error after 6 min
-- 2026-10-25T08:29:31+00:00 — Started smoke session 1 on sn8-smoke (code 8469b5c)
