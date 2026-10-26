@@ -1,0 +1,13 @@
+{
+  "id": "abl_classic_registration",
+  "state": "completed",
+  "attempts": 0,
+  "session": "431cd722",
+  "worker": "0",
+  "pid": 62,
+  "started_at": "2026-10-26T17:42:48+00:00",
+  "updated_at": "2026-10-26T21:31:17+00:00",
+  "error": null,
+  "completed_at": "2026-10-26T21:31:17+00:00",
+  "seconds_total": 13708.7
+}

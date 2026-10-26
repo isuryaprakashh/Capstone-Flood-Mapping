@@ -1,0 +1,18 @@
+2026-10-26 21:31:25 [INFO] Loading pretrained weights from Hugging Face hub (timm/vit_large_patch16_dinov3.sat493m)
+2026-10-26 21:31:25 [INFO] HTTP Request: HEAD https://huggingface.co/timm/vit_large_patch16_dinov3.sat493m/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-10-26 21:31:25 [INFO] [timm/vit_large_patch16_dinov3.sat493m] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
+2026-10-26 21:31:29 [INFO] Loading pretrained weights from Hugging Face hub (timm/resnet18.a1_in1k)
+2026-10-26 21:31:29 [INFO] HTTP Request: HEAD https://huggingface.co/timm/resnet18.a1_in1k/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-10-26 21:31:29 [INFO] [timm/resnet18.a1_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
+2026-10-26 21:31:29 [INFO] Missing keys (fc.weight, fc.bias) discovered while loading pretrained weights. This is expected if model is being adapted.
+2026-10-26 21:41:21 [INFO] [abl_dense_flood_loss] joint epoch 1/40 loss 7.1383 val_score 0.3005 * (591s)
+2026-10-26 21:46:50 [INFO] [abl_dense_flood_loss] joint epoch 2/40 loss 6.0568 val_score 0.7378 * (328s)
+2026-10-26 21:52:08 [INFO] [abl_dense_flood_loss] joint epoch 3/40 loss 5.2459 val_score 0.7295 (317s)
+2026-10-26 21:57:30 [INFO] [abl_dense_flood_loss] joint epoch 4/40 loss 4.5588 val_score 0.7713 * (321s)
+2026-10-26 22:02:48 [INFO] [abl_dense_flood_loss] joint epoch 5/40 loss 4.0566 val_score 0.7603 (318s)
+2026-10-26 22:08:09 [INFO] [abl_dense_flood_loss] joint epoch 6/40 loss 3.7505 val_score 0.7391 (321s)
+2026-10-26 22:13:36 [INFO] [abl_dense_flood_loss] joint epoch 7/40 loss 3.5386 val_score 0.7250 (325s)
+2026-10-26 22:19:00 [INFO] [abl_dense_flood_loss] joint epoch 8/40 loss 3.4128 val_score 0.7442 (324s)
+2026-10-26 22:24:25 [INFO] [abl_dense_flood_loss] joint epoch 9/40 loss 3.2935 val_score 0.7605 (324s)
+2026-10-26 22:29:53 [INFO] [abl_dense_flood_loss] joint epoch 10/40 loss 3.2136 val_score 0.7599 (327s)
+2026-10-26 22:29:55 [INFO] Pausing before epoch 10: not enough session time left

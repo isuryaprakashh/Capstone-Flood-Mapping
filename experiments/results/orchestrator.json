@@ -2,11 +2,11 @@
   "phase": "train",
   "code_commit": "7d4177d07c6e323169f785d081d010c2126e1f48",
   "session": 12,
-  "kernel": "sn8-train-a",
+  "kernel": null,
   "kernel_mode": "train",
   "pushed_at": 1793013359.8109584,
-  "wait_until": null,
-  "last_good_train": "sn8-train-b",
+  "wait_until": 1793405400.0,
+  "last_good_train": "sn8-train-a",
   "phase_retries": 0,
   "stop_reason": null,
   "gpu_sessions": [
@@ -33,6 +33,10 @@
     {
       "start": 1792971565.548841,
       "hours": 11.476666666666667
+    },
+    {
+      "start": 1793013359.8109584,
+      "hours": 11.296666666666665
     }
   ],
   "prepared": true,
@@ -175,6 +179,14 @@
     {
       "at": "2026-10-26T16:47:15+00:00",
       "message": "Command: training code re-pinned to 7d4177d"
+    },
+    {
+      "at": "2026-10-26T22:43:43+00:00",
+      "message": "sn8-train-a (train) ended: complete after 688 min"
+    },
+    {
+      "at": "2026-10-26T22:44:48+00:00",
+      "message": "Weekly GPU quota used up (0.0 GPU h left); waiting until 2026-10-31T00:10:00+00:00"
     }
   ]
 }

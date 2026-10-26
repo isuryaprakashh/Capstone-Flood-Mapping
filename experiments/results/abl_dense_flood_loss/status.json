@@ -1,0 +1,12 @@
+{
+  "id": "abl_dense_flood_loss",
+  "state": "paused",
+  "attempts": 0,
+  "session": "431cd722",
+  "worker": "0",
+  "pid": 62,
+  "started_at": "2026-10-26T21:31:17+00:00",
+  "updated_at": "2026-10-26T22:29:55+00:00",
+  "error": null,
+  "seconds_total": 3517.9
+}

@@ -1,0 +1,503 @@
+2026-10-26 12:16:40 [INFO] Loading pretrained weights from Hugging Face hub (timm/efficientnet_b5.sw_in12k_ft_in1k)
+2026-10-26 12:16:40 [INFO] HTTP Request: HEAD https://huggingface.co/timm/efficientnet_b5.sw_in12k_ft_in1k/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-10-26 12:16:40 [INFO] HTTP Request: GET https://huggingface.co/api/models/timm/efficientnet_b5.sw_in12k_ft_in1k/xet-read-token/13dc77aa3a148f79df28798eef496172f7611691 "HTTP/1.1 200 OK"
+2026-10-26 12:16:42 [INFO] [timm/efficientnet_b5.sw_in12k_ft_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
+2026-10-26 12:16:42 [WARNING] Unexpected keys (bn2.num_batches_tracked, bn2.bias, bn2.running_mean, bn2.running_var, bn2.weight, classifier.bias, classifier.weight, conv_head.weight) found while loading pretrained weights. This may be expected if model is being adapted.
+2026-10-26 12:16:43 [INFO] Loading pretrained weights from Hugging Face hub (timm/efficientnet_b5.sw_in12k_ft_in1k)
+2026-10-26 12:16:43 [INFO] HTTP Request: HEAD https://huggingface.co/timm/efficientnet_b5.sw_in12k_ft_in1k/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-10-26 12:16:43 [INFO] [timm/efficientnet_b5.sw_in12k_ft_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
+2026-10-26 12:16:43 [WARNING] Unexpected keys (bn2.num_batches_tracked, bn2.bias, bn2.running_mean, bn2.running_var, bn2.weight, classifier.bias, classifier.weight, conv_head.weight) found while loading pretrained weights. This may be expected if model is being adapted.
+2026-10-26 12:21:46 [INFO] [p3_siamese_unet_s0] foundation epoch 1/20 loss 3.5957 val_score 0.2997 * (302s)
+2026-10-26 12:25:00 [INFO] [p3_siamese_unet_s0] foundation epoch 2/20 loss 2.1927 val_score 0.4422 * (193s)
+2026-10-26 12:28:17 [INFO] [p3_siamese_unet_s0] foundation epoch 3/20 loss 1.7657 val_score 0.4824 * (196s)
+2026-10-26 12:31:33 [INFO] [p3_siamese_unet_s0] foundation epoch 4/20 loss 1.5939 val_score 0.5083 * (194s)
+2026-10-26 12:34:49 [INFO] [p3_siamese_unet_s0] foundation epoch 5/20 loss 1.5628 val_score 0.5151 * (194s)
+2026-10-26 12:38:05 [INFO] [p3_siamese_unet_s0] foundation epoch 6/20 loss 1.5104 val_score 0.5148 (194s)
+2026-10-26 12:41:24 [INFO] [p3_siamese_unet_s0] foundation epoch 7/20 loss 1.4546 val_score 0.5348 * (198s)
+2026-10-26 12:44:41 [INFO] [p3_siamese_unet_s0] foundation epoch 8/20 loss 1.4000 val_score 0.5463 * (196s)
+2026-10-26 12:47:58 [INFO] [p3_siamese_unet_s0] foundation epoch 9/20 loss 1.4127 val_score 0.5516 * (195s)
+2026-10-26 12:51:17 [INFO] [p3_siamese_unet_s0] foundation epoch 10/20 loss 1.4007 val_score 0.5542 * (198s)
+2026-10-26 12:54:33 [INFO] [p3_siamese_unet_s0] foundation epoch 11/20 loss 1.4193 val_score 0.5575 * (194s)
+2026-10-26 12:57:48 [INFO] [p3_siamese_unet_s0] foundation epoch 12/20 loss 1.3442 val_score 0.5545 (194s)
+2026-10-26 13:01:02 [INFO] [p3_siamese_unet_s0] foundation epoch 13/20 loss 1.3245 val_score 0.5592 * (192s)
+2026-10-26 13:04:14 [INFO] [p3_siamese_unet_s0] foundation epoch 14/20 loss 1.3206 val_score 0.5624 * (191s)
+2026-10-26 13:07:48 [INFO] [p3_siamese_unet_s0] foundation epoch 15/20 loss 1.3131 val_score 0.5642 * (212s)
+2026-10-26 13:11:21 [INFO] [p3_siamese_unet_s0] foundation epoch 16/20 loss 1.2958 val_score 0.5620 (211s)
+2026-10-26 13:14:52 [INFO] [p3_siamese_unet_s0] foundation epoch 17/20 loss 1.3149 val_score 0.5632 (209s)
+2026-10-26 13:18:21 [INFO] [p3_siamese_unet_s0] foundation epoch 18/20 loss 1.2891 val_score 0.5652 * (207s)
+2026-10-26 13:21:55 [INFO] [p3_siamese_unet_s0] foundation epoch 19/20 loss 1.2813 val_score 0.5644 (212s)
+2026-10-26 13:25:29 [INFO] [p3_siamese_unet_s0] foundation epoch 20/20 loss 1.2808 val_score 0.5642 (212s)
+2026-10-26 13:25:31 [INFO] Stage 'flood': ran init_flood_from_foundation()
+2026-10-26 13:29:19 [INFO] [p3_siamese_unet_s0] flood epoch 1/20 loss 2.2414 val_score 0.5640 * (228s)
+2026-10-26 13:33:05 [INFO] [p3_siamese_unet_s0] flood epoch 2/20 loss 2.1470 val_score 0.4520 (224s)
+2026-10-26 13:36:56 [INFO] [p3_siamese_unet_s0] flood epoch 3/20 loss 2.0562 val_score 0.5666 * (229s)
+2026-10-26 13:40:43 [INFO] [p3_siamese_unet_s0] flood epoch 4/20 loss 2.0607 val_score 0.6341 * (225s)
+2026-10-26 13:44:30 [INFO] [p3_siamese_unet_s0] flood epoch 5/20 loss 2.1263 val_score 0.4412 (225s)
+2026-10-26 13:48:19 [INFO] [p3_siamese_unet_s0] flood epoch 6/20 loss 2.1704 val_score 0.5604 (227s)
+2026-10-26 13:52:04 [INFO] [p3_siamese_unet_s0] flood epoch 7/20 loss 1.9252 val_score 0.6808 * (224s)
+2026-10-26 13:55:48 [INFO] [p3_siamese_unet_s0] flood epoch 8/20 loss 1.8437 val_score 0.6562 (221s)
+2026-10-26 13:59:38 [INFO] [p3_siamese_unet_s0] flood epoch 9/20 loss 1.8494 val_score 0.6446 (229s)
+2026-10-26 14:03:25 [INFO] [p3_siamese_unet_s0] flood epoch 10/20 loss 1.8016 val_score 0.6551 (225s)
+2026-10-26 14:07:10 [INFO] [p3_siamese_unet_s0] flood epoch 11/20 loss 1.8605 val_score 0.6695 (223s)
+2026-10-26 14:10:59 [INFO] [p3_siamese_unet_s0] flood epoch 12/20 loss 1.5414 val_score 0.6183 (228s)
+2026-10-26 14:14:47 [INFO] [p3_siamese_unet_s0] flood epoch 13/20 loss 1.7836 val_score 0.6378 (226s)
+2026-10-26 14:18:36 [INFO] [p3_siamese_unet_s0] flood epoch 14/20 loss 1.8738 val_score 0.6490 (227s)
+2026-10-26 14:22:23 [INFO] [p3_siamese_unet_s0] flood epoch 15/20 loss 1.6818 val_score 0.6767 (226s)
+2026-10-26 14:26:08 [INFO] [p3_siamese_unet_s0] flood epoch 16/20 loss 1.6180 val_score 0.7249 * (224s)
+2026-10-26 14:29:55 [INFO] [p3_siamese_unet_s0] flood epoch 17/20 loss 1.4318 val_score 0.7370 * (225s)
+2026-10-26 14:33:42 [INFO] [p3_siamese_unet_s0] flood epoch 18/20 loss 1.3201 val_score 0.7611 * (225s)
+2026-10-26 14:37:28 [INFO] [p3_siamese_unet_s0] flood epoch 19/20 loss 1.4857 val_score 0.7537 (224s)
+2026-10-26 14:41:15 [INFO] [p3_siamese_unet_s0] flood epoch 20/20 loss 1.1457 val_score 0.7466 (226s)
+2026-10-26 14:48:24 [INFO] [p3_siamese_unet_s0] thresholds {'building': 0.5, 'road': 0.6, 'flooded_building': 0.7, 'flooded_road': 0.2}
+2026-10-26 14:48:26 [INFO] Road graph: 12 nodes, 8 edges
+2026-10-26 14:48:29 [INFO] Road graph: 19 nodes, 14 edges
+2026-10-26 14:48:32 [INFO] Road graph: 15 nodes, 13 edges
+2026-10-26 14:48:35 [INFO] Road graph: 23 nodes, 17 edges
+2026-10-26 14:48:38 [INFO] Road graph: 18 nodes, 14 edges
+2026-10-26 14:48:41 [INFO] Road graph: 14 nodes, 7 edges
+2026-10-26 14:48:44 [INFO] Road graph: 22 nodes, 13 edges
+2026-10-26 14:48:47 [INFO] Road graph: 14 nodes, 9 edges
+2026-10-26 14:48:50 [INFO] Road graph: 31 nodes, 23 edges
+2026-10-26 14:48:53 [INFO] Road graph: 2 nodes, 1 edges
+2026-10-26 14:48:56 [INFO] Road graph: 46 nodes, 36 edges
+2026-10-26 14:49:00 [INFO] Road graph: 51 nodes, 40 edges
+2026-10-26 14:49:03 [INFO] Road graph: 32 nodes, 21 edges
+2026-10-26 14:49:06 [INFO] Road graph: 37 nodes, 24 edges
+2026-10-26 14:49:09 [INFO] Road graph: 20 nodes, 14 edges
+2026-10-26 14:49:12 [INFO] Road graph: 19 nodes, 12 edges
+2026-10-26 14:49:15 [INFO] Road graph: 26 nodes, 15 edges
+2026-10-26 14:49:18 [INFO] Road graph: 22 nodes, 14 edges
+2026-10-26 14:49:21 [INFO] Road graph: 36 nodes, 24 edges
+2026-10-26 14:49:25 [INFO] Road graph: 18 nodes, 9 edges
+2026-10-26 14:49:28 [INFO] Road graph: 60 nodes, 43 edges
+2026-10-26 14:49:31 [INFO] Road graph: 20 nodes, 10 edges
+2026-10-26 14:49:34 [INFO] Road graph: 31 nodes, 21 edges
+2026-10-26 14:49:37 [INFO] Road graph: 22 nodes, 12 edges
+2026-10-26 14:49:40 [INFO] Road graph: 52 nodes, 33 edges
+2026-10-26 14:49:43 [INFO] Road graph: 46 nodes, 24 edges
+2026-10-26 14:49:46 [INFO] Road graph: 18 nodes, 12 edges
+2026-10-26 14:49:49 [INFO] Road graph: 9 nodes, 6 edges
+2026-10-26 14:49:52 [INFO] Road graph: 80 nodes, 51 edges
+2026-10-26 14:49:55 [INFO] Road graph: 42 nodes, 26 edges
+2026-10-26 14:49:58 [INFO] Road graph: 22 nodes, 16 edges
+2026-10-26 14:50:00 [INFO] Road graph: 42 nodes, 26 edges
+2026-10-26 14:50:03 [INFO] Road graph: 9 nodes, 5 edges
+2026-10-26 14:50:06 [INFO] Road graph: 2 nodes, 1 edges
+2026-10-26 14:50:09 [INFO] Road graph: 6 nodes, 3 edges
+2026-10-26 14:50:11 [INFO] Road graph: 4 nodes, 2 edges
+2026-10-26 14:50:15 [INFO] Road graph: 28 nodes, 18 edges
+2026-10-26 14:50:19 [INFO] Road graph: 21 nodes, 14 edges
+2026-10-26 14:50:23 [INFO] Road graph: 88 nodes, 72 edges
+2026-10-26 14:50:27 [INFO] Road graph: 47 nodes, 35 edges
+2026-10-26 14:50:31 [INFO] Road graph: 44 nodes, 25 edges
+2026-10-26 14:50:34 [INFO] Road graph: 75 nodes, 56 edges
+2026-10-26 14:50:38 [INFO] Road graph: 34 nodes, 25 edges
+2026-10-26 14:50:42 [INFO] Road graph: 11 nodes, 7 edges
+2026-10-26 14:50:45 [INFO] Road graph: 60 nodes, 39 edges
+2026-10-26 14:50:49 [INFO] Road graph: 26 nodes, 17 edges
+2026-10-26 14:50:53 [INFO] Road graph: 28 nodes, 16 edges
+2026-10-26 14:50:56 [INFO] Road graph: 4 nodes, 2 edges
+2026-10-26 14:51:00 [INFO] Road graph: 2 nodes, 1 edges
+2026-10-26 14:51:04 [INFO] Road graph: 12 nodes, 7 edges
+2026-10-26 14:51:07 [INFO] Road graph: 32 nodes, 26 edges
+2026-10-26 14:51:10 [INFO] Road graph: 14 nodes, 7 edges
+2026-10-26 14:51:15 [INFO] Road graph: 36 nodes, 27 edges
+2026-10-26 14:51:19 [INFO] Road graph: 62 nodes, 46 edges
+2026-10-26 14:51:23 [INFO] Road graph: 34 nodes, 19 edges
+2026-10-26 14:51:27 [INFO] Road graph: 22 nodes, 18 edges
+2026-10-26 14:51:32 [INFO] Road graph: 39 nodes, 29 edges
+2026-10-26 14:51:36 [INFO] Road graph: 63 nodes, 46 edges
+2026-10-26 14:51:40 [INFO] Road graph: 50 nodes, 29 edges
+2026-10-26 14:51:44 [INFO] Road graph: 88 nodes, 64 edges
+2026-10-26 14:51:47 [INFO] Road graph: 37 nodes, 21 edges
+2026-10-26 14:51:51 [INFO] Road graph: 7 nodes, 5 edges
+2026-10-26 14:51:55 [INFO] Road graph: 14 nodes, 10 edges
+2026-10-26 14:51:58 [INFO] Road graph: 22 nodes, 14 edges
+2026-10-26 14:52:01 [INFO] Road graph: 12 nodes, 7 edges
+2026-10-26 14:52:05 [INFO] Road graph: 8 nodes, 5 edges
+2026-10-26 14:52:09 [INFO] Road graph: 40 nodes, 34 edges
+2026-10-26 14:52:13 [INFO] Road graph: 40 nodes, 32 edges
+2026-10-26 14:52:16 [INFO] Road graph: 51 nodes, 38 edges
+2026-10-26 14:52:21 [INFO] Road graph: 46 nodes, 26 edges
+2026-10-26 14:52:24 [INFO] Road graph: 8 nodes, 4 edges
+2026-10-26 14:52:28 [INFO] Road graph: 8 nodes, 4 edges
+2026-10-26 14:52:31 [INFO] Road graph: 20 nodes, 10 edges
+2026-10-26 14:52:34 [INFO] Road graph: 2 nodes, 1 edges
+2026-10-26 14:52:37 [INFO] Road graph: 2 nodes, 1 edges
+2026-10-26 14:52:41 [INFO] Road graph: 2 nodes, 1 edges
+2026-10-26 14:52:44 [INFO] Road graph: 22 nodes, 14 edges
+2026-10-26 14:52:48 [INFO] Road graph: 16 nodes, 13 edges
+2026-10-26 14:52:52 [INFO] Road graph: 2 nodes, 1 edges
+2026-10-26 14:52:56 [INFO] Road graph: 26 nodes, 18 edges
+2026-10-26 14:53:00 [INFO] Road graph: 24 nodes, 17 edges
+2026-10-26 14:53:04 [INFO] Road graph: 6 nodes, 3 edges
+2026-10-26 14:53:07 [INFO] Road graph: 10 nodes, 6 edges
+2026-10-26 14:53:10 [INFO] Road graph: 8 nodes, 5 edges
+2026-10-26 14:53:13 [INFO] Road graph: 20 nodes, 15 edges
+2026-10-26 14:53:18 [INFO] Road graph: 20 nodes, 14 edges
+2026-10-26 14:53:22 [INFO] Road graph: 18 nodes, 12 edges
+2026-10-26 14:53:25 [INFO] Road graph: 22 nodes, 14 edges
+2026-10-26 14:53:29 [INFO] Road graph: 15 nodes, 11 edges
+2026-10-26 14:53:32 [INFO] Road graph: 10 nodes, 5 edges
+2026-10-26 14:53:36 [INFO] Road graph: 20 nodes, 13 edges
+2026-10-26 14:53:39 [INFO] Road graph: 4 nodes, 2 edges
+2026-10-26 14:53:43 [INFO] Road graph: 4 nodes, 3 edges
+2026-10-26 14:53:47 [INFO] Road graph: 8 nodes, 4 edges
+2026-10-26 14:53:51 [INFO] Road graph: 56 nodes, 46 edges
+2026-10-26 14:53:55 [INFO] Road graph: 8 nodes, 5 edges
+2026-10-26 14:53:58 [INFO] Road graph: 25 nodes, 15 edges
+2026-10-26 14:54:01 [INFO] Road graph: 4 nodes, 2 edges
+2026-10-26 14:54:05 [INFO] Road graph: 18 nodes, 14 edges
+2026-10-26 14:54:09 [INFO] Road graph: 18 nodes, 9 edges
+2026-10-26 14:54:12 [INFO] Road graph: 38 nodes, 35 edges
+2026-10-26 14:54:16 [INFO] Road graph: 20 nodes, 11 edges
+2026-10-26 14:54:19 [INFO] Road graph: 14 nodes, 10 edges
+2026-10-26 14:54:22 [INFO] Road graph: 2 nodes, 1 edges
+2026-10-26 14:54:26 [INFO] Road graph: 6 nodes, 3 edges
+2026-10-26 14:54:30 [INFO] Road graph: 53 nodes, 35 edges
+2026-10-26 14:54:34 [INFO] Road graph: 26 nodes, 18 edges
+2026-10-26 14:54:37 [INFO] Road graph: 18 nodes, 11 edges
+2026-10-26 14:54:41 [INFO] Road graph: 10 nodes, 7 edges
+2026-10-26 14:54:45 [INFO] Road graph: 18 nodes, 11 edges
+2026-10-26 14:54:49 [INFO] Road graph: 46 nodes, 26 edges
+2026-10-26 14:54:52 [INFO] Road graph: 18 nodes, 11 edges
+2026-10-26 14:54:56 [INFO] Road graph: 30 nodes, 18 edges
+2026-10-26 14:55:00 [INFO] Road graph: 46 nodes, 28 edges
+2026-10-26 14:55:04 [INFO] Road graph: 53 nodes, 35 edges
+2026-10-26 14:55:08 [INFO] Road graph: 46 nodes, 26 edges
+2026-10-26 14:55:12 [INFO] Road graph: 26 nodes, 16 edges
+2026-10-26 14:55:16 [INFO] Road graph: 8 nodes, 5 edges
+2026-10-26 14:55:20 [INFO] Road graph: 83 nodes, 59 edges
+2026-10-26 14:55:24 [INFO] Road graph: 72 nodes, 56 edges
+2026-10-26 14:55:27 [INFO] Road graph: 0 nodes, 0 edges
+2026-10-26 14:55:31 [INFO] Road graph: 20 nodes, 13 edges
+2026-10-26 14:55:35 [INFO] Road graph: 10 nodes, 6 edges
+2026-10-26 14:55:39 [INFO] Road graph: 6 nodes, 3 edges
+2026-10-26 14:55:43 [INFO] Road graph: 32 nodes, 19 edges
+2026-10-26 14:55:47 [INFO] Road graph: 42 nodes, 23 edges
+2026-10-26 14:55:51 [INFO] Road graph: 30 nodes, 15 edges
+2026-10-26 14:55:55 [INFO] Road graph: 8 nodes, 5 edges
+2026-10-26 14:55:59 [INFO] Road graph: 2 nodes, 1 edges
+2026-10-26 14:56:03 [INFO] Road graph: 4 nodes, 3 edges
+2026-10-26 14:56:06 [INFO] Road graph: 6 nodes, 3 edges
+2026-10-26 14:56:10 [INFO] Road graph: 45 nodes, 29 edges
+2026-10-26 14:56:14 [INFO] Road graph: 32 nodes, 17 edges
+2026-10-26 14:56:18 [INFO] Road graph: 44 nodes, 24 edges
+2026-10-26 14:56:22 [INFO] Road graph: 6 nodes, 3 edges
+2026-10-26 14:56:25 [INFO] Road graph: 4 nodes, 2 edges
+2026-10-26 14:56:28 [INFO] Road graph: 22 nodes, 14 edges
+2026-10-26 14:56:32 [INFO] Road graph: 6 nodes, 3 edges
+2026-10-26 14:56:35 [INFO] Road graph: 2 nodes, 1 edges
+2026-10-26 14:56:39 [INFO] Road graph: 2 nodes, 1 edges
+2026-10-26 14:56:42 [INFO] Road graph: 12 nodes, 7 edges
+2026-10-26 14:57:00 [INFO] [p3_siamese_unet_s0] test {'building_f1': 0.6914871794871795, 'flooded_building_f1': 0.6038751345532831, 'building_flood_iou': 0.606621913545863, 'apls': 0.47816705471962717, 'apls_flooded_network': 0.3336873224549152, 'flooded_road_f1': 0.5718717712101533}
+2026-10-26 14:57:01 [INFO] Road graph: 17 nodes, 13 edges
+2026-10-26 14:57:02 [INFO] Road graph: 20 nodes, 14 edges
+2026-10-26 14:57:04 [INFO] Road graph: 19 nodes, 15 edges
+2026-10-26 14:57:05 [INFO] Road graph: 19 nodes, 13 edges
+2026-10-26 14:57:06 [INFO] Road graph: 18 nodes, 15 edges
+2026-10-26 14:57:07 [INFO] Road graph: 14 nodes, 7 edges
+2026-10-26 14:57:08 [INFO] Road graph: 20 nodes, 11 edges
+2026-10-26 14:57:10 [INFO] Road graph: 16 nodes, 9 edges
+2026-10-26 14:57:11 [INFO] Road graph: 39 nodes, 31 edges
+2026-10-26 14:57:12 [INFO] Road graph: 4 nodes, 2 edges
+2026-10-26 14:57:14 [INFO] Road graph: 54 nodes, 46 edges
+2026-10-26 14:57:15 [INFO] Road graph: 58 nodes, 46 edges
+2026-10-26 14:57:17 [INFO] Road graph: 34 nodes, 24 edges
+2026-10-26 14:57:19 [INFO] Road graph: 42 nodes, 27 edges
+2026-10-26 14:57:20 [INFO] Road graph: 27 nodes, 19 edges
+2026-10-26 14:57:21 [INFO] Road graph: 29 nodes, 18 edges
+2026-10-26 14:57:22 [INFO] Road graph: 32 nodes, 20 edges
+2026-10-26 14:57:24 [INFO] Road graph: 24 nodes, 13 edges
+2026-10-26 14:57:25 [INFO] Road graph: 44 nodes, 28 edges
+2026-10-26 14:57:26 [INFO] Road graph: 32 nodes, 17 edges
+2026-10-26 14:57:28 [INFO] Road graph: 65 nodes, 46 edges
+2026-10-26 14:57:30 [INFO] Road graph: 22 nodes, 11 edges
+2026-10-26 14:57:31 [INFO] Road graph: 39 nodes, 28 edges
+2026-10-26 14:57:32 [INFO] Road graph: 22 nodes, 12 edges
+2026-10-26 14:57:34 [INFO] Road graph: 61 nodes, 41 edges
+2026-10-26 14:57:35 [INFO] Road graph: 46 nodes, 25 edges
+2026-10-26 14:57:36 [INFO] Road graph: 16 nodes, 11 edges
+2026-10-26 14:57:38 [INFO] Road graph: 9 nodes, 5 edges
+2026-10-26 14:57:39 [INFO] Road graph: 75 nodes, 48 edges
+2026-10-26 14:57:40 [INFO] Road graph: 40 nodes, 24 edges
+2026-10-26 14:57:42 [INFO] Road graph: 18 nodes, 11 edges
+2026-10-26 14:57:43 [INFO] Road graph: 56 nodes, 35 edges
+2026-10-26 14:57:44 [INFO] Road graph: 11 nodes, 8 edges
+2026-10-26 14:57:45 [INFO] Road graph: 6 nodes, 3 edges
+2026-10-26 14:57:46 [INFO] Road graph: 12 nodes, 6 edges
+2026-10-26 14:57:47 [INFO] Road graph: 4 nodes, 2 edges
+2026-10-26 14:57:48 [INFO] Road graph: 43 nodes, 31 edges
+2026-10-26 14:57:50 [INFO] Road graph: 20 nodes, 13 edges
+2026-10-26 14:57:51 [INFO] Road graph: 92 nodes, 71 edges
+2026-10-26 14:57:52 [INFO] Road graph: 52 nodes, 38 edges
+2026-10-26 14:57:54 [INFO] Road graph: 38 nodes, 21 edges
+2026-10-26 14:57:55 [INFO] Road graph: 83 nodes, 63 edges
+2026-10-26 14:57:57 [INFO] Road graph: 23 nodes, 14 edges
+2026-10-26 14:57:58 [INFO] Road graph: 9 nodes, 5 edges
+2026-10-26 14:58:00 [INFO] Road graph: 66 nodes, 44 edges
+2026-10-26 14:58:01 [INFO] Road graph: 28 nodes, 19 edges
+2026-10-26 14:58:03 [INFO] Road graph: 43 nodes, 29 edges
+2026-10-26 14:58:04 [INFO] Road graph: 4 nodes, 2 edges
+2026-10-26 14:58:05 [INFO] Road graph: 2 nodes, 1 edges
+2026-10-26 14:58:06 [INFO] Road graph: 16 nodes, 11 edges
+2026-10-26 14:58:07 [INFO] Road graph: 15 nodes, 11 edges
+2026-10-26 14:58:08 [INFO] Road graph: 21 nodes, 15 edges
+2026-10-26 14:58:09 [INFO] Road graph: 19 nodes, 15 edges
+2026-10-26 14:58:10 [INFO] Road graph: 21 nodes, 15 edges
+2026-10-26 14:58:11 [INFO] Road graph: 16 nodes, 13 edges
+2026-10-26 14:58:12 [INFO] Road graph: 14 nodes, 7 edges
+2026-10-26 14:58:13 [INFO] Road graph: 20 nodes, 11 edges
+2026-10-26 14:58:15 [INFO] Road graph: 16 nodes, 9 edges
+2026-10-26 14:58:16 [INFO] Road graph: 41 nodes, 33 edges
+2026-10-26 14:58:18 [INFO] Road graph: 4 nodes, 2 edges
+2026-10-26 14:58:19 [INFO] Road graph: 50 nodes, 42 edges
+2026-10-26 14:58:21 [INFO] Road graph: 54 nodes, 42 edges
+2026-10-26 14:58:22 [INFO] Road graph: 34 nodes, 24 edges
+2026-10-26 14:58:24 [INFO] Road graph: 43 nodes, 28 edges
+2026-10-26 14:58:25 [INFO] Road graph: 28 nodes, 20 edges
+2026-10-26 14:58:27 [INFO] Road graph: 29 nodes, 18 edges
+2026-10-26 14:58:28 [INFO] Road graph: 32 nodes, 20 edges
+2026-10-26 14:58:29 [INFO] Road graph: 24 nodes, 13 edges
+2026-10-26 14:58:31 [INFO] Road graph: 44 nodes, 28 edges
+2026-10-26 14:58:32 [INFO] Road graph: 32 nodes, 17 edges
+2026-10-26 14:58:34 [INFO] Road graph: 65 nodes, 46 edges
+2026-10-26 14:58:36 [INFO] Road graph: 27 nodes, 16 edges
+2026-10-26 14:58:37 [INFO] Road graph: 39 nodes, 28 edges
+2026-10-26 14:58:39 [INFO] Road graph: 22 nodes, 12 edges
+2026-10-26 14:58:40 [INFO] Road graph: 67 nodes, 47 edges
+2026-10-26 14:58:41 [INFO] Road graph: 46 nodes, 25 edges
+2026-10-26 14:58:42 [INFO] Road graph: 16 nodes, 11 edges
+2026-10-26 14:58:43 [INFO] Road graph: 9 nodes, 5 edges
+2026-10-26 14:58:45 [INFO] Road graph: 75 nodes, 48 edges
+2026-10-26 14:58:46 [INFO] Road graph: 40 nodes, 24 edges
+2026-10-26 14:58:48 [INFO] Road graph: 18 nodes, 11 edges
+2026-10-26 14:58:50 [INFO] Road graph: 57 nodes, 36 edges
+2026-10-26 14:58:52 [INFO] Road graph: 7 nodes, 4 edges
+2026-10-26 14:58:53 [INFO] Road graph: 6 nodes, 3 edges
+2026-10-26 14:58:54 [INFO] Road graph: 12 nodes, 6 edges
+2026-10-26 14:58:55 [INFO] Road graph: 4 nodes, 2 edges
+2026-10-26 14:58:56 [INFO] Road graph: 45 nodes, 33 edges
+2026-10-26 14:58:58 [INFO] Road graph: 22 nodes, 15 edges
+2026-10-26 14:58:59 [INFO] Road graph: 107 nodes, 86 edges
+2026-10-26 14:59:01 [INFO] Road graph: 50 nodes, 36 edges
+2026-10-26 14:59:02 [INFO] Road graph: 38 nodes, 21 edges
+2026-10-26 14:59:04 [INFO] Road graph: 86 nodes, 66 edges
+2026-10-26 14:59:05 [INFO] Road graph: 23 nodes, 14 edges
+2026-10-26 14:59:06 [INFO] Road graph: 11 nodes, 7 edges
+2026-10-26 14:59:08 [INFO] Road graph: 66 nodes, 44 edges
+2026-10-26 14:59:09 [INFO] Road graph: 26 nodes, 17 edges
+2026-10-26 14:59:10 [INFO] Road graph: 43 nodes, 29 edges
+2026-10-26 14:59:12 [INFO] Road graph: 4 nodes, 2 edges
+2026-10-26 14:59:13 [INFO] Road graph: 2 nodes, 1 edges
+2026-10-26 14:59:14 [INFO] Road graph: 16 nodes, 11 edges
+2026-10-26 14:59:15 [INFO] Road graph: 15 nodes, 11 edges
+2026-10-26 14:59:16 [INFO] Road graph: 19 nodes, 13 edges
+2026-10-26 14:59:17 [INFO] Road graph: 19 nodes, 15 edges
+2026-10-26 14:59:19 [INFO] Road graph: 25 nodes, 19 edges
+2026-10-26 14:59:20 [INFO] Road graph: 18 nodes, 15 edges
+2026-10-26 14:59:21 [INFO] Road graph: 14 nodes, 7 edges
+2026-10-26 14:59:22 [INFO] Road graph: 20 nodes, 11 edges
+2026-10-26 14:59:23 [INFO] Road graph: 16 nodes, 9 edges
+2026-10-26 14:59:25 [INFO] Road graph: 36 nodes, 28 edges
+2026-10-26 14:59:26 [INFO] Road graph: 4 nodes, 2 edges
+2026-10-26 14:59:28 [INFO] Road graph: 52 nodes, 44 edges
+2026-10-26 14:59:29 [INFO] Road graph: 56 nodes, 44 edges
+2026-10-26 14:59:30 [INFO] Road graph: 34 nodes, 24 edges
+2026-10-26 14:59:32 [INFO] Road graph: 44 nodes, 29 edges
+2026-10-26 14:59:33 [INFO] Road graph: 27 nodes, 19 edges
+2026-10-26 14:59:34 [INFO] Road graph: 29 nodes, 18 edges
+2026-10-26 14:59:36 [INFO] Road graph: 34 nodes, 22 edges
+2026-10-26 14:59:37 [INFO] Road graph: 24 nodes, 13 edges
+2026-10-26 14:59:38 [INFO] Road graph: 44 nodes, 28 edges
+2026-10-26 14:59:40 [INFO] Road graph: 32 nodes, 17 edges
+2026-10-26 14:59:41 [INFO] Road graph: 67 nodes, 48 edges
+2026-10-26 14:59:43 [INFO] Road graph: 24 nodes, 13 edges
+2026-10-26 14:59:44 [INFO] Road graph: 40 nodes, 29 edges
+2026-10-26 14:59:45 [INFO] Road graph: 22 nodes, 12 edges
+2026-10-26 14:59:47 [INFO] Road graph: 64 nodes, 44 edges
+2026-10-26 14:59:48 [INFO] Road graph: 48 nodes, 27 edges
+2026-10-26 14:59:49 [INFO] Road graph: 16 nodes, 11 edges
+2026-10-26 14:59:50 [INFO] Road graph: 9 nodes, 5 edges
+2026-10-26 14:59:52 [INFO] Road graph: 75 nodes, 48 edges
+2026-10-26 14:59:53 [INFO] Road graph: 40 nodes, 24 edges
+2026-10-26 14:59:55 [INFO] Road graph: 18 nodes, 11 edges
+2026-10-26 14:59:56 [INFO] Road graph: 57 nodes, 36 edges
+2026-10-26 14:59:57 [INFO] Road graph: 7 nodes, 4 edges
+2026-10-26 14:59:58 [INFO] Road graph: 6 nodes, 3 edges
+2026-10-26 15:00:00 [INFO] Road graph: 14 nodes, 8 edges
+2026-10-26 15:00:01 [INFO] Road graph: 4 nodes, 2 edges
+2026-10-26 15:00:02 [INFO] Road graph: 44 nodes, 32 edges
+2026-10-26 15:00:04 [INFO] Road graph: 26 nodes, 19 edges
+2026-10-26 15:00:06 [INFO] Road graph: 98 nodes, 77 edges
+2026-10-26 15:00:08 [INFO] Road graph: 44 nodes, 30 edges
+2026-10-26 15:00:09 [INFO] Road graph: 38 nodes, 21 edges
+2026-10-26 15:00:10 [INFO] Road graph: 87 nodes, 67 edges
+2026-10-26 15:00:11 [INFO] Road graph: 23 nodes, 14 edges
+2026-10-26 15:00:13 [INFO] Road graph: 9 nodes, 5 edges
+2026-10-26 15:00:15 [INFO] Road graph: 66 nodes, 44 edges
+2026-10-26 15:00:17 [INFO] Road graph: 25 nodes, 16 edges
+2026-10-26 15:00:18 [INFO] Road graph: 43 nodes, 29 edges
+2026-10-26 15:00:20 [INFO] Road graph: 4 nodes, 2 edges
+2026-10-26 15:00:21 [INFO] Road graph: 2 nodes, 1 edges
+2026-10-26 15:00:22 [INFO] Road graph: 16 nodes, 11 edges
+2026-10-26 15:00:23 [INFO] Road graph: 20 nodes, 16 edges
+2026-10-26 15:00:24 [INFO] Road graph: 21 nodes, 15 edges
+2026-10-26 15:00:25 [INFO] Road graph: 20 nodes, 16 edges
+2026-10-26 15:00:26 [INFO] Road graph: 25 nodes, 19 edges
+2026-10-26 15:00:27 [INFO] Road graph: 16 nodes, 13 edges
+2026-10-26 15:00:28 [INFO] Road graph: 14 nodes, 7 edges
+2026-10-26 15:00:29 [INFO] Road graph: 20 nodes, 11 edges
+2026-10-26 15:00:31 [INFO] Road graph: 16 nodes, 9 edges
+2026-10-26 15:00:32 [INFO] Road graph: 39 nodes, 31 edges
+2026-10-26 15:00:33 [INFO] Road graph: 4 nodes, 2 edges
+2026-10-26 15:00:35 [INFO] Road graph: 54 nodes, 46 edges
+2026-10-26 15:00:36 [INFO] Road graph: 57 nodes, 45 edges
+2026-10-26 15:00:38 [INFO] Road graph: 34 nodes, 24 edges
+2026-10-26 15:00:40 [INFO] Road graph: 43 nodes, 28 edges
+2026-10-26 15:00:41 [INFO] Road graph: 27 nodes, 19 edges
+2026-10-26 15:00:42 [INFO] Road graph: 29 nodes, 18 edges
+2026-10-26 15:00:43 [INFO] Road graph: 32 nodes, 20 edges
+2026-10-26 15:00:44 [INFO] Road graph: 24 nodes, 13 edges
+2026-10-26 15:00:46 [INFO] Road graph: 44 nodes, 28 edges
+2026-10-26 15:00:47 [INFO] Road graph: 32 nodes, 17 edges
+2026-10-26 15:00:48 [INFO] Road graph: 68 nodes, 49 edges
+2026-10-26 15:00:50 [INFO] Road graph: 25 nodes, 14 edges
+2026-10-26 15:00:51 [INFO] Road graph: 38 nodes, 27 edges
+2026-10-26 15:00:52 [INFO] Road graph: 22 nodes, 12 edges
+2026-10-26 15:00:54 [INFO] Road graph: 58 nodes, 38 edges
+2026-10-26 15:00:56 [INFO] Road graph: 49 nodes, 28 edges
+2026-10-26 15:00:57 [INFO] Road graph: 16 nodes, 11 edges
+2026-10-26 15:00:58 [INFO] Road graph: 9 nodes, 5 edges
+2026-10-26 15:00:59 [INFO] Road graph: 74 nodes, 47 edges
+2026-10-26 15:01:01 [INFO] Road graph: 40 nodes, 24 edges
+2026-10-26 15:01:03 [INFO] Road graph: 18 nodes, 11 edges
+2026-10-26 15:01:04 [INFO] Road graph: 56 nodes, 35 edges
+2026-10-26 15:01:06 [INFO] Road graph: 7 nodes, 4 edges
+2026-10-26 15:01:07 [INFO] Road graph: 6 nodes, 3 edges
+2026-10-26 15:01:08 [INFO] Road graph: 14 nodes, 8 edges
+2026-10-26 15:01:09 [INFO] Road graph: 4 nodes, 2 edges
+2026-10-26 15:01:10 [INFO] Road graph: 43 nodes, 31 edges
+2026-10-26 15:01:12 [INFO] Road graph: 22 nodes, 15 edges
+2026-10-26 15:01:13 [INFO] Road graph: 87 nodes, 66 edges
+2026-10-26 15:01:14 [INFO] Road graph: 46 nodes, 32 edges
+2026-10-26 15:01:16 [INFO] Road graph: 39 nodes, 22 edges
+2026-10-26 15:01:17 [INFO] Road graph: 80 nodes, 60 edges
+2026-10-26 15:01:19 [INFO] Road graph: 23 nodes, 14 edges
+2026-10-26 15:01:21 [INFO] Road graph: 9 nodes, 5 edges
+2026-10-26 15:01:22 [INFO] Road graph: 64 nodes, 42 edges
+2026-10-26 15:01:24 [INFO] Road graph: 28 nodes, 19 edges
+2026-10-26 15:01:25 [INFO] Road graph: 45 nodes, 31 edges
+2026-10-26 15:01:26 [INFO] Road graph: 4 nodes, 2 edges
+2026-10-26 15:01:27 [INFO] Road graph: 2 nodes, 1 edges
+2026-10-26 15:01:28 [INFO] Road graph: 16 nodes, 11 edges
+2026-10-26 15:01:29 [INFO] Road graph: 31 nodes, 27 edges
+2026-10-26 15:01:30 [INFO] Road graph: 20 nodes, 14 edges
+2026-10-26 15:01:31 [INFO] Road graph: 19 nodes, 15 edges
+2026-10-26 15:01:32 [INFO] Road graph: 31 nodes, 25 edges
+2026-10-26 15:01:34 [INFO] Road graph: 20 nodes, 17 edges
+2026-10-26 15:01:35 [INFO] Road graph: 14 nodes, 7 edges
+2026-10-26 15:01:36 [INFO] Road graph: 20 nodes, 11 edges
+2026-10-26 15:01:37 [INFO] Road graph: 16 nodes, 9 edges
+2026-10-26 15:01:38 [INFO] Road graph: 37 nodes, 29 edges
+2026-10-26 15:01:39 [INFO] Road graph: 4 nodes, 2 edges
+2026-10-26 15:01:40 [INFO] Road graph: 54 nodes, 46 edges
+2026-10-26 15:01:42 [INFO] Road graph: 56 nodes, 44 edges
+2026-10-26 15:01:43 [INFO] Road graph: 34 nodes, 24 edges
+2026-10-26 15:01:44 [INFO] Road graph: 46 nodes, 31 edges
+2026-10-26 15:01:46 [INFO] Road graph: 27 nodes, 19 edges
+2026-10-26 15:01:47 [INFO] Road graph: 33 nodes, 22 edges
+2026-10-26 15:01:48 [INFO] Road graph: 32 nodes, 20 edges
+2026-10-26 15:01:49 [INFO] Road graph: 24 nodes, 13 edges
+2026-10-26 15:01:50 [INFO] Road graph: 44 nodes, 28 edges
+2026-10-26 15:01:52 [INFO] Road graph: 32 nodes, 17 edges
+2026-10-26 15:01:54 [INFO] Road graph: 70 nodes, 51 edges
+2026-10-26 15:01:55 [INFO] Road graph: 25 nodes, 14 edges
+2026-10-26 15:01:57 [INFO] Road graph: 37 nodes, 26 edges
+2026-10-26 15:01:58 [INFO] Road graph: 22 nodes, 12 edges
+2026-10-26 15:01:59 [INFO] Road graph: 58 nodes, 38 edges
+2026-10-26 15:02:01 [INFO] Road graph: 52 nodes, 31 edges
+2026-10-26 15:02:02 [INFO] Road graph: 16 nodes, 11 edges
+2026-10-26 15:02:03 [INFO] Road graph: 11 nodes, 7 edges
+2026-10-26 15:02:04 [INFO] Road graph: 78 nodes, 51 edges
+2026-10-26 15:02:06 [INFO] Road graph: 40 nodes, 24 edges
+2026-10-26 15:02:07 [INFO] Road graph: 18 nodes, 11 edges
+2026-10-26 15:02:08 [INFO] Road graph: 56 nodes, 35 edges
+2026-10-26 15:02:10 [INFO] Road graph: 7 nodes, 4 edges
+2026-10-26 15:02:11 [INFO] Road graph: 6 nodes, 3 edges
+2026-10-26 15:02:12 [INFO] Road graph: 14 nodes, 8 edges
+2026-10-26 15:02:13 [INFO] Road graph: 4 nodes, 2 edges
+2026-10-26 15:02:15 [INFO] Road graph: 46 nodes, 34 edges
+2026-10-26 15:02:16 [INFO] Road graph: 22 nodes, 15 edges
+2026-10-26 15:02:18 [INFO] Road graph: 91 nodes, 70 edges
+2026-10-26 15:02:19 [INFO] Road graph: 43 nodes, 29 edges
+2026-10-26 15:02:21 [INFO] Road graph: 38 nodes, 21 edges
+2026-10-26 15:02:23 [INFO] Road graph: 77 nodes, 57 edges
+2026-10-26 15:02:24 [INFO] Road graph: 24 nodes, 15 edges
+2026-10-26 15:02:26 [INFO] Road graph: 11 nodes, 7 edges
+2026-10-26 15:02:27 [INFO] Road graph: 65 nodes, 43 edges
+2026-10-26 15:02:29 [INFO] Road graph: 27 nodes, 18 edges
+2026-10-26 15:02:30 [INFO] Road graph: 39 nodes, 25 edges
+2026-10-26 15:02:32 [INFO] Road graph: 4 nodes, 2 edges
+2026-10-26 15:02:33 [INFO] Road graph: 2 nodes, 1 edges
+2026-10-26 15:02:34 [INFO] Road graph: 16 nodes, 11 edges
+2026-10-26 15:02:35 [INFO] Road graph: 21 nodes, 17 edges
+2026-10-26 15:02:36 [INFO] Road graph: 19 nodes, 13 edges
+2026-10-26 15:02:37 [INFO] Road graph: 19 nodes, 15 edges
+2026-10-26 15:02:39 [INFO] Road graph: 25 nodes, 19 edges
+2026-10-26 15:02:40 [INFO] Road graph: 20 nodes, 17 edges
+2026-10-26 15:02:42 [INFO] Road graph: 14 nodes, 7 edges
+2026-10-26 15:02:43 [INFO] Road graph: 20 nodes, 11 edges
+2026-10-26 15:02:44 [INFO] Road graph: 16 nodes, 9 edges
+2026-10-26 15:02:45 [INFO] Road graph: 40 nodes, 32 edges
+2026-10-26 15:02:47 [INFO] Road graph: 4 nodes, 2 edges
+2026-10-26 15:02:48 [INFO] Road graph: 50 nodes, 42 edges
+2026-10-26 15:02:49 [INFO] Road graph: 54 nodes, 42 edges
+2026-10-26 15:02:51 [INFO] Road graph: 36 nodes, 26 edges
+2026-10-26 15:02:52 [INFO] Road graph: 44 nodes, 29 edges
+2026-10-26 15:02:54 [INFO] Road graph: 28 nodes, 20 edges
+2026-10-26 15:02:55 [INFO] Road graph: 33 nodes, 22 edges
+2026-10-26 15:02:56 [INFO] Road graph: 32 nodes, 20 edges
+2026-10-26 15:02:57 [INFO] Road graph: 24 nodes, 13 edges
+2026-10-26 15:02:58 [INFO] Road graph: 44 nodes, 28 edges
+2026-10-26 15:02:59 [INFO] Road graph: 32 nodes, 17 edges
+2026-10-26 15:03:01 [INFO] Road graph: 67 nodes, 48 edges
+2026-10-26 15:03:02 [INFO] Road graph: 24 nodes, 13 edges
+2026-10-26 15:03:03 [INFO] Road graph: 40 nodes, 29 edges
+2026-10-26 15:03:04 [INFO] Road graph: 22 nodes, 12 edges
+2026-10-26 15:03:06 [INFO] Road graph: 59 nodes, 39 edges
+2026-10-26 15:03:07 [INFO] Road graph: 51 nodes, 30 edges
+2026-10-26 15:03:08 [INFO] Road graph: 16 nodes, 11 edges
+2026-10-26 15:03:09 [INFO] Road graph: 11 nodes, 7 edges
+2026-10-26 15:03:11 [INFO] Road graph: 77 nodes, 50 edges
+2026-10-26 15:03:12 [INFO] Road graph: 40 nodes, 24 edges
+2026-10-26 15:03:14 [INFO] Road graph: 20 nodes, 13 edges
+2026-10-26 15:03:15 [INFO] Road graph: 58 nodes, 37 edges
+2026-10-26 15:03:16 [INFO] Road graph: 7 nodes, 4 edges
+2026-10-26 15:03:17 [INFO] Road graph: 6 nodes, 3 edges
+2026-10-26 15:03:18 [INFO] Road graph: 12 nodes, 6 edges
+2026-10-26 15:03:19 [INFO] Road graph: 4 nodes, 2 edges
+2026-10-26 15:03:20 [INFO] Road graph: 43 nodes, 31 edges
+2026-10-26 15:03:21 [INFO] Road graph: 26 nodes, 19 edges
+2026-10-26 15:03:23 [INFO] Road graph: 94 nodes, 73 edges
+2026-10-26 15:03:25 [INFO] Road graph: 48 nodes, 34 edges
+2026-10-26 15:03:26 [INFO] Road graph: 38 nodes, 21 edges
+2026-10-26 15:03:27 [INFO] Road graph: 80 nodes, 60 edges
+2026-10-26 15:03:29 [INFO] Road graph: 24 nodes, 15 edges
+2026-10-26 15:03:30 [INFO] Road graph: 9 nodes, 5 edges
+2026-10-26 15:03:31 [INFO] Road graph: 65 nodes, 43 edges
+2026-10-26 15:03:32 [INFO] Road graph: 25 nodes, 16 edges
+2026-10-26 15:03:34 [INFO] Road graph: 41 nodes, 27 edges
+2026-10-26 15:03:35 [INFO] Road graph: 4 nodes, 2 edges
+2026-10-26 15:03:36 [INFO] Road graph: 2 nodes, 1 edges
+2026-10-26 15:03:37 [INFO] Road graph: 16 nodes, 11 edges
+2026-10-26 15:04:13 [INFO] Road graph: 9 nodes, 5 edges
+2026-10-26 15:04:14 [INFO] Road graph: 26 nodes, 20 edges
+2026-10-26 15:04:15 [INFO] Road graph: 12 nodes, 9 edges
+2026-10-26 15:04:16 [INFO] Road graph: 25 nodes, 19 edges
+2026-10-26 15:04:17 [INFO] Road graph: 16 nodes, 12 edges
+2026-10-26 15:04:18 [INFO] Road graph: 18 nodes, 10 edges
+2026-10-26 15:04:19 [INFO] Road graph: 24 nodes, 14 edges
+2026-10-26 15:04:21 [INFO] Road graph: 14 nodes, 7 edges
+2026-10-26 15:04:22 [INFO] Road graph: 34 nodes, 26 edges
+2026-10-26 15:04:23 [INFO] Road graph: 4 nodes, 2 edges

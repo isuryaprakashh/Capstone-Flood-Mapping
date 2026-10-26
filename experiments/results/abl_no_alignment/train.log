@@ -1,0 +1,15 @@
+2026-10-26 22:06:46 [INFO] Loading pretrained weights from Hugging Face hub (timm/vit_large_patch16_dinov3.sat493m)
+2026-10-26 22:06:46 [INFO] HTTP Request: HEAD https://huggingface.co/timm/vit_large_patch16_dinov3.sat493m/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-10-26 22:06:46 [INFO] [timm/vit_large_patch16_dinov3.sat493m] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
+2026-10-26 22:06:46 [INFO] Loading pretrained weights from Hugging Face hub (timm/resnet18.a1_in1k)
+2026-10-26 22:06:46 [INFO] HTTP Request: HEAD https://huggingface.co/timm/resnet18.a1_in1k/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-10-26 22:06:46 [INFO] [timm/resnet18.a1_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
+2026-10-26 22:06:46 [INFO] Missing keys (fc.weight, fc.bias) discovered while loading pretrained weights. This is expected if model is being adapted.
+2026-10-26 22:10:40 [INFO] [abl_no_alignment] joint epoch 1/40 loss 5.5157 val_score 0.6920 * (233s)
+2026-10-26 22:14:33 [INFO] [abl_no_alignment] joint epoch 2/40 loss 4.4562 val_score 0.7547 * (232s)
+2026-10-26 22:18:26 [INFO] [abl_no_alignment] joint epoch 3/40 loss 3.7496 val_score 0.7750 * (233s)
+2026-10-26 22:22:19 [INFO] [abl_no_alignment] joint epoch 4/40 loss 3.4435 val_score 0.7881 * (231s)
+2026-10-26 22:26:10 [INFO] [abl_no_alignment] joint epoch 5/40 loss 2.8181 val_score 0.7941 * (231s)
+2026-10-26 22:30:02 [INFO] [abl_no_alignment] joint epoch 6/40 loss 2.6658 val_score 0.7961 * (231s)
+2026-10-26 22:33:48 [INFO] [abl_no_alignment] joint epoch 7/40 loss 2.4734 val_score 0.7958 (225s)
+2026-10-26 22:33:49 [INFO] Pausing before epoch 7: not enough session time left

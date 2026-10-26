@@ -1,0 +1,13 @@
+{
+  "id": "abl_convnext_backbone",
+  "state": "completed",
+  "attempts": 0,
+  "session": "431cd722",
+  "worker": "1",
+  "pid": 103,
+  "started_at": "2026-10-26T19:13:53+00:00",
+  "updated_at": "2026-10-26T22:06:39+00:00",
+  "error": null,
+  "completed_at": "2026-10-26T22:06:39+00:00",
+  "seconds_total": 10366.7
+}
