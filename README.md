@@ -182,6 +182,10 @@ docker compose up --build   # http://localhost:8000 — mounts ./weights and ./C
 
 Louisiana-West has no public labels, so it is not used for evaluation.
 
+Flood looks different in the two events: Louisiana-East shows standing water, Germany the mud and
+debris left after the water receded. P1 and P2 therefore also test cross-event flood transfer, and
+the ablations of the flood branch run on P3, where training and test tiles cover both events.
+
 ### Local
 
 ```bash
@@ -197,7 +201,9 @@ python scripts/run_queue.py --processed ./processed --results ./results_smoke --
 
 Each run writes `results/<run>/`: `train_log.csv`, `metrics_val.json` (tuned thresholds),
 `metrics_test.json` (metrics with 95 % bootstrap CIs), `stress_test.json` (metrics under added
-pre/post offsets), `timing.json` and `checkpoints/best.pt`. `results/PROGRESS.md` summarises all
+pre/post offsets, on up to 50 test tiles with flooded tiles first), `timing.json` and
+`checkpoints/best.pt`. A finished run whose evaluation is out of date is re-evaluated from its
+`best.pt` without retraining. `results/PROGRESS.md` summarises all
 runs. `python scripts/aggregate_results.py --results ./results` builds the tables
 (`RESULTS.md`, `RESULTS.csv`: mean ± std over seeds, misalignment stress curves).
 
