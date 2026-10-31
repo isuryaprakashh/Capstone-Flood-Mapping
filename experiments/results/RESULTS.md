@@ -31,6 +31,7 @@ Mean ± std over seeds; single runs show the 95 % bootstrap CI over test tiles.
 | p3_abl_classic_registration | ra_fusion | 1 | 0.651 [0.620, 0.682] | 0.607 [0.514, 0.658] | 0.651 [0.621, 0.670] | 0.490 [0.448, 0.531] | 0.378 [0.280, 0.474] | 0.673 [0.569, 0.756] | 1.77 |
 | p3_abl_dense_flood_loss | ra_fusion | 1 | 0.724 [0.693, 0.753] | 0.678 [0.574, 0.729] | 0.668 [0.638, 0.687] | 0.506 [0.460, 0.549] | 0.363 [0.263, 0.463] | 0.594 [0.481, 0.689] | 1.69 |
 | p3_abl_no_alignment | ra_fusion | 1 | 0.674 [0.641, 0.705] | 0.632 [0.530, 0.684] | 0.651 [0.615, 0.674] | 0.525 [0.485, 0.570] | 0.379 [0.281, 0.475] | 0.643 [0.527, 0.738] | 1.75 |
+| p3_abl_no_shift_training | ra_fusion | 1 | 0.656 [0.622, 0.687] | 0.616 [0.516, 0.673] | 0.646 [0.616, 0.666] | 0.501 [0.457, 0.542] | 0.382 [0.284, 0.475] | 0.664 [0.558, 0.751] | 1.94 |
 | p3_ra_fusion | ra_fusion | 3 | 0.654 ± 0.015 | 0.594 ± 0.010 | 0.640 ± 0.009 | 0.493 ± 0.025 | 0.388 ± 0.015 | 0.665 ± 0.006 | 1.83 |
 | p3_siamese_unet | siamese_unet | 3 | 0.688 ± 0.012 | 0.575 ± 0.058 | 0.593 ± 0.037 | 0.472 ± 0.016 | 0.308 ± 0.041 | 0.567 ± 0.047 | 0.91 |
 | p3_sn8_baseline | sn8_baseline | 3 | 0.656 ± 0.008 | 0.572 ± 0.015 | 0.582 ± 0.003 | 0.432 ± 0.014 | 0.322 ± 0.038 | 0.611 ± 0.008 | 0.70 |
@@ -54,6 +55,7 @@ Mean ± std over seeds; single runs show the 95 % bootstrap CI over test tiles.
 | p3_abl_classic_registration | 0.615 | 0.616 | 0.616 | 0.615 | 0.614 | 0.614 |
 | p3_abl_dense_flood_loss | 0.690 | 0.688 | 0.686 | 0.685 | 0.686 | 0.685 |
 | p3_abl_no_alignment | 0.628 | 0.628 | 0.629 | 0.627 | 0.628 | 0.627 |
+| p3_abl_no_shift_training | 0.621 | 0.622 | 0.621 | 0.621 | 0.621 | 0.615 |
 | p3_ra_fusion | 0.612 | 0.616 | 0.615 | 0.611 | 0.614 | 0.615 |
 | p3_siamese_unet | 0.592 | 0.595 | 0.589 | 0.592 | 0.595 | 0.596 |
 | p3_sn8_baseline | 0.545 | 0.543 | 0.543 | 0.544 | 0.545 | 0.545 |
@@ -77,6 +79,7 @@ Mean ± std over seeds; single runs show the 95 % bootstrap CI over test tiles.
 | p3_abl_classic_registration | 0.708 | 0.707 | 0.706 | 0.707 | 0.704 | 0.701 |
 | p3_abl_dense_flood_loss | 0.676 | 0.675 | 0.673 | 0.669 | 0.665 | 0.662 |
 | p3_abl_no_alignment | 0.694 | 0.695 | 0.694 | 0.692 | 0.687 | 0.685 |
+| p3_abl_no_shift_training | 0.700 | 0.700 | 0.699 | 0.695 | 0.691 | 0.685 |
 | p3_ra_fusion | 0.706 | 0.707 | 0.706 | 0.704 | 0.702 | 0.701 |
 | p3_siamese_unet | 0.613 | 0.610 | 0.608 | 0.609 | 0.608 | 0.611 |
 | p3_sn8_baseline | 0.622 | 0.620 | 0.619 | 0.619 | 0.620 | 0.617 |
@@ -100,6 +103,7 @@ Mean ± std over seeds; single runs show the 95 % bootstrap CI over test tiles.
 | p3_abl_classic_registration | 0.537 | 0.546 | 0.544 | 0.542 | 0.541 | 0.533 |
 | p3_abl_dense_flood_loss | 0.554 | 0.548 | 0.549 | 0.546 | 0.555 | 0.551 |
 | p3_abl_no_alignment | 0.548 | 0.543 | 0.545 | 0.545 | 0.545 | 0.549 |
+| p3_abl_no_shift_training | 0.545 | 0.551 | 0.542 | 0.549 | 0.549 | 0.542 |
 | p3_ra_fusion | 0.533 | 0.534 | 0.533 | 0.523 | 0.536 | 0.540 |
 | p3_siamese_unet | 0.463 | 0.463 | 0.458 | 0.461 | 0.463 | 0.465 |
 | p3_sn8_baseline | 0.423 | 0.420 | 0.418 | 0.423 | 0.428 | 0.430 |
@@ -123,6 +127,7 @@ Mean ± std over seeds; single runs show the 95 % bootstrap CI over test tiles.
 | p3_abl_classic_registration | 0.612 | 0.612 | 0.612 | 0.612 | 0.612 | 0.612 |
 | p3_abl_dense_flood_loss | 0.680 | 0.680 | 0.680 | 0.680 | 0.680 | 0.680 |
 | p3_abl_no_alignment | 0.639 | 0.639 | 0.639 | 0.639 | 0.639 | 0.639 |
+| p3_abl_no_shift_training | 0.606 | 0.606 | 0.606 | 0.606 | 0.606 | 0.606 |
 | p3_ra_fusion | 0.604 | 0.604 | 0.604 | 0.604 | 0.604 | 0.604 |
 | p3_siamese_unet | 0.596 | 0.596 | 0.596 | 0.596 | 0.596 | 0.596 |
 | p3_sn8_baseline | 0.550 | 0.550 | 0.550 | 0.550 | 0.550 | 0.550 |
@@ -146,6 +151,7 @@ Mean ± std over seeds; single runs show the 95 % bootstrap CI over test tiles.
 | p3_abl_classic_registration | 0.487 | 0.487 | 0.487 | 0.487 | 0.487 | 0.487 |
 | p3_abl_dense_flood_loss | 0.513 | 0.513 | 0.513 | 0.513 | 0.513 | 0.513 |
 | p3_abl_no_alignment | 0.520 | 0.520 | 0.520 | 0.520 | 0.520 | 0.520 |
+| p3_abl_no_shift_training | 0.497 | 0.497 | 0.497 | 0.497 | 0.497 | 0.497 |
 | p3_ra_fusion | 0.493 | 0.493 | 0.493 | 0.493 | 0.493 | 0.493 |
 | p3_siamese_unet | 0.437 | 0.437 | 0.437 | 0.437 | 0.437 | 0.437 |
 | p3_sn8_baseline | 0.410 | 0.410 | 0.410 | 0.410 | 0.410 | 0.410 |

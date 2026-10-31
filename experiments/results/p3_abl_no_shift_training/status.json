@@ -1,12 +1,13 @@
 {
   "id": "p3_abl_no_shift_training",
-  "state": "paused",
+  "state": "completed",
   "attempts": 0,
-  "session": "c7080350",
+  "session": "5b0c21f8",
   "worker": "0",
-  "pid": 62,
+  "pid": 61,
   "started_at": "2026-10-31T19:55:05+00:00",
-  "updated_at": "2026-10-31T23:21:53+00:00",
+  "updated_at": "2026-10-31T23:28:47+00:00",
   "error": null,
-  "seconds_total": 12407.5
+  "seconds_total": 12626.5,
+  "completed_at": "2026-10-31T23:28:47+00:00"
 }

@@ -1,16 +1,18 @@
 # Orchestrator status
 
-- **Phase:** train
+- **Phase:** done
 - **Sessions started:** 15
-- **Running:** sn8-train-b
+- **Running:** —
 - **Code commit:** 7d4177d07c6e323169f785d081d010c2126e1f48
 - **Waiting for quota until:** —
-- **Updated:** 2026-10-31T23:23:54+00:00
+- **Updated:** 2026-10-31T23:35:10+00:00
 
 Per-run progress: [PROGRESS.md](PROGRESS.md)
 
 ## Recent events
 
+- 2026-10-31T23:35:10+00:00 — All runs finished
+- 2026-10-31T23:34:03+00:00 — sn8-train-b (train) ended: complete after 10 min
 - 2026-10-31T23:23:54+00:00 — Started train session 15 on sn8-train-b (code 7d4177d, 6.55 h)
 - 2026-10-31T23:22:54+00:00 — sn8-train-a (train) ended: complete after 689 min
 - 2026-10-31T11:53:30+00:00 — Started train session 14 on sn8-train-a (code 7d4177d, 11.5 h)
@@ -39,5 +41,3 @@ Per-run progress: [PROGRESS.md](PROGRESS.md)
 - 2026-10-25T10:37:33+00:00 — sn8-smoke (smoke) ended: error after 13 min
 - 2026-10-25T10:24:48+00:00 — Started smoke session 6 on sn8-smoke (code 6e97ab0)
 - 2026-10-25T10:24:44+00:00 — Manually resumed at phase 'smoke'
-- 2026-10-25T10:07:42+00:00 — Smoke test failed: runs not completed: ['smoke_siamese_unet'] — retry 1/2
-- 2026-10-25T10:07:36+00:00 — sn8-smoke (smoke) ended: error after 19 min

@@ -445,3 +445,69 @@
 2026-10-31 23:21:49 [INFO] Road graph: 6 nodes, 3 edges
 2026-10-31 23:21:51 [INFO] Road graph: 37 nodes, 28 edges
 2026-10-31 23:21:53 [INFO] Road graph: 0 nodes, 0 edges
+2026-10-31 23:25:21 [INFO] Loading pretrained weights from Hugging Face hub (timm/vit_large_patch16_dinov3.sat493m)
+2026-10-31 23:25:21 [INFO] HTTP Request: GET https://huggingface.co/api/agent-harnesses "HTTP/1.1 200 OK"
+2026-10-31 23:25:21 [INFO] HTTP Request: HEAD https://huggingface.co/timm/vit_large_patch16_dinov3.sat493m/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-10-31 23:25:21 [INFO] HTTP Request: GET https://huggingface.co/api/models/timm/vit_large_patch16_dinov3.sat493m/xet-read-token/ce148bd5ed3de1eb75ebdccafcb2c280bb3e8f7c "HTTP/1.1 200 OK"
+2026-10-31 23:25:32 [INFO] [timm/vit_large_patch16_dinov3.sat493m] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
+2026-10-31 23:25:38 [INFO] Loading pretrained weights from Hugging Face hub (timm/resnet18.a1_in1k)
+2026-10-31 23:25:38 [INFO] HTTP Request: HEAD https://huggingface.co/timm/resnet18.a1_in1k/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-10-31 23:25:38 [WARNING] Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-10-31 23:25:38 [INFO] HTTP Request: GET https://huggingface.co/api/models/timm/resnet18.a1_in1k/xet-read-token/491b427b45c94c7fb0e78b5474cc919aff584bbf "HTTP/1.1 200 OK"
+2026-10-31 23:25:39 [INFO] [timm/resnet18.a1_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
+2026-10-31 23:25:39 [INFO] Missing keys (fc.weight, fc.bias) discovered while loading pretrained weights. This is expected if model is being adapted.
+2026-10-31 23:25:40 [INFO] Resuming p3_abl_no_shift_training at stage 1 epoch 0
+2026-10-31 23:25:51 [WARNING] CPLE_AppDefined in DeprecationWarning: 'Memory' driver is deprecated since GDAL 3.11. Use 'MEM' onwards. Further messages of this type will be suppressed.
+2026-10-31 23:25:51 [INFO] Road graph: 50 nodes, 44 edges
+2026-10-31 23:25:55 [INFO] Road graph: 38 nodes, 23 edges
+2026-10-31 23:25:58 [INFO] Road graph: 36 nodes, 23 edges
+2026-10-31 23:26:01 [INFO] Road graph: 25 nodes, 16 edges
+2026-10-31 23:26:04 [INFO] Road graph: 16 nodes, 8 edges
+2026-10-31 23:26:06 [INFO] Road graph: 32 nodes, 26 edges
+2026-10-31 23:26:09 [INFO] Road graph: 57 nodes, 41 edges
+2026-10-31 23:26:12 [INFO] Road graph: 22 nodes, 13 edges
+2026-10-31 23:26:15 [INFO] Road graph: 18 nodes, 10 edges
+2026-10-31 23:26:18 [INFO] Road graph: 6 nodes, 3 edges
+2026-10-31 23:26:21 [INFO] Road graph: 2 nodes, 1 edges
+2026-10-31 23:26:24 [INFO] Road graph: 4 nodes, 3 edges
+2026-10-31 23:26:27 [INFO] Road graph: 4 nodes, 2 edges
+2026-10-31 23:26:30 [INFO] Road graph: 8 nodes, 5 edges
+2026-10-31 23:26:33 [INFO] Road graph: 70 nodes, 51 edges
+2026-10-31 23:26:36 [INFO] Road graph: 35 nodes, 23 edges
+2026-10-31 23:26:39 [INFO] Road graph: 74 nodes, 51 edges
+2026-10-31 23:26:42 [INFO] Road graph: 18 nodes, 12 edges
+2026-10-31 23:26:45 [INFO] Road graph: 42 nodes, 23 edges
+2026-10-31 23:26:48 [INFO] Road graph: 16 nodes, 11 edges
+2026-10-31 23:26:51 [INFO] Road graph: 25 nodes, 17 edges
+2026-10-31 23:26:54 [INFO] Road graph: 0 nodes, 0 edges
+2026-10-31 23:26:57 [INFO] Road graph: 42 nodes, 24 edges
+2026-10-31 23:27:00 [INFO] Road graph: 14 nodes, 8 edges
+2026-10-31 23:27:03 [INFO] Road graph: 4 nodes, 2 edges
+2026-10-31 23:27:06 [INFO] Road graph: 40 nodes, 22 edges
+2026-10-31 23:27:09 [INFO] Road graph: 49 nodes, 26 edges
+2026-10-31 23:27:12 [INFO] Road graph: 40 nodes, 22 edges
+2026-10-31 23:27:15 [INFO] Road graph: 10 nodes, 6 edges
+2026-10-31 23:27:18 [INFO] Road graph: 19 nodes, 14 edges
+2026-10-31 23:27:21 [INFO] Road graph: 38 nodes, 22 edges
+2026-10-31 23:27:24 [INFO] Road graph: 26 nodes, 13 edges
+2026-10-31 23:27:28 [INFO] Road graph: 50 nodes, 25 edges
+2026-10-31 23:27:31 [INFO] Road graph: 10 nodes, 6 edges
+2026-10-31 23:27:34 [INFO] Road graph: 6 nodes, 5 edges
+2026-10-31 23:27:36 [INFO] Road graph: 12 nodes, 9 edges
+2026-10-31 23:27:40 [INFO] Road graph: 4 nodes, 2 edges
+2026-10-31 23:27:42 [INFO] Road graph: 28 nodes, 16 edges
+2026-10-31 23:27:45 [INFO] Road graph: 12 nodes, 6 edges
+2026-10-31 23:27:49 [INFO] Road graph: 44 nodes, 30 edges
+2026-10-31 23:27:52 [INFO] Road graph: 38 nodes, 20 edges
+2026-10-31 23:27:55 [INFO] Road graph: 22 nodes, 11 edges
+2026-10-31 23:27:58 [INFO] Road graph: 26 nodes, 15 edges
+2026-10-31 23:28:22 [INFO] Road graph: 2 nodes, 1 edges
+2026-10-31 23:28:24 [INFO] Road graph: 6 nodes, 3 edges
+2026-10-31 23:28:27 [INFO] Road graph: 9 nodes, 7 edges
+2026-10-31 23:28:30 [INFO] Road graph: 8 nodes, 6 edges
+2026-10-31 23:28:33 [INFO] Road graph: 4 nodes, 2 edges
+2026-10-31 23:28:35 [INFO] Road graph: 4 nodes, 2 edges
+2026-10-31 23:28:38 [INFO] Road graph: 10 nodes, 5 edges
+2026-10-31 23:28:41 [INFO] Road graph: 6 nodes, 3 edges
+2026-10-31 23:28:44 [INFO] Road graph: 37 nodes, 28 edges
+2026-10-31 23:28:47 [INFO] Road graph: 0 nodes, 0 edges

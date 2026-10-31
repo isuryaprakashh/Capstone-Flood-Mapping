@@ -1,6 +1,6 @@
 # Training progress
 
-32/33 runs completed · updated 2026-10-31T23:22:04+00:00
+33/33 runs completed · updated 2026-10-31T23:29:01+00:00
 
 | Run | Model | Protocol | Seed | State | Failed attempts | Test metrics | Last error |
 |---|---|---|---|---|---|---|---|
@@ -36,4 +36,4 @@
 | p3_abl_classic_registration | ra_fusion | P3 | 0 | completed | 0 | building_f1 0.651 · flooded_building_f1 0.607 · building_flood_iou 0.651 · apls 0.490 · apls_flooded_network 0.378 · flooded_road_f1 0.673 |  |
 | p3_abl_dense_flood_loss | ra_fusion | P3 | 0 | completed | 0 | building_f1 0.724 · flooded_building_f1 0.678 · building_flood_iou 0.668 · apls 0.506 · apls_flooded_network 0.363 · flooded_road_f1 0.594 |  |
 | p3_abl_no_alignment | ra_fusion | P3 | 0 | completed | 0 | building_f1 0.674 · flooded_building_f1 0.632 · building_flood_iou 0.651 · apls 0.525 · apls_flooded_network 0.379 · flooded_road_f1 0.643 |  |
-| p3_abl_no_shift_training | ra_fusion | P3 | 0 | paused | 0 | building_f1 0.656 · flooded_building_f1 0.616 · building_flood_iou 0.646 · apls 0.501 · apls_flooded_network 0.382 · flooded_road_f1 0.664 |  |
+| p3_abl_no_shift_training | ra_fusion | P3 | 0 | completed | 0 | building_f1 0.656 · flooded_building_f1 0.616 · building_flood_iou 0.646 · apls 0.501 · apls_flooded_network 0.382 · flooded_road_f1 0.664 |  |
