@@ -1,16 +1,18 @@
 # Orchestrator status
 
 - **Phase:** train
-- **Sessions started:** 13
-- **Running:** sn8-train-b
+- **Sessions started:** 14
+- **Running:** sn8-train-a
 - **Code commit:** 7d4177d07c6e323169f785d081d010c2126e1f48
 - **Waiting for quota until:** —
-- **Updated:** 2026-10-31T00:14:18+00:00
+- **Updated:** 2026-10-31T11:53:30+00:00
 
 Per-run progress: [PROGRESS.md](PROGRESS.md)
 
 ## Recent events
 
+- 2026-10-31T11:53:30+00:00 — Started train session 14 on sn8-train-a (code 7d4177d, 11.5 h)
+- 2026-10-31T11:52:08+00:00 — sn8-train-b (train) ended: complete after 698 min
 - 2026-10-31T00:14:18+00:00 — Started train session 13 on sn8-train-b (code 7d4177d, 11.5 h)
 - 2026-10-26T22:44:48+00:00 — Weekly GPU quota used up (0.0 GPU h left); waiting until 2026-10-31T00:10:00+00:00
 - 2026-10-26T22:43:43+00:00 — sn8-train-a (train) ended: complete after 688 min
@@ -39,5 +41,3 @@ Per-run progress: [PROGRESS.md](PROGRESS.md)
 - 2026-10-25T10:07:36+00:00 — sn8-smoke (smoke) ended: error after 19 min
 - 2026-10-25T09:48:37+00:00 — Started smoke session 5 on sn8-smoke (code 2dcf24d)
 - 2026-10-25T09:48:33+00:00 — Manually resumed at phase 'smoke'
-- 2026-10-25T09:00:30+00:00 — Started smoke session 4 on sn8-smoke (code 64eeb7d)
-- 2026-10-25T09:00:27+00:00 — Manually resumed at phase 'smoke'

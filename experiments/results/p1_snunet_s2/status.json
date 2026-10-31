@@ -2,12 +2,12 @@
   "id": "p1_snunet_s2",
   "state": "completed",
   "attempts": 0,
-  "session": "a0fdb116",
+  "session": "d3a0acd9",
   "worker": "0",
   "pid": 62,
   "started_at": "2026-10-26T05:09:29+00:00",
-  "updated_at": "2026-10-26T08:15:06+00:00",
+  "updated_at": "2026-10-31T01:02:06+00:00",
   "error": null,
-  "completed_at": "2026-10-26T08:15:06+00:00",
-  "seconds_total": 11136.9
+  "completed_at": "2026-10-31T01:02:06+00:00",
+  "seconds_total": 11546.6
 }

@@ -1,6 +1,6 @@
 # Training progress
 
-23/27 runs completed · updated 2026-10-26T22:33:53+00:00
+26/33 runs completed · updated 2026-10-31T11:42:41+00:00
 
 | Run | Model | Protocol | Seed | State | Failed attempts | Test metrics | Last error |
 |---|---|---|---|---|---|---|---|
@@ -25,9 +25,15 @@
 | p3_siamese_unet_s0 | siamese_unet | P3 | 0 | completed | 0 | building_f1 0.691 · flooded_building_f1 0.604 · building_flood_iou 0.607 · apls 0.478 · apls_flooded_network 0.334 · flooded_road_f1 0.572 |  |
 | p3_sn8_baseline_s0 | sn8_baseline | P3 | 0 | completed | 0 | building_f1 0.662 · flooded_building_f1 0.555 · building_flood_iou 0.579 · apls 0.444 · apls_flooded_network 0.366 · flooded_road_f1 0.609 |  |
 | p3_snunet_s0 | snunet | P3 | 0 | completed | 0 | building_f1 0.423 · flooded_building_f1 0.312 · building_flood_iou 0.426 · apls 0.262 · apls_flooded_network 0.140 · flooded_road_f1 0.469 |  |
-| abl_classic_registration | ra_fusion | P1 | 0 | completed | 0 | building_f1 0.346 · flooded_building_f1 0.012 · building_flood_iou 0.195 · apls 0.236 · apls_flooded_network 0.003 · flooded_road_f1 0.044 |  |
+| p3_ra_fusion_s1 | ra_fusion | P3 | 1 | completed | 0 | building_f1 0.670 · flooded_building_f1 0.605 · building_flood_iou 0.651 · apls 0.521 · apls_flooded_network 0.384 · flooded_road_f1 0.669 |  |
+| p3_ra_fusion_s2 | ra_fusion | P3 | 2 | completed | 0 | building_f1 0.650 · flooded_building_f1 0.585 · building_flood_iou 0.636 · apls 0.478 · apls_flooded_network 0.405 · flooded_road_f1 0.658 |  |
+| p3_siamese_unet_s1 | siamese_unet | P3 | 1 | completed | 0 | building_f1 0.674 · flooded_building_f1 0.509 · building_flood_iou 0.551 · apls 0.484 · apls_flooded_network 0.261 · flooded_road_f1 0.518 |  |
+| p3_siamese_unet_s2 | siamese_unet | P3 | 2 | completed | 0 | building_f1 0.698 · flooded_building_f1 0.613 · building_flood_iou 0.622 · apls 0.453 · apls_flooded_network 0.330 · flooded_road_f1 0.612 |  |
+| p3_sn8_baseline_s1 | sn8_baseline | P3 | 1 | paused | 0 | building_f1 0.647 · flooded_building_f1 0.576 · building_flood_iou 0.582 · apls 0.417 · apls_flooded_network 0.296 · flooded_road_f1 0.604 |  |
+| p3_sn8_baseline_s2 | sn8_baseline | P3 | 2 | paused | 0 | building_f1 0.658 · flooded_building_f1 0.584 · building_flood_iou 0.585 · apls 0.435 · apls_flooded_network 0.305 · flooded_road_f1 0.621 |  |
 | abl_convnext_backbone | ra_fusion | P1 | 0 | completed | 0 | building_f1 0.181 · flooded_building_f1 0.118 · building_flood_iou 0.125 · apls 0.092 · apls_flooded_network 0.020 · flooded_road_f1 0.293 |  |
-| abl_dense_flood_loss | ra_fusion | P1 | 0 | paused | 0 |  |  |
-| abl_no_alignment | ra_fusion | P1 | 0 | paused | 0 |  |  |
 | abl_no_junction_head | ra_fusion | P1 | 0 | pending | 0 |  |  |
-| abl_no_shift_training | ra_fusion | P1 | 0 | pending | 0 |  |  |
+| p3_abl_classic_registration | ra_fusion | P3 | 0 | pending | 0 |  |  |
+| p3_abl_dense_flood_loss | ra_fusion | P3 | 0 | pending | 0 |  |  |
+| p3_abl_no_alignment | ra_fusion | P3 | 0 | pending | 0 |  |  |
+| p3_abl_no_shift_training | ra_fusion | P3 | 0 | pending | 0 |  |  |

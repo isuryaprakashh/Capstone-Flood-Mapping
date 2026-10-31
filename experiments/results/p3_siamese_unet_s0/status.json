@@ -2,12 +2,12 @@
   "id": "p3_siamese_unet_s0",
   "state": "completed",
   "attempts": 0,
-  "session": "431cd722",
-  "worker": "0",
-  "pid": 62,
+  "session": "d3a0acd9",
+  "worker": "1",
+  "pid": 94,
   "started_at": "2026-10-26T12:16:40+00:00",
-  "updated_at": "2026-10-26T15:04:25+00:00",
+  "updated_at": "2026-10-31T01:23:42+00:00",
   "error": null,
-  "completed_at": "2026-10-26T15:04:25+00:00",
-  "seconds_total": 10065.0
+  "completed_at": "2026-10-31T01:23:42+00:00",
+  "seconds_total": 10427.9
 }

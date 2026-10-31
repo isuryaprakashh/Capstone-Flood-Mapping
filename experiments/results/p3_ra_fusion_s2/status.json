@@ -1,0 +1,13 @@
+{
+  "id": "p3_ra_fusion_s2",
+  "state": "completed",
+  "attempts": 0,
+  "session": "d3a0acd9",
+  "worker": "1",
+  "pid": 94,
+  "started_at": "2026-10-31T01:34:26+00:00",
+  "updated_at": "2026-10-31T06:16:28+00:00",
+  "error": null,
+  "completed_at": "2026-10-31T06:16:28+00:00",
+  "seconds_total": 16922.3
+}

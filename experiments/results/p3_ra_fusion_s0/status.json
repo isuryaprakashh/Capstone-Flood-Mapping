@@ -2,12 +2,12 @@
   "id": "p3_ra_fusion_s0",
   "state": "completed",
   "attempts": 0,
-  "session": "431cd722",
-  "worker": "1",
-  "pid": 103,
+  "session": "d3a0acd9",
+  "worker": "0",
+  "pid": 62,
   "started_at": "2026-10-26T11:17:20+00:00",
-  "updated_at": "2026-10-26T15:56:55+00:00",
+  "updated_at": "2026-10-31T01:26:20+00:00",
   "error": null,
-  "completed_at": "2026-10-26T15:56:55+00:00",
-  "seconds_total": 16775.3
+  "completed_at": "2026-10-31T01:26:20+00:00",
+  "seconds_total": 17491.0
 }

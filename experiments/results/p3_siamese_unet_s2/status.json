@@ -1,0 +1,13 @@
+{
+  "id": "p3_siamese_unet_s2",
+  "state": "completed",
+  "attempts": 0,
+  "session": "d3a0acd9",
+  "worker": "0",
+  "pid": 62,
+  "started_at": "2026-10-31T06:16:39+00:00",
+  "updated_at": "2026-10-31T09:13:50+00:00",
+  "error": null,
+  "completed_at": "2026-10-31T09:13:50+00:00",
+  "seconds_total": 10631.1
+}

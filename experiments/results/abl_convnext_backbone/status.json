@@ -2,12 +2,12 @@
   "id": "abl_convnext_backbone",
   "state": "completed",
   "attempts": 0,
-  "session": "431cd722",
+  "session": "d3a0acd9",
   "worker": "1",
-  "pid": 103,
+  "pid": 94,
   "started_at": "2026-10-26T19:13:53+00:00",
-  "updated_at": "2026-10-26T22:06:39+00:00",
+  "updated_at": "2026-10-31T01:34:26+00:00",
   "error": null,
-  "completed_at": "2026-10-26T22:06:39+00:00",
-  "seconds_total": 10366.7
+  "completed_at": "2026-10-31T01:34:26+00:00",
+  "seconds_total": 10704.0
 }

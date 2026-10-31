@@ -2,12 +2,12 @@
   "id": "p1_sn8_baseline_s1",
   "state": "completed",
   "attempts": 0,
-  "session": "a0fdb116",
+  "session": "d3a0acd9",
   "worker": "0",
   "pid": 62,
   "started_at": "2026-10-25T21:51:27+00:00",
-  "updated_at": "2026-10-26T00:24:24+00:00",
+  "updated_at": "2026-10-31T00:43:55+00:00",
   "error": null,
-  "seconds_total": 9058.3,
-  "completed_at": "2026-10-26T00:24:24+00:00"
+  "seconds_total": 9348.9,
+  "completed_at": "2026-10-31T00:43:55+00:00"
 }
