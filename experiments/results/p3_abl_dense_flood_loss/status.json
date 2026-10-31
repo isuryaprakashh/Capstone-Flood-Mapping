@@ -1,0 +1,13 @@
+{
+  "id": "p3_abl_dense_flood_loss",
+  "state": "completed",
+  "attempts": 0,
+  "session": "c7080350",
+  "worker": "0",
+  "pid": 62,
+  "started_at": "2026-10-31T15:27:39+00:00",
+  "updated_at": "2026-10-31T19:55:05+00:00",
+  "error": null,
+  "completed_at": "2026-10-31T19:55:05+00:00",
+  "seconds_total": 16046.8
+}

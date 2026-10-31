@@ -1,0 +1,13 @@
+{
+  "id": "p3_abl_no_alignment",
+  "state": "completed",
+  "attempts": 0,
+  "session": "c7080350",
+  "worker": "1",
+  "pid": 97,
+  "started_at": "2026-10-31T16:33:19+00:00",
+  "updated_at": "2026-10-31T20:05:59+00:00",
+  "error": null,
+  "completed_at": "2026-10-31T20:05:59+00:00",
+  "seconds_total": 12759.7
+}

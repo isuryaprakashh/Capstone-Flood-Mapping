@@ -1,0 +1,18 @@
+{
+  "seconds_per_tile_mean": 1.724,
+  "seconds_per_tile_all": [
+    1.89,
+    1.641,
+    1.814,
+    1.754,
+    1.635,
+    1.623,
+    1.613,
+    1.707,
+    1.649,
+    1.91
+  ],
+  "tile_size_px": 1300,
+  "device": "Tesla T4",
+  "includes": "inference (no TTA) + vectorization"
+}
