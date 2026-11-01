@@ -268,5 +268,3 @@ Buildings*, CVPR Workshops 2022. Imagery © Maxar Technologies (CC BY-NC 4.0).
 RA-Fusion uses DINOv3 (O. Siméoni et al., *DINOv3*, 2025; satellite ViT-L/16 weights via
 [timm](https://github.com/huggingface/pytorch-image-models)), distributed under the DINOv3
 License.
-
-KL University Capstone Project KLCAP-2026-00010 — Department of Computer Science & Engineering.
