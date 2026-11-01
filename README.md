@@ -162,6 +162,14 @@ automatically — then *Map flood damage*. For labelled AOIs, enable *Ground tru
 compare and read the per-tile IoU/F1. In *Upload files* mode, choosing a pre-event GeoTIFF that
 appears in a mapping CSV attaches its post image automatically.
 
+**Research models.** The model picker also lists the runs set up under `weights/research/<run>/`
+(their `config.yaml` and tuned thresholds in `metrics_val.json` are in git). Download a run's
+`best.pt` from the Kaggle output of `sn8-train-a` / `sn8-train-b`
+(`results/<run>/checkpoints/best.pt`) into that folder to enable it. Inference matches the final
+evaluation: georeferenced resampling, sliding windows and the run's own thresholds. RA-Fusion
+downloads its DINOv3 satellite backbone (~1.2 GB) on first use. The P3 runs saw both regions in
+training, so score them on P3 test tiles (`processed/splits.json`) for unbiased per-tile numbers.
+
 ### Docker
 
 ```bash

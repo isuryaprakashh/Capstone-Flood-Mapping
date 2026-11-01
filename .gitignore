@@ -42,7 +42,7 @@ htmlcov/
 logs/
 checkpoints/
 weights/*.pth
-weights/*.pt
+weights/**/*.pt
 weights/*.zip
 wandb/
 

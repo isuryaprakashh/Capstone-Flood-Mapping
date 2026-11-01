@@ -3,6 +3,7 @@ API Routes for SpaceNet 8 Flood Mapping.
 
 Endpoints:
   GET  /api/health           — Health check and loaded model
+  GET  /api/models           — Models that can be selected for prediction
   GET  /api/pairs/aois       — AOIs available in the dataset
   GET  /api/pairs            — Search pre/post pairs from the mapping CSVs
   GET  /api/pairs/lookup     — Pre image filename → its post image(s)
@@ -11,6 +12,9 @@ Endpoints:
   POST /api/predict          — Upload pre/post GeoTIFFs → flood mapping
   POST /api/predict_pair     — Run on a dataset pair by name (no upload),
                                scored against ground truth when labelled
+
+Both prediction routes take an optional 'model' form field (an id from
+/api/models); without it the model loaded at startup is used.
 """
 
 import base64
@@ -18,6 +22,7 @@ import io
 import logging
 import os
 import tempfile
+import threading
 from pathlib import Path
 from typing import Optional
 
@@ -36,6 +41,9 @@ MODEL_NAMES = {
     "fusion": "Siamese Cross-Attention Fusion (ResNet34)",
     "unet": "U-Net Baseline (ResNet34, early fusion)",
 }
+LEGACY_WEIGHTS = {"fusion": ("O3_FUSION_WEIGHTS", "weights/fusion_net_best.pth"),
+                  "unet": ("O2_BASELINE_WEIGHTS", "weights/unet_net_best.pth")}
+_load_lock = threading.Lock()  # models load once, even when two requests ask at the same time
 
 
 # ─── Pair Index ─────────────────────────────────────────────────────────────
@@ -82,9 +90,27 @@ async def health_check(request: Request):
         "service": "SpaceNet 8 Flood Mapping API",
         "version": "1.1.0",
         "stub_mode": getattr(request.app.state, "predictor", None) is None,
-        "model": _model_info(request),
+        "model": _model_info(getattr(request.app.state, "predictor", None)),
     }
 
+
+@router.get("/models")
+async def list_models(request: Request):
+    """
+    Selectable models: the two original models (weights/*.pth) and the
+    research runs set up under weights/research/. A research run is
+    'available' once its best.pt has been downloaded from Kaggle.
+    """
+    from inference.research import list_research_runs
+
+    default = getattr(request.app.state, "predictor", None)
+    models = []
+    for model_id, (env_key, fallback) in LEGACY_WEIGHTS.items():
+        models.append({"id": model_id, "name": f"{MODEL_NAMES[model_id]} · v0", "group": "Original models",
+                       "available": _legacy_checkpoint(env_key, fallback).exists()})
+    for run in list_research_runs():
+        models.append({"id": run["id"], "name": run["name"], "group": "Research models", "available": run["available"]})
+    return {"models": models, "default": default.model_type if default else None}
 
 @router.get("/pairs/aois")
 async def list_aois(request: Request):
@@ -136,6 +162,7 @@ async def predict_flood(
     request: Request,
     pre_image: UploadFile = File(..., description="Pre-event GeoTIFF image"),
     post_image: UploadFile = File(..., description="Post-event GeoTIFF image"),
+    model: Optional[str] = Form(None, description="Model id from /api/models (default: startup model)"),
 ):
     """
     Run flood mapping on an uploaded pre/post GeoTIFF pair.
@@ -153,11 +180,13 @@ async def predict_flood(
             pre_path.write_bytes(pre_content)
             post_path.write_bytes(post_content)
 
-            result = await run_in_threadpool(_run_model, request, pre_path, post_path)
+            result = await run_in_threadpool(_run_model, request, pre_path, post_path, model)
             payload = await run_in_threadpool(_prediction_payload, request, result)
 
         return JSONResponse(payload)
 
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Prediction error: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
@@ -169,6 +198,7 @@ async def predict_pair(
     aoi: str = Form(..., description="AOI folder name"),
     pre_image: str = Form(..., description="Pre-event image filename"),
     post_image: Optional[str] = Form(None, description="Post image (default: best-aligned mapped post)"),
+    model: Optional[str] = Form(None, description="Model id from /api/models (default: startup model)"),
 ):
     """
     Run flood mapping on a dataset pair selected by name.
@@ -188,7 +218,7 @@ async def predict_pair(
     post_path = _resolve_or_404(request, aoi, "post", post_name)
 
     try:
-        result = await run_in_threadpool(_run_model, request, pre_path, post_path)
+        result = await run_in_threadpool(_run_model, request, pre_path, post_path, model)
         payload = await run_in_threadpool(_prediction_payload, request, result)
         payload["pair"] = {**entry, "post_image": post_name}
 
@@ -199,6 +229,8 @@ async def predict_pair(
             )
         return JSONResponse(payload)
 
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Prediction error: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
@@ -207,22 +239,55 @@ async def predict_pair(
 # ─── Prediction Helpers ─────────────────────────────────────────────────────
 
 
-def _model_info(request: Request) -> dict:
-    predictor = getattr(request.app.state, "predictor", None)
+def _model_info(predictor) -> dict:
     if predictor is None:
         return {"name": "Stub (no model loaded)", "checkpoint": None, "stub": True}
-    return {
-        "name": MODEL_NAMES.get(predictor.model_type, predictor.model_type),
-        "checkpoint": predictor.checkpoint_name,
-        "stub": False,
-    }
+    name = getattr(predictor, "display_name", None) or MODEL_NAMES.get(predictor.model_type, predictor.model_type)
+    return {"id": predictor.model_type, "name": name, "checkpoint": predictor.checkpoint_name, "stub": False}
 
 
-def _run_model(request: Request, pre_path: Path, post_path: Path) -> dict:
-    """Run the loaded model, or a stub prediction on the real aligned images."""
-    predictor = getattr(request.app.state, "predictor", None)
+def _legacy_checkpoint(env_key: str, fallback: str) -> Path:
+    path = Path(os.getenv(env_key, fallback))
+    return path if path.is_absolute() else ROOT_DIR / path
+
+
+def _predictor(request: Request, model_id: Optional[str]):
+    """The predictor for a model id (loaded on first use and cached); None = stub."""
+    state = request.app.state
+    default = getattr(state, "predictor", None)
+    if not model_id or (default is not None and model_id == default.model_type):
+        return default
+    with _load_lock:
+        cache = getattr(state, "predictors", None)
+        if cache is None:
+            cache = state.predictors = {}
+        if model_id not in cache:
+            if model_id in LEGACY_WEIGHTS:
+                from inference.predict import FloodPredictor
+
+                ckpt = _legacy_checkpoint(*LEGACY_WEIGHTS[model_id])
+                if not ckpt.exists():
+                    raise HTTPException(status_code=404, detail=f"Weights for '{model_id}' not found: {ckpt}")
+                cache[model_id] = FloodPredictor(checkpoint_path=ckpt, model_type=model_id)
+            else:
+                from inference.research import RESEARCH_DIR, ResearchPredictor
+
+                run_dir = RESEARCH_DIR / model_id
+                if model_id != run_dir.name or not (run_dir / "config.yaml").exists():
+                    raise HTTPException(status_code=404, detail=f"Unknown model '{model_id}'")
+                if not (run_dir / "best.pt").exists():
+                    raise HTTPException(status_code=404, detail=f"Download best.pt into {run_dir} to use '{model_id}'")
+                cache[model_id] = ResearchPredictor(run_dir)
+        return cache[model_id]
+
+
+def _run_model(request: Request, pre_path: Path, post_path: Path, model_id: Optional[str] = None) -> dict:
+    """Run the selected (or startup) model, or a stub prediction on the real aligned images."""
+    predictor = _predictor(request, model_id)
     if predictor is not None:
-        return predictor.predict_from_files(pre_path, post_path)
+        result = predictor.predict_from_files(pre_path, post_path)
+        result["model_info"] = _model_info(predictor)
+        return result
 
     from dataloader.align import load_aligned_pair, read_rgb
     from inference.predict import create_stub_prediction
@@ -254,7 +319,7 @@ def _prediction_payload(request: Request, result: dict) -> dict:
 
     return {
         "ok": True,
-        "model": _model_info(request),
+        "model": result.get("model_info") or _model_info(None),
         "summary": {
             **vectors["summary"],
             "gsd_m": round(gsd_m, 3),

@@ -162,6 +162,8 @@ export default function App() {
 
   // Input: pick a mapped pair from the dataset, or upload files
   const [inputMode, setInputMode] = useState('dataset'); // 'dataset' | 'upload'
+  const [models, setModels] = useState([]);
+  const [modelId, setModelId] = useState('');
   const [aois, setAois] = useState([]);
   const [aoi, setAoi] = useState('');
   const [query, setQuery] = useState('');
@@ -198,6 +200,15 @@ export default function App() {
       .get(`${API_BASE}/health`)
       .then((res) => setApiStatus(res.data))
       .catch(() => setApiStatus({ status: 'error' }));
+
+    axios
+      .get(`${API_BASE}/models`)
+      .then((res) => {
+        const list = res.data.models || [];
+        setModels(list);
+        setModelId(res.data.default || (list.find((m) => m.available) || {}).id || '');
+      })
+      .catch(() => setModels([]));
 
     axios
       .get(`${API_BASE}/pairs/aois`)
@@ -275,6 +286,7 @@ export default function App() {
       form.append('pre_image', preFile);
       form.append('post_image', postFile);
     }
+    if (modelId) form.append('model', modelId);
 
     setLoading(true);
     setError(null);
@@ -547,6 +559,23 @@ export default function App() {
               </div>
             )}
 
+            {models.length > 0 && (
+              <select className="field" value={modelId} onChange={(e) => setModelId(e.target.value)} title="Model used for mapping">
+                {[...new Set(models.map((m) => m.group))].map((group) => (
+                  <optgroup key={group} label={group}>
+                    {models.filter((m) => m.group === group).map((m) => (
+                      <option key={m.id} value={m.id} disabled={!m.available}>
+                        {m.name}{m.available ? '' : ' — weights not downloaded'}
+                      </option>
+                    ))}
+                  </optgroup>
+                ))}
+              </select>
+            )}
+            {modelId.includes('ra_fusion') && (
+              <div className="note">RA-Fusion runs a large satellite backbone: about 1–2 minutes per tile on a CPU.</div>
+            )}
+
             <button className="btn-primary" onClick={handlePredict} disabled={loading || !canPredict}>
               {loading ? 'Running inference…' : 'Map flood damage'}
             </button>
@@ -692,6 +721,7 @@ export default function App() {
                 </div>
 
                 <div className="meta-line">
+                  {result.model?.name && !result.model.stub && <>{result.model.name} · </>}
                   GSD {summary.gsd_m} m/px
                   {summary.inference_s != null && ` · ${summary.inference_s} s`}
                   {result.pair && ` · ${result.pair.label.replace('.geojson', '')}`}

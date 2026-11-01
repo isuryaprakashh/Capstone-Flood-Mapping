@@ -58,3 +58,45 @@ def test_removed_routing_endpoints_are_gone(api_client: TestClient):
     """The route planner and demo sample endpoints were removed."""
     assert api_client.post("/api/route", data={}).status_code in (404, 405)
     assert api_client.get("/api/sample").status_code in (404, 405)
+
+
+def _research_run(root, run_id, model="snunet", with_weights=True):
+    import json
+
+    import torch
+    import yaml
+
+    from models import build_research_model
+    from training.engine import model_state
+
+    run = root / run_id
+    run.mkdir(parents=True)
+    run.joinpath("config.yaml").write_text(yaml.safe_dump({
+        "model": model, "model_kwargs": {}, "protocol": "P3", "seed": 0, "amp": False,
+        "eval": {"window": 64, "overlap": 16, "window_batch": 2},
+    }))
+    run.joinpath("metrics_val.json").write_text(json.dumps({"thresholds": {"building": 0.5}}))
+    if with_weights:
+        torch.save({"model": model_state(build_research_model(model))}, run / "best.pt")
+
+
+def test_models_list_and_research_model_prediction(api_client: TestClient, tmp_path, monkeypatch):
+    """Research runs are listed (available once best.pt exists) and selectable per request."""
+    import inference.research as research
+
+    monkeypatch.setattr(research, "RESEARCH_DIR", tmp_path)
+    _research_run(tmp_path, "p3_snunet_s0")
+    _research_run(tmp_path, "p3_ra_fusion_s0", model="ra_fusion", with_weights=False)
+
+    listed = {m["id"]: m for m in api_client.get("/api/models").json()["models"]}
+    assert listed["p3_snunet_s0"]["available"] and not listed["p3_ra_fusion_s0"]["available"]
+
+    files = lambda: {"pre_image": ("pre.tif", _geotiff_bytes(96, 0), "image/tiff"),
+                     "post_image": ("post.tif", _geotiff_bytes(96, 1), "image/tiff")}
+    res = api_client.post("/api/predict", files=files(), data={"model": "p3_snunet_s0"})
+    assert res.status_code == 200
+    assert res.json()["model"]["id"] == "p3_snunet_s0" and not res.json()["model"]["stub"]
+
+    missing = api_client.post("/api/predict", files=files(), data={"model": "p3_ra_fusion_s0"})
+    assert missing.status_code == 404 and "best.pt" in missing.json()["detail"]
+    assert api_client.post("/api/predict", files=files(), data={"model": "../x"}).status_code == 404
